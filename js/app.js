@@ -63,9 +63,9 @@ const S = {
   coach: 'Paco', team: 'Alevín 2º año',
   /* Equipos de Paco (entrenador de ejemplo). Los partidos son reales; la plantilla aún es de ejemplo. */
   teams: {
-    'Alevín 2º año': { cat: 'Alevín · F7', next: { h: '18:00', what: 'Entrenamiento', where: 'Campo 2' },
+    'Alevín 2º año': { cat: 'Alevín · F7', train: { dias: [1, 3], h: '18:00', where: 'Campo 2' },
       players: ['Lucas Romero', 'Hugo Sanz', 'Martín Gil', 'Pablo Ortega', 'Daniel Ruiz', 'Álvaro Vidal', 'Leo Navarro', 'Mateo Cano', 'Izan Molina', 'Adrián Prieto', 'Marcos León', 'Bruno Díez'] },
-    'Infantil': { cat: 'Infantil · F11', next: { h: '19:30', what: 'Entrenamiento', where: 'Campo 1' },
+    'Infantil': { cat: 'Infantil · F11', train: { dias: [1, 4], h: '19:30', where: 'Campo 1' },
       players: ['Sara Blanco', 'Nerea Gómez', 'Lucía Pastor', 'Carla Ibáñez', 'Alba Rubio', 'Irene Moya', 'Paula Crespo', 'Vega Herrero', 'Noa Garrido', 'Elena Soler'] }
   },
   attend: {},
@@ -178,16 +178,31 @@ const firstName = () => myName().split(' ')[0];
 const crestImg = (cls = '') => `<img class="cr ${cls}" src="${CREST}" alt="">`;
 
 
-/* Agenda: entrenos de ejemplo + partidos reales de los próximos 7 días */
-const WEEK = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() + i); return ISO(d); });
+/* Días de entreno: 1 = lunes … 7 = domingo (los elige la junta en cada equipo) */
+const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const DIAS_L = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados', 'domingos'];
+const dow = iso => (toDate(iso).getDay() + 6) % 7 + 1;
+const addDays = (iso, n) => { const d = toDate(iso); d.setDate(d.getDate() + n); return ISO(d); };
+const trainOf = team => S.teams[team] && S.teams[team].train && S.teams[team].train.dias.length ? S.teams[team].train : null;
+const trainsOn = (team, iso) => { const t = trainOf(team); return !!t && t.dias.includes(dow(iso)); };
+const trainLbl = t => ['Entrenamiento', t.h, t.where].filter(Boolean).join(' · ');
+/* Entrenos de la última semana (hoy incluido) en los que aún no se ha pasado lista */
+const pendingLists = team => {
+  const t = S.teams[team];
+  if (!trainOf(team) || !t.players.length) return [];
+  return [6, 5, 4, 3, 2, 1, 0].map(i => addDays(TODAY, -i)).filter(iso => trainsOn(team, iso) && !(S.attend[`${team} ${iso}`] || { size: 0 }).size);
+};
+const pendingAll = () => Object.keys(S.teams).flatMap(team => pendingLists(team).map(iso => ({ team, iso })));
+/* Agenda: entrenos y partidos reales de los próximos 7 días; tira de días de lunes a domingo */
+const WEEK = [...Array(7)].map((_, i) => addDays(TODAY, i));
+const MONWEEK = [...Array(7)].map((_, i) => addDays(TODAY, i - dow(TODAY) + 1));
 function buildAgenda() {
   const ev = [];
-  const trains = { 'Alevín 2º año': [0, 2], 'Infantil': [0, 3] };
-  for (const [team, days] of Object.entries(trains)) for (const i of days) {
-    const t = S.teams[team] && S.teams[team].next;
-    if (!t) continue;
-    ev.push({ iso: WEEK[i], day: i === 0 ? 'Hoy' : dayLbl(WEEK[i]), h: t.h, kind: 'train', team, where: t.where, today: i === 0 });
-  }
+  for (const team of Object.keys(S.teams)) WEEK.forEach((iso, i) => {
+    if (!trainsOn(team, iso)) return;
+    const t = trainOf(team);
+    ev.push({ iso, day: i === 0 ? 'Hoy' : dayLbl(iso), h: t.h || '--:--', kind: 'train', team, where: t.where || '', today: i === 0 });
+  });
   for (const e of D.equipos) for (const p of e.partidos)
     if (!p.descansa && p.fecha >= WEEK[0] && p.fecha <= WEEK[6]) ev.push({ iso: p.fecha, day: p.fecha === TODAY ? 'Hoy' : dayLbl(p.fecha), h: p.hora || '--:--', kind: 'match', team: e.nombre, p, e });
   return ev.sort((a, b) => (a.iso + a.h).localeCompare(b.iso + b.h));
@@ -198,7 +213,7 @@ function tabsFor() {
   const unread = S.notices.filter(n => !n.read).length;
   const open = S.requests.filter(r => r.st < 3).length;
   return S.role === 'coach'
-    ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team'], ['ask', 'Pedir', 'plus', 'plus'], ['msg', 'Mensajes', 'chat', '', unread]]
+    ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team', '', pendingAll().length], ['ask', 'Pedir', 'plus', 'plus'], ['msg', 'Mensajes', 'chat', '', unread]]
     : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Aviso', 'send', 'plus'], ['msg', 'Enviados', 'chat']];
 }
 
@@ -323,6 +338,25 @@ function noticeCard(n, cls = '') {
     <span class="eyebrow">${esc(n.from)}</span><h3 id="nt${n.id}">${esc(n.title)}</h3><p class="eyebrow nb">${esc(n.body)}</p></section>`;
 }
 
+/* Días, hora y campo de entreno de un equipo (lo edita la junta) */
+function trainCard(team) {
+  const t = trainOf(team) || { dias: [], h: '', where: '' };
+  return `<form id="tf" class="card stack" novalidate aria-labelledby="h-tr"><h2 id="h-tr" style="margin:0;font-size:1.1rem">Entrenamientos</h2>
+    <fieldset class="f"><legend>Días</legend><div class="chips">${DIAS.map((d, i) => `<label class="chip"><input type="checkbox" value="${i + 1}" ${t.dias.includes(i + 1) ? 'checked' : ''}> <span aria-hidden="true">${d}</span><span class="sr">${DIAS_L[i]}</span></label>`).join('')}</div></fieldset>
+    <div class="row2"><label class="f" for="th">Hora<input type="time" id="th" value="${esc(t.h || '')}"></label>
+    <label class="f" for="tw">Campo<input type="text" id="tw" value="${esc(t.where || '')}" placeholder="Campo 1"></label></div>
+    <button type="submit" class="btn blue block">${ic('check')} Guardar entrenamientos</button></form>`;
+}
+function bindTrain(team) {
+  $('#tf').onsubmit = async e => {
+    e.preventDefault();
+    const tr = { dias: [...document.querySelectorAll('#tf input[type=checkbox]:checked')].map(x => +x.value), h: $('#th').value, where: $('#tw').value.trim() };
+    try { API() && await API().entreno(team, tr); } catch (_) { say('No se ha podido guardar. Revisa la conexión.'); return; }
+    S.teams[team].train = tr; AGENDA = buildAgenda(); render();
+    say(tr.dias.length ? `${team} entrena los ${tr.dias.map(d => DIAS_L[d - 1]).join(', ').replace(/, ([^,]*)$/, ' y $1')}` : `${team} sin días de entreno`);
+  };
+}
+
 /* Plantilla: lista y alta/baja de jugadores (entrenador de ese equipo o junta) */
 function rosterCard(team) {
   const t = S.teams[team];
@@ -363,16 +397,19 @@ const COACH = {
     const notice = S.notices.find(n => !n.read) || S.notices[0];
     const nm = EQ[S.team] && nextMatch(EQ[S.team]);
     const mine2 = new Set(AGENDA.filter(x => x.kind === 'match' && S.teams[x.team]).map(x => x.iso));
+    const pend = pendingAll(), tt = trainsOn(S.team, TODAY) && trainOf(S.team);
     return {
       kicker: `${greet()},`, title: esc(myName()), layout: '',
       body: `
-      <div class="days" aria-label="Próximos 7 días">${WEEK.map((iso, i) => { const [w, n] = dayLbl(iso).split(' '); return `<span class="${i === 0 ? 'today' : ''} ${mine2.has(iso) ? 'has-match' : ''}">${w}<b>${n}</b></span>`; }).join('')}</div>
+      <div class="days" aria-label="Esta semana">${MONWEEK.map(iso => { const [w, n] = dayLbl(iso).split(' '); return `<span class="${iso === TODAY ? 'today' : ''} ${mine2.has(iso) ? 'has-match' : ''} ${Object.keys(S.teams).some(tm => trainsOn(tm, iso)) ? 'has-train' : ''}">${w}<b>${n}</b></span>`; }).join('')}</div>
+      ${pend.length ? `<section class="card pend" aria-labelledby="h-pend"><div class="card-h"><h2 id="h-pend">${pend.length === 1 ? 'Tienes 1 lista sin pasar' : `Tienes ${pend.length} listas sin pasar`}</h2></div>
+        <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
       <div class="grid coach-home">
         ${card('h-m', 'Próximo partido', `${scoreHTML(S.team)}
           <div class="match-btns"><button type="button" class="btn gold" data-say="La convocatoria llegará en la próxima versión.">Convocatoria</button>${nm && nm.campo ? `<a class="btn glass" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" data-say="Campo por confirmar">${ic('pin')}Cómo llegar</button>`}</div>`,
           'match a-match', nm ? `<span class="tag gold">${dateLbl(nm.fecha)}</span>` : '')}
         <section class="hero a-hero" aria-labelledby="h-hero">${crestImg('big-crest')}
-          <span class="kick">${t.next ? `Hoy · ${t.next.what} ${t.next.h} · ${t.next.where}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>
+          <span class="kick">${tt ? `Hoy · ${esc(trainLbl(tt))}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>
           <h2 id="h-hero">Semana de partido para el ${S.team}</h2>
           <p>${nm ? `El ${dateLbl(nm.fecha).toLowerCase()} ${nm.casa ? 'recibís al' : 'visitáis al'} ${esc(nice(nm.rival))}. ` : ''}Pasa lista hoy y prepara la convocatoria.</p>
           <div class="btns"><button type="button" class="btn gold" data-go="team:list">Pasar lista</button><button type="button" class="btn glass" data-go="ask:material">Pedir algo a la junta</button></div>
@@ -391,6 +428,7 @@ const COACH = {
       </div>`,
       bind() {
         bindAgenda();
+        document.querySelectorAll('[data-att]').forEach(b => b.onclick = () => { S.team = b.dataset.attTeam; S.attDate = b.dataset.att; go('team', 'list'); });
         document.querySelectorAll('[data-say]').forEach(b => b.onclick = () => say(b.dataset.say));
       }
     };
@@ -398,8 +436,14 @@ const COACH = {
   team() {
     const t = S.teams[S.team];
     const sub = S.sub || 'list';
-    const key = `${S.team} ${today()}`;
+    const pend = pendingLists(S.team);
+    const recent = S.attDate && S.attDate <= TODAY && S.attDate >= addDays(TODAY, -6) ? [S.attDate] : [];
+    const dates = [...new Set([...pend, ...recent, TODAY])].sort();
+    if (!dates.includes(S.attDate)) S.attDate = trainsOn(S.team, TODAY) || !pend.length ? TODAY : pend[pend.length - 1];
+    const date = S.attDate, isToday = date === TODAY;
+    const key = `${S.team} ${date}`;
     const a = S.attend[key] || (S.attend[key] = new Set());
+    const tt = trainsOn(S.team, date) && trainOf(S.team);
     const pct = () => t.players.length ? Math.round(a.size / t.players.length * 100) : 0;
     const head = `<div class="stack" style="margin-bottom:16px">
       <div class="chips" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n => `<button type="button" class="chip" data-team="${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>
@@ -407,8 +451,9 @@ const COACH = {
         `<button type="button" data-sub="${k}" aria-pressed="${sub === k}">${l}</button>`).join('')}</div></div>`;
     let body = '';
     if (sub === 'list') body = `<div class="split"><div class="stack">
-      <section class="card match" aria-label="Resumen de asistencia de hoy"><div class="att-top">
-        <div><span class="tag">${t.next ? `Hoy · ${t.next.h} · ${t.next.where}` : `Hoy · ${dateLbl(TODAY)}`}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
+      ${dates.length > 1 ? `<div class="chips" role="group" aria-label="Elige el entreno">${dates.map(d => `<button type="button" class="chip" data-date="${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
+      <section class="card match" aria-label="Resumen de asistencia"><div class="att-top">
+        <div><span class="tag">${isToday ? 'Hoy' : dateLbl(date)}${tt ? ` · ${esc([tt.h, tt.where].filter(Boolean).join(' · '))}` : ''}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
         <button type="button" class="btn gold" id="all">${ic('check')} Marcar a todos</button></div>
         <div class="progress" aria-hidden="true"><i id="bar" style="width:${pct()}%"></i></div></section>
       <p class="muted" style="margin:0">Toca a cada jugador que ha venido. Se guarda solo.</p>
@@ -425,12 +470,13 @@ const COACH = {
       kicker: `Mi equipo · ${EQ[S.team] ? EQ[S.team].cat : t.cat}`, title: S.team,
       body: head + body,
       bind() {
-        document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; render(); });
+        document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; S.attDate = null; render(); });
+        document.querySelectorAll('[data-date]').forEach(b => b.onclick = () => { S.attDate = b.dataset.date; render(); });
         document.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { S.sub = b.dataset.sub; render(); });
         bindRoster(S.team);
         document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
           const i = +b.dataset.p; a.has(i) ? a.delete(i) : a.add(i);
-          API() && API().asistencia(i, TODAY, a.has(i)).catch(() => { a.has(i) ? a.delete(i) : a.add(i); render(); say('No se ha podido guardar. Revisa la conexión.'); });
+          API() && API().asistencia(i, date, a.has(i)).catch(() => { a.has(i) ? a.delete(i) : a.add(i); render(); say('No se ha podido guardar. Revisa la conexión.'); });
           b.setAttribute('aria-pressed', a.has(i));
           b.querySelector('.pstate').textContent = a.has(i) ? 'Ha venido' : 'Sin marcar';
           $('#cnt').innerHTML = `${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; $('#bar').style.width = pct() + '%';
@@ -442,8 +488,8 @@ const COACH = {
         if (all) all.onclick = () => {
           const prev = new Set(a), added = t.players.filter(p => !a.has(p.id)).map(p => p.id);
           added.forEach(i => a.add(i)); render();
-          API() && Promise.all(added.map(i => API().asistencia(i, TODAY, true))).catch(() => say('No se ha podido guardar. Revisa la conexión.'));
-          say('Todos marcados como presentes', () => { S.attend[key] = prev; API() && added.forEach(i => API().asistencia(i, TODAY, false)); });
+          API() && Promise.all(added.map(i => API().asistencia(i, date, true))).catch(() => say('No se ha podido guardar. Revisa la conexión.'));
+          say('Todos marcados como presentes', () => { S.attend[key] = prev; API() && added.forEach(i => API().asistencia(i, date, false)); });
         };
       }
     };
@@ -628,8 +674,9 @@ const BOARD = {
     }
     if (S.sub && S.sub.startsWith('eq:')) {
       const team = S.sub.slice(3);
-      S.teams[team] = S.teams[team] || { cat: (EQ[team] || {}).cat || '', next: null, players: [] };
-      return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), layout: 'narrow', back: () => go('team'), body: rosterCard(team), bind: () => bindRoster(team) };
+      S.teams[team] = S.teams[team] || { cat: (EQ[team] || {}).cat || '', train: null, players: [] };
+      return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), layout: 'narrow', back: () => go('team'),
+        body: `<div class="stack">${trainCard(team)}${rosterCard(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); } };
     }
     const all = D.equipos.flatMap(e => played(e));
     const wins = all.filter(p => outcome(p) === 'G').length;
