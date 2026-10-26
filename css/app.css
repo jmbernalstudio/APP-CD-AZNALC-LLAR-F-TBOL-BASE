@@ -7,8 +7,8 @@
   --ink: #0E1530;
   --muted: #5B6582;
   --line: #E6EAF2;
-  --club: #0047A0;
-  --club-soft: #E7EEFA;
+  --club: #0034DF;
+  --club-soft: #E6EBFD;
   --navy: #071A40;
   --gold: #FDCB2B;
   --gold-ink: #241A00;
@@ -87,8 +87,8 @@ main.narrow { max-width: 680px; }
 /* Marcador */
 .match { position: relative; overflow: hidden; color: #fff; background:
   radial-gradient(80% 70% at 100% 0%, rgba(253, 203, 43, .28), transparent 60%),
-  radial-gradient(70% 80% at 0% 100%, rgba(0, 120, 255, .45), transparent 60%),
-  linear-gradient(150deg, #0A3C8C, var(--navy)); }
+  radial-gradient(70% 80% at 0% 100%, rgba(60, 110, 255, .5), transparent 60%),
+  linear-gradient(150deg, #0034DF, var(--navy)); }
 .match::after { content: ""; position: absolute; right: -40px; top: -20px; width: 220px; height: 240px; background: url("../icons/escudo.png") center / contain no-repeat; opacity: .09; pointer-events: none; }
 .match > * { position: relative; z-index: 1; }
 .tag { display: inline-flex; align-items: center; gap: 6px; font-size: .75rem; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, .14); white-space: nowrap; }
@@ -130,7 +130,7 @@ main.narrow { max-width: 680px; }
 
 /* Banner */
 .hero { position: relative; overflow: hidden; border-radius: 28px; color: #fff; padding: 34px 36px; min-height: 260px; flex-direction: column; justify-content: center; gap: 14px;
-  background: conic-gradient(from 200deg at 85% 60%, #0047A0, #2A7BFF, #FDCB2B, #FF8A3D, #0047A0) right / 60% 100% no-repeat, #050E24; }
+  background: conic-gradient(from 200deg at 85% 60%, #0034DF, #4D7BFF, #FDCB2B, #FF8A3D, #0034DF) right / 60% 100% no-repeat, #050E24; }
 .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, #050E24 40%, rgba(5, 14, 36, .2) 70%, transparent); }
 .hero .big-crest { position: absolute; right: 30px; bottom: -30px; width: 240px; filter: drop-shadow(0 20px 40px rgba(0, 0, 0, .5)); transform: rotate(-6deg); }
 .hero > *:not(.big-crest) { position: relative; z-index: 1; max-width: 430px; }
@@ -178,7 +178,7 @@ main.narrow { max-width: 680px; }
 .last b { margin-left: auto; }
 
 /* Aviso */
-.media { border-radius: 18px; height: 130px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0047A0, #2A7BFF 55%, #FDCB2B); display: grid; place-items: center; margin-bottom: 10px; }
+.media { border-radius: 18px; height: 130px; position: relative; overflow: hidden; background: linear-gradient(135deg, #0034DF, #4D7BFF 55%, #FDCB2B); display: grid; place-items: center; margin-bottom: 10px; }
 .media img { width: 70px; filter: drop-shadow(0 10px 20px rgba(0, 0, 0, .35)); }
 .media .lbl { position: absolute; left: 12px; bottom: 12px; background: rgba(255, 255, 255, .92); color: var(--ink); border-radius: 999px; padding: 4px 10px; font-size: .75rem; font-weight: 700; display: flex; gap: 6px; align-items: center; }
 .media .lbl .i { width: 16px; height: 16px; }
