@@ -136,6 +136,44 @@ const CREST_SRC = CREST;
 const CLUB = 'C.D. Aznalcóllar';
 const greet = () => { const h = new Date().getHours(); return h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches'; };
 const myName = () => S.live ? S.me.nombre : S.role === 'coach' ? S.me.nombre : S.board;
+const roleName = () => S.role === 'coach' ? 'Entrenador' : 'Junta directiva';
+const myPerson = () => S.live ? S.me : { nombre: myName(), foto: null };
+/* Foto de la persona, o sus iniciales si la junta aún no ha subido ninguna */
+const avatar = (p, cls) => p.foto ? `<span class="${cls} ph" aria-hidden="true"><img src="${esc(p.foto)}" alt=""></span>` : `<span class="${cls}" aria-hidden="true">${esc(initials(p.nombre))}</span>`;
+function bindMe() {
+  const b = $('#me'), m = $('#me-menu');
+  const close = () => { m.hidden = true; b.setAttribute('aria-expanded', 'false'); };
+  b.onclick = e => { e.stopPropagation(); m.hidden = !m.hidden; b.setAttribute('aria-expanded', String(!m.hidden)); if (!m.hidden) m.querySelector('button').focus(); };
+  m.onclick = e => e.stopPropagation();
+  m.onkeydown = e => { if (e.key === 'Escape') { close(); b.focus(); } };
+  document.onclick = close;
+  if ($('#logout')) $('#logout').onclick = () => window.logout && window.logout();
+  m.querySelectorAll('[data-role]').forEach(x => x.onclick = () => { S.role = x.dataset.role; go('home'); });
+}
+/* Reduce la foto a 192 px (JPEG) para guardarla junto al perfil */
+function readPhoto(file) {
+  return new Promise((ok, ko) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const n = 192, c = document.createElement('canvas'), sz = Math.min(img.width, img.height);
+      c.width = c.height = n;
+      c.getContext('2d').drawImage(img, (img.width - sz) / 2, (img.height - sz) / 2, sz, sz, 0, 0, n, n);
+      URL.revokeObjectURL(url); ok(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.onerror = ko; img.src = url;
+  });
+}
+function photoField(foto, nombre) {
+  return `<label class="photo" for="fo">${avatar({ foto, nombre: nombre || '?' }, 'av')}<span id="fo-t">${foto ? 'Foto añadida · toca para cambiarla' : 'Añadir foto (opcional)'}</span></label>
+    <input type="file" id="fo" accept="image/*" class="sr">`;
+}
+function bindPhoto(state) {
+  $('#fo').onchange = async () => {
+    const f = $('#fo').files[0]; if (!f) return;
+    try { state.foto = await readPhoto(f); } catch (_) { say('No se ha podido leer esa foto. Prueba con otra.'); return; }
+    const l = $('label[for=fo]'); l.querySelector('.av').outerHTML = avatar({ foto: state.foto }, 'av'); $('#fo-t').textContent = 'Foto añadida · toca para cambiarla';
+  };
+}
 const firstName = () => myName().split(' ')[0];
 const crestImg = (cls = '') => `<img class="cr ${cls}" src="${CREST}" alt="">`;
 
@@ -179,7 +217,14 @@ function render(focus) {
     ${v.back ? `<button type="button" class="back" data-back aria-label="Volver">${ic('back')}</button>` : crestImg('logo')}
     <div class="title"><small>${v.kicker}</small><h1 id="title">${v.title}</h1></div>
     ${S.role === 'coach' ? `<button type="button" class="iconbtn" data-go="msg" aria-label="Mensajes${unread ? `, ${unread} sin leer` : ''}">${ic('bell')}${unread ? '<span class="dot"></span>' : ''}</button>` : ''}
-    <div class="who"><div><small>${S.role === 'coach' ? 'Entrenador' : 'Junta directiva'}</small><b>${esc(myName())}</b></div><span class="av" aria-hidden="true">${esc(initials(myName()))}</span></div>`;
+    <div class="me-wrap"><button type="button" class="me" id="me" aria-haspopup="true" aria-expanded="false" aria-controls="me-menu" aria-label="Tu cuenta: ${esc(myName())}">
+      <span class="me-t"><small>${roleName()}</small><b>${esc(myName())}</b></span>${avatar(myPerson(), 'av')}</button>
+      <div class="me-menu card" id="me-menu" hidden>${avatar(myPerson(), 'av big')}<b>${esc(myName())}</b><small>${roleName()}</small>
+        ${S.live ? `<button type="button" class="btn out block" id="logout">Salir</button>`
+          : `<div class="stack" style="width:100%;gap:8px"><small>Demostración · ver como</small>
+            <button type="button" class="btn ${S.role === 'coach' ? 'blue' : 'out'} block" data-role="coach">Entrenador</button>
+            <button type="button" class="btn ${S.role === 'board' ? 'blue' : 'out'} block" data-role="board">Junta</button></div>`}</div></div>`;
+  bindMe();
   $('#main').className = v.layout || '';
   $('#main').innerHTML = v.body;
   v.bind && v.bind();
@@ -488,9 +533,9 @@ const coachCount = () => S.people.filter(p => p.rol === 'entrenador').length;
 const teamOf = id => (D.equipos.find(e => e.id === id) || {}).nombre || id;
 /* Entrenadores y junta con sus equipos; alta de cuentas nuevas */
 function peopleCard() {
-  return card('h-pp', `Entrenadores y accesos · ${S.people.length}`, (S.people.length ? S.people.map(p => `<div class="tm"><span class="av" aria-hidden="true">${esc(initials(p.nombre))}</span>
+  return card('h-pp', `Entrenadores y accesos · ${S.people.length}`, (S.people.length ? S.people.map(p => `<div class="tm">${avatar(p, 'av')}
     <div class="grow"><b title="${esc(p.nombre)}">${esc(p.nombre)}</b><small title="${esc(p.usuario)}">${p.rol === 'junta' ? 'Junta directiva' : p.equipos.length ? p.equipos.map(teamOf).join(', ') : 'Sin equipo asignado'} · ${esc(p.usuario)}</small></div>
-    ${p.id !== S.me.id ? `<button type="button" class="more" data-pw="${p.id}" aria-label="Nueva contraseña para ${esc(p.nombre)}">Contraseña</button>` : ''}</div>`).join('') : '<p class="muted" style="margin:0">Aún no hay nadie dado de alta.</p>'),
+    <button type="button" class="more" data-pw="${p.id}" aria-label="Cambiar foto o contraseña de ${esc(p.nombre)}">Editar</button></div>`).join('') : '<p class="muted" style="margin:0">Aún no hay nadie dado de alta.</p>'),
     'a-people', '<button type="button" class="more" data-go="team:alta">Dar de alta</button>');
 }
 function bindPeople() {
@@ -498,22 +543,30 @@ function bindPeople() {
 }
 function claveForm(p) {
   return `<form id="cf" class="card stack" novalidate>
-    <p style="margin:0">Escribe una contraseña nueva para <b>${esc(p.nombre)}</b> y dísela en persona. Entrará con “${esc(p.usuario)}”.</p>
-    <label class="f" for="cp">Contraseña nueva<span class="hint">Mínimo 8 caracteres</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
+    <p style="margin:0">Entra con “${esc(p.usuario)}”.</p>
+    ${photoField(p.foto, p.nombre)}
+    <label class="f" for="cp">Contraseña nueva<span class="hint">Déjala vacía para no cambiarla</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
     <p id="cerr" class="err" role="alert" hidden></p>
-    <button type="submit" class="btn blue block">${ic('check')} Guardar contraseña</button></form>`;
+    <button type="submit" class="btn blue block">${ic('check')} Guardar</button></form>`;
 }
 function bindClave(p) {
+  const st = { foto: p.foto };
+  bindPhoto(st);
   $('#cf').onsubmit = async e => {
     e.preventDefault();
     const pw = $('#cp').value, err = m => { $('#cerr').textContent = m; $('#cerr').hidden = false; };
-    if (pw.length < 8) return err('La contraseña debe tener al menos 8 caracteres.');
-    try { API() && await API().clave(p.id, pw); } catch (_) { return err('No se ha podido cambiar. Revisa la conexión.'); }
-    go('team'); say(`Contraseña cambiada. Dísela a ${p.nombre.split(' ')[0]}.`);
+    if (pw && pw.length < 8) return err('La contraseña debe tener al menos 8 caracteres.');
+    try {
+      if (pw && API()) await API().clave(p.id, pw);
+      if (st.foto !== p.foto && API()) await API().foto(p.id, st.foto);
+    } catch (_) { return err('No se ha podido guardar. Revisa la conexión.'); }
+    p.foto = st.foto; if (p.id === S.me.id) S.me.foto = st.foto;
+    go('team'); say(pw ? `Guardado. Dale la contraseña nueva a ${p.nombre.split(' ')[0]}.` : 'Guardado.');
   };
 }
 function altaForm() {
   return `<form id="af" class="card stack" novalidate>
+    ${photoField(null, '')}
     <label class="f" for="an">Nombre y apellidos<input type="text" id="an" autocomplete="off" required></label>
     <label class="f" for="au">Usuario o correo<span class="hint">Sin correo: p. ej. manolo.alevin</span><input type="text" id="au" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
     <label class="f" for="ap">Contraseña<span class="hint">Mínimo 8 caracteres</span><input type="text" id="ap" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
@@ -525,7 +578,8 @@ function altaForm() {
     <button type="submit" class="btn blue block">${ic('check')} Dar de alta</button></form>`;
 }
 function bindAlta() {
-  const f = $('#af');
+  const f = $('#af'), st = { foto: null };
+  bindPhoto(st);
   f.querySelectorAll('[name=ar]').forEach(r => r.onchange = () => { $('#aeq').hidden = f.querySelector('[name=ar]:checked').value === 'junta'; });
   f.onsubmit = async e => {
     e.preventDefault();
@@ -538,7 +592,8 @@ function bindAlta() {
     if (p.clave.length < 8) return err('La contraseña debe tener al menos 8 caracteres.');
     if (rol === 'entrenador' && !p.equipos.length) return err('Marca al menos un equipo.');
     try { p.id = API() ? await API().alta(p) : String(Date.now()); } catch (x) { return err(/existe/.test(x.message) ? 'Ese usuario ya existe. Elige otro.' : 'No se ha podido dar de alta. Revisa la conexión.'); }
-    S.people.push({ id: p.id, nombre: p.nombre, usuario: p.usuario, rol, equipos: p.equipos });
+    if (st.foto) try { API() && await API().foto(p.id, st.foto); } catch (_) { st.foto = null; say('Alta hecha, pero la foto no se ha guardado. Súbela desde “Editar”.'); }
+    S.people.push({ id: p.id, nombre: p.nombre, usuario: p.usuario, rol, equipos: p.equipos, foto: st.foto });
     go('team'); say(`${p.nombre} ya puede entrar con “${p.usuario}” y su contraseña.`);
   };
 }
@@ -569,7 +624,7 @@ const BOARD = {
     if (S.sub === 'alta') return { kicker: 'Equipos · Accesos', title: 'Dar de alta', layout: 'narrow', back: () => go('team'), body: altaForm(), bind: bindAlta };
     if (S.sub && S.sub.startsWith('pw:')) {
       const p = S.people.find(x => x.id === S.sub.slice(3));
-      return { kicker: 'Equipos · Accesos', title: 'Cambiar contraseña', layout: 'narrow', back: () => go('team'), body: claveForm(p), bind: () => bindClave(p) };
+      return { kicker: 'Equipos · Accesos', title: esc(p.nombre), layout: 'narrow', back: () => go('team'), body: claveForm(p), bind: () => bindClave(p) };
     }
     if (S.sub && S.sub.startsWith('eq:')) {
       const team = S.sub.slice(3);
@@ -627,13 +682,6 @@ function bindGo() {
 }
 
 document.addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); });
-function setRole(r) {
-  S.role = r; $('#role-coach').setAttribute('aria-pressed', r === 'coach'); $('#role-board').setAttribute('aria-pressed', r === 'board'); go('home');
-}
-$('#role-coach').onclick = () => setRole('coach');
-$('#role-board').onclick = () => setRole('board');
-$('#bigtext').onchange = e => { document.documentElement.classList.toggle('big', e.target.checked); try { localStorage.setItem('big', e.target.checked ? '1' : ''); } catch (_) {} };
-try { if (localStorage.getItem('big')) { $('#bigtext').checked = true; document.documentElement.classList.add('big'); } } catch (_) {}
 if (window.SERVIDOR_ON) window.startServer();
 else { load(); render(); }
 

@@ -21,6 +21,7 @@ create table if not exists public.perfiles (
   rol     text not null default 'entrenador' check (rol in ('entrenador', 'junta')),
   creado  timestamptz not null default now()
 );
+alter table public.perfiles add column if not exists foto text;  -- foto pequeña (JPEG 192 px) que sube la junta
 
 create table if not exists public.entrenador_equipo (
   perfil uuid references public.perfiles on delete cascade,
