@@ -257,3 +257,41 @@ nav.tabs .center[aria-current="page"]::after { background: var(--gold-ink); }
   main > *:nth-child(2) { animation-delay: .05s; } main > *:nth-child(3) { animation-delay: .1s; } main > *:nth-child(4) { animation-delay: .15s; }
   @keyframes rise { from { transform: translateY(10px); opacity: .4; } to { transform: none; opacity: 1; } }
 }
+
+/* ---------- Tablet y escritorio ---------- */
+nav.tabs .brand { display: none; }
+
+@media (min-width: 720px) {
+  .shell { max-width: 920px; }
+  .hero { border-radius: 0 0 40px 40px; padding-block: 1.4rem 2.2rem; }
+  .hero h1 { font-size: 4rem; }
+  .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tile.wide { grid-column: auto; flex-direction: column; align-items: flex-start; justify-content: space-between; min-height: 150px; }
+  .cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .teams { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); }
+  .grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  main.narrow { max-width: 640px; }
+  nav.tabs ul { max-width: 600px; }
+}
+
+@media (min-width: 1024px) {
+  /* Menú lateral fijo a la izquierda */
+  nav.tabs { top: 0; right: auto; width: 248px; padding: calc(1.2rem + env(safe-area-inset-top, 0px)) 0 1.2rem max(14px, env(safe-area-inset-left, 0px));
+    display: flex; flex-direction: column; gap: 1.6rem; }
+  nav.tabs .brand { display: flex; align-items: center; gap: .7rem; padding: 0 .6rem; pointer-events: auto; }
+  nav.tabs .brand .crest { width: 52px; height: 62px; filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .45)); }
+  nav.tabs ul { flex: 1; margin: 0; max-width: none; display: flex; flex-direction: column; align-items: stretch; gap: .4rem; padding: .7rem; border-radius: 26px; }
+  nav.tabs li:has(.center) { order: -1; margin-bottom: .6rem; }
+  nav.tabs button { flex-direction: row; justify-content: flex-start; gap: .9rem; min-height: 58px; padding: 0 1rem; font-size: 1rem; border-radius: 18px; }
+  nav.tabs .center { transform: none; min-height: 64px; font-family: var(--display); font-weight: 800; text-transform: uppercase; font-size: 1.2rem; }
+  nav.tabs button[aria-current="page"]::after { left: 0; bottom: auto; top: 50%; transform: translateY(-50%); width: 4px; height: 26px; }
+  nav.tabs .badge { position: static; margin-left: auto; border: 0; }
+  .shell { max-width: 1180px; margin-left: 264px; margin-right: auto; padding: 0 1.5rem 3rem; }
+  .shell > .demo, .shell > main { padding-left: 0; padding-right: 0; }
+  .hero { margin-top: .4rem; border-radius: 36px; padding-left: 2.2rem; padding-right: 2.2rem; }
+  .hero .hero-top { display: none; }
+  .hero h1 { margin-top: .4rem; font-size: 4.6rem; }
+  main.split { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 1.7rem 2rem; align-items: start; }
+  .cards { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
+  .toast { left: calc(50% + 124px); bottom: 1.5rem; }
+}

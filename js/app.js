@@ -123,6 +123,7 @@ function render(focus) {
     <div class="hero-top">${crest()}<div class="club-name">CD Aznalcóllar<small>Fútbol base · ${S.role === 'coach' ? 'Entrenadores' : 'Junta directiva'}</small></div></div>
     ${v.back ? `<button type="button" class="back" data-back>${ic('back')} Volver</button>` : ''}
     <h1 id="title">${v.title}</h1>${v.sub ? `<p>${v.sub}</p>` : ''}`;
+  $('#main').className = 'pad ' + (v.layout || '');
   $('#main').innerHTML = v.body;
   v.bind && v.bind();
   if (v.back) $('[data-back]').onclick = v.back;
@@ -182,7 +183,7 @@ const COACH = {
             ${stepsHTML(r)}
           </article>`).join('') : '<p class="muted">No tienes peticiones abiertas.</p>'}</div>
       </section>`,
-      bind: bindGo
+      bind: bindGo, layout: 'split'
     };
   },
   team() {
@@ -235,7 +236,7 @@ const COACH = {
       <p class="muted" style="margin:.5rem 0 0;font-weight:700">Paso ${d.step} de 3 · ${['¿Qué necesitas?', 'Cuéntanos', 'Revisa y envía'][d.step - 1]}</p></div>`;
     const back = d.step > 1 && d.step < 4 ? () => { d.step--; render(true); } : null;
     if (d.step === 1) return {
-      title: 'Pedir o <em>avisar</em>', sub: 'La junta lo recibe al momento', back,
+      title: 'Pedir o <em>avisar</em>', sub: 'La junta lo recibe al momento', back, layout: 'narrow',
       body: `${stepper}<div class="stack">
         <button type="button" class="btn opt" data-k="material"><span class="ti">${ic('box')}</span><span><b>Pedir material</b><small>Balones, petos, conos, botiquín…</small></span></button>
         <button type="button" class="btn opt" data-k="roto"><span class="ti">${ic('wrench')}</span><span><b>Algo roto</b><small>Porterías, luces, vestuarios…</small></span></button>
@@ -243,7 +244,7 @@ const COACH = {
       bind() { document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { d.kind = b.dataset.k; d.step = 2; render(true); }); }
     };
     if (d.step === 2) return {
-      title: kindName(d.kind), sub: S.team, back,
+      title: kindName(d.kind), sub: S.team, back, layout: 'narrow',
       body: `${stepper}<form id="f" class="stack" novalidate>
         <label class="f" for="t">${d.kind === 'roto' ? '¿Qué se ha roto?' : d.kind === 'material' ? '¿Qué necesitas?' : '¿Qué quieres decir a la junta?'}
           <span class="hint">${ic('mic')} Con una frase basta. Puedes dictarlo con el micrófono del teclado.</span>
@@ -264,7 +265,7 @@ const COACH = {
       }
     };
     if (d.step === 3) return {
-      title: 'Revisa y <em>envía</em>', sub: 'Así lo verá la junta', back,
+      title: 'Revisa y <em>envía</em>', sub: 'Así lo verá la junta', back, layout: 'narrow',
       body: `${stepper}<article class="glass req">
         <div class="req-head"><span class="ti">${ic(kindIco(d.kind))}</span><div class="grow"><strong>${esc(d.text)}</strong>
         <span class="muted">${kindName(d.kind)} · ${S.team}${d.where ? ' · ' + esc(d.where) : ''}</span></div>${d.urgent ? '<span class="pill bad">Urgente</span>' : ''}</div>
@@ -278,7 +279,7 @@ const COACH = {
       }
     };
     return {
-      title: '¡<em>Enviado</em>!', sub: 'La junta ya lo tiene',
+      title: '¡<em>Enviado</em>!', sub: 'La junta ya lo tiene', layout: 'narrow',
       body: `<div class="done"><span class="ring">${ic('check')}</span><h2>Recibido</h2>
         <p style="margin:0;max-width:30ch">Verás cómo avanza en <strong>Inicio</strong>, en “Mis peticiones”. Te avisaremos cuando esté resuelta.</p></div>
         <button type="button" class="btn gold" data-go="home">Volver al inicio</button>`,
@@ -288,7 +289,7 @@ const COACH = {
   msg() {
     return {
       title: 'Mensajes', sub: 'Avisos del club y de la junta',
-      body: `<div class="stack">${S.notices.map(n => `
+      body: `<div class="stack grid2">${S.notices.map(n => `
         <article class="glass stack ${n.read ? '' : 'unread'}" aria-labelledby="n${n.id}">
           <div class="req-head"><span class="ti">${ic('bell')}</span><div class="grow"><strong id="n${n.id}">${esc(n.title)}</strong><span class="muted">De ${esc(n.from)}</span></div>
           ${n.read ? '<span class="pill ok">Leído</span>' : '<span class="pill warn">Nuevo</span>'}</div>
@@ -312,7 +313,7 @@ const BOARD = {
           <div class="kpi"><b>${open.length}</b><span>Abiertas</span></div>
           <div class="kpi hot"><b>${open.filter(r => r.urgent).length}</b><span>Urgentes</span></div>
           <div class="kpi"><b>${S.requests.filter(r => r.st === 0).length}</b><span>Sin ver</span></div></div>
-        <section aria-labelledby="h-in"><h2 id="h-in">Peticiones y avisos</h2><div class="stack">${order.map(r => `
+        <section aria-labelledby="h-in"><h2 id="h-in">Peticiones y avisos</h2><div class="stack grid2">${order.map(r => `
           <article class="glass req ${r.urgent && r.st < 3 ? 'urgent' : ''}" aria-labelledby="r${r.id}">
             <div class="req-head"><span class="ti">${ic(kindIco(r.kind))}</span>
               <div class="grow"><strong id="r${r.id}">${esc(r.title)}</strong><span class="muted">${r.by} · ${r.team}${r.where ? ' · ' + esc(r.where) : ''} · ${r.when}</span></div>
@@ -330,7 +331,7 @@ const BOARD = {
     const rows = [['Alevín A', 'Paco Martín', 12, 86], ['Infantil B', 'Paco Martín', 10, 91], ['Cadete A', 'Raquel Torres', 16, 78], ['Benjamín C', 'Manolo Fuentes', 11, 94], ['Juvenil A', 'Iker Domínguez', 18, 72]];
     return {
       title: 'Los <em>equipos</em>', sub: `${rows.length} equipos · asistencia del último mes`,
-      body: `<div class="stack">${rows.map(([t, c, n, p]) => `<div class="glass">
+      body: `<div class="stack grid2">${rows.map(([t, c, n, p]) => `<div class="glass">
         <div class="row">${kit()}<div class="grow"><strong style="font-family:var(--display);font-size:1.3rem;text-transform:uppercase">${t}</strong><br><span class="muted">${c} · ${n} jugadores</span></div>
         <span class="pill ${p >= 85 ? 'ok' : p >= 75 ? 'warn' : 'bad'}">${p}%</span></div>
         <div class="bar" role="img" aria-label="Asistencia ${p}%"><i style="width:${p}%"></i></div></div>`).join('')}</div>`
@@ -339,6 +340,7 @@ const BOARD = {
   ask() {
     return {
       title: 'Enviar <em>aviso</em>', sub: 'Llega al móvil de los entrenadores',
+      layout: 'narrow',
       body: `<form id="nf" class="stack" novalidate>
         <label class="f" for="to">¿A quién?<select id="to"><option>Todos los entrenadores (24)</option><option>Fútbol base (14)</option><option>Categoría alevín (4)</option><option>Solo a Paco Martín</option></select></label>
         <label class="f" for="nt">Título<input type="text" id="nt" value="Reunión de entrenadores"></label>
@@ -353,7 +355,7 @@ const BOARD = {
   msg() {
     return {
       title: 'Avisos <em>enviados</em>', sub: 'Quién los ha leído',
-      body: `<div class="stack">${S.notices.map(n => `<article class="glass stack">
+      body: `<div class="stack grid2">${S.notices.map(n => `<article class="glass stack">
         <div class="req-head"><span class="ti">${ic('bell')}</span><div class="grow"><strong>${esc(n.title)}</strong><span class="muted">${esc(n.body)}</span></div></div>
         <div><div class="score"><span class="muted">Leído por</span><b style="font-family:var(--display);font-size:1.6rem">${n.readBy} / ${n.total}</b></div>
         <div class="bar" aria-hidden="true"><i style="width:${n.readBy / n.total * 100}%"></i></div></div></article>`).join('')}</div>`
@@ -373,6 +375,7 @@ $('#role-coach').onclick = () => setRole('coach');
 $('#role-board').onclick = () => setRole('board');
 $('#bigtext').onchange = e => { document.documentElement.classList.toggle('big', e.target.checked); try { localStorage.setItem('big', e.target.checked ? '1' : ''); } catch (_) {} };
 try { if (localStorage.getItem('big')) { $('#bigtext').checked = true; document.documentElement.classList.add('big'); } } catch (_) {}
+$('#brand-crest').innerHTML = crest();
 load();
 render();
 
