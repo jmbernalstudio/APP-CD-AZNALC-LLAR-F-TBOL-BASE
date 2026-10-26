@@ -1,0 +1,359 @@
+"""Descarga los equipos del club desde las dos webs oficiales y genera js/datos.js.
+
+Solo usa www.rfaf.es (y su almacén de escudos rfaf.filesnovanet.es) y educationleague.es.
+
+    python3 herramientas/actualizar.py
+
+Necesita Python 3, BeautifulSoup (bs4) y Pillow.
+"""
+import http.cookiejar
+import io
+import json
+import re
+import ssl
+import sys
+import time
+import unicodedata
+import urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+from bs4 import BeautifulSoup
+from PIL import Image
+
+RAIZ = Path(__file__).resolve().parent.parent
+DIR_ESCUDOS = RAIZ / 'icons' / 'escudos'
+RFAF = 'https://www.rfaf.es/pnfg/NPcd/'
+EDUCA = 'https://educationleague.es/'
+TEMPORADA_RFAF = 22  # 2026-2027
+
+EQUIPOS = [
+    dict(id='senior', nombre='Senior', cat='3ª Andaluza Senior · Grupo 5', web='rfaf', comp=48466186, grupo=48466191, jornadas=30),
+    dict(id='juvenil', nombre='Juvenil', cat='4ª Andaluza Juvenil · Grupo 11', web='rfaf', comp=48466231, grupo=48466242, jornadas=26),
+    dict(id='infantil', nombre='Infantil', cat='4ª Andaluza Infantil · Grupo 2', web='rfaf', comp=48466271, grupo=48466273, jornadas=30),
+    dict(id='alevin2', nombre='Alevín 2º año', cat='4ª Andaluza Alevín · Grupo 2', web='rfaf', comp=48466388, grupo=48466390, jornadas=22),
+    dict(id='benjamin2', nombre='Benjamín 2º año', cat='4ª Andaluza Benjamín · Grupo 2', web='rfaf', comp=48466406, grupo=48466408, jornadas=26),
+    dict(id='benjamin1', nombre='Benjamín 1º año', cat='4ª Andaluza Benjamín · Grupo 10', web='rfaf', comp=48466406, grupo=48466416, jornadas=26),
+    dict(id='cadete', nombre='Cadete F-7', cat='Liga Educa · Cadete F-7 · Grupo 1', web='educa', age=81, gro1=451, sea=1834, sta=2267, jornadas=21),
+    dict(id='alevin1', nombre='Alevín 1º año', cat='Liga Educa · Alevín 1º año · Grupo 1', web='educa', age=77, gro1=466, sea=1832, sta=2259, jornadas=21),
+    dict(id='prebenjamin', nombre='Prebenjamín 2º año', cat='Liga Educa · Prebenjamín 2º año · Grupo 2', web='educa', age=73, gro1=475, sea=1830, sta=2253, jornadas=15),
+    dict(id='minis', nombre='Minis', cat='Liga Educa · Minis · Grupo 1', web='educa', age=72, gro1=474, sea=1828, sta=2244, jornadas=15),
+]
+
+NOSOTROS = re.compile(r'AZNALC', re.I)
+CTX = ssl.create_default_context()
+# La RFAF necesita una sesión (cookie) antes de enseñar las jornadas
+ABRIDOR = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()),
+                                      urllib.request.HTTPSHandler(context=CTX))
+
+
+def bajar(url, binario=False, minimo=0):
+    """Descarga con reintentos. La RFAF a veces responde vacío: eso también se reintenta."""
+    for intento in range(6):
+        try:
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0 (club CD Aznalcollar FB)'})
+            with ABRIDOR.open(req, timeout=40) as r:
+                datos = r.read()
+            if len(datos) >= minimo:
+                return datos if binario else datos.decode('latin-1')
+        except Exception:
+            if intento == 5:
+                raise
+        time.sleep(1.5 * (intento + 1))
+    raise RuntimeError(f'Respuesta vacía de {url}')
+
+
+def limpio(s):
+    return re.sub(r'\s+', ' ', s or '').strip()
+
+
+def fecha_iso(dmy):
+    m = re.search(r'(\d{2})[-/](\d{2})[-/](\d{4})', dmy or '')
+    return f'{m[3]}-{m[2]}-{m[1]}' if m else None
+
+
+# ---------- RFAF ----------
+# Los marcadores llevan cifras falsas ocultas, cifras puestas por CSS y cifras que pone un script.
+# Aquí se reproduce lo que se ve en pantalla.
+TABLA_NTYPE = [2, 5, 9, 4, 1, 0, 8, 6, 3, 7, 1, 3, 5, 7, 9, 0, 2, 4, 6, 8, 0, 2, 4, 6, 8, 1, 3, 5, 7, 9, 7, 5, 2, 0, 9, 6, 3, 8, 4, 1]
+
+
+def cifra_visible(nodo):
+    reglas = {}
+    for st in nodo.find_all('style'):
+        for el_id, cual, cuerpo in re.findall(r'#([\w-]+):(before|after)\{([^}]*)\}', st.get_text()):
+            reglas[f'{el_id}:{cual}'] = cuerpo
+    for sc in nodo.find_all('script'):
+        m = re.search(r'ntype\("([\w-]+)",\s*(\d+),\s*(\d+)', sc.get_text())
+        if m:
+            reglas[m[1] + ':ntype'] = str(TABLA_NTYPE[int(m[3]) * 10 + int(m[2])])
+
+    def pseudo(el_id, cual):
+        c = reglas.get(f'{el_id}:{cual}')
+        if not c or re.search(r'display\s*:\s*none', c):
+            return ''
+        m = re.search(r'content\s*:\s*"([^"]*)"', c)
+        if not m:
+            return ''
+        return re.sub(r'\\([0-9a-fA-F]{1,6})\s?', lambda x: chr(int(x[1], 16)), m[1])
+
+    def vis(el):
+        if isinstance(el, str):
+            return str(el)
+        if el.name in ('script', 'style'):
+            return ''
+        if re.search(r'display\s*:\s*none', el.get('style', '')):
+            return ''
+        i = el.get('id')
+        out = pseudo(i, 'before') if i else ''
+        if i and f'{i}:ntype' in reglas:
+            out += reglas[f'{i}:ntype']
+        for h in el.children:
+            out += vis(h)
+        return out + (pseudo(i, 'after') if i else '')
+
+    return re.sub(r'\D', '', vis(nodo))
+
+
+def jornada_rfaf(eq, n):
+    html = bajar(minimo=20000, url=f'{RFAF}NFG_CmpJornada?cod_primaria=1000120&CodCompeticion={eq["comp"]}&CodGrupo={eq["grupo"]}'
+                 f'&CodTemporada={TEMPORADA_RFAF}&cod_agrupacion=1&CodJornada={n}&Sch_Codigo_Delegacion=1&Sch_Tipo_Juego=1')
+    sopa = BeautifulSoup(html, 'html.parser')
+    filas = []
+    for tr in sopa.find_all('tr'):
+        tds = tr.find_all('td', recursive=False)
+        if len(tds) != 3 or 'td_widget' not in (tds[0].get('class') or []) or 'td_widget' not in (tds[2].get('class') or []):
+            continue
+
+        def lado(td):
+            h4 = td.find('h4')
+            img = td.find('img')
+            return dict(nombre=limpio(h4.get_text()) if h4 else '', escudo=img.get('src') if img else None)
+
+        marc = [cifra_visible(x) for x in tds[1].select('.wid2_resultado_cerrada')]
+        hor = [limpio(x.get_text()) for x in tds[1].select('.horario')]
+        sig = tr.find_parent('table').find_all('tr')
+        campo = sup = None
+        for t2 in sig:
+            a = t2.select_one('a[href*="NFG_VisCampos"]')
+            if a:
+                campo = limpio(a.get_text())
+                s = a.parent.find('span')
+                sup = limpio(s.get_text()) if s else None
+                break
+        filas.append(dict(local=lado(tds[0]), visitante=lado(tds[2]),
+                          goles=[int(marc[0]), int(marc[1])] if len(marc) == 2 and marc[0] and marc[1] else None,
+                          fecha=hor[0] if hor else None, hora=hor[1] if len(hor) > 1 else None, campo=campo, superficie=sup))
+    return filas
+
+
+def equipo_rfaf(eq, pool):
+    for intento in range(6):  # a veces la RFAF devuelve la lista vacía
+        exe = bajar(f'{RFAF}NFG_CmpJornada_Exec?cod_primaria=1000120&codgrupo={eq["grupo"]}')
+        arr = re.search(r'new Array\(([^)]*)\)', exe)
+        if arr and arr[1].count(',') > 2:
+            break
+        time.sleep(2)
+    vals = re.findall(r'"([^"]*)"', arr[1]) if arr else []
+    lista = [(int(vals[i]), fecha_iso(vals[i + 1])) for i in range(2, len(vals) - 1, 2)]
+    # De una en una: la RFAF guarda en la sesión la última consulta y las peticiones a la vez se mezclan
+    resultados = [jornada_rfaf(eq, n) for n, _ in lista]
+
+    partidos, escudos = [], {}
+    for (n, fecha), filas in zip(lista, resultados):
+        for f in filas:
+            for l in (f['local'], f['visitante']):
+                if l['nombre'] and l['escudo'] and 'escudo_sm_resultados' not in l['escudo'] and l['nombre'] != 'Descansa':
+                    escudos[l['nombre']] = l['escudo']
+        m = next((f for f in filas if NOSOTROS.search(f['local']['nombre']) or NOSOTROS.search(f['visitante']['nombre'])), None)
+        casa = bool(m and NOSOTROS.search(m['local']['nombre']))
+        otro = m and (m['visitante'] if casa else m['local'])
+        if not m or re.fullmatch(r'Descansa', otro['nombre'], re.I):
+            partidos.append(dict(j=n, fecha=fecha, descansa=True))
+            continue
+        partidos.append(dict(j=n, fecha=fecha_iso(m['fecha']) or fecha, hora=m['hora'], casa=casa, rival=otro['nombre'],
+                             campo=m['campo'], superficie=m['superficie'], goles=m['goles']))
+
+    html = bajar(minimo=20000, url=f'{RFAF}NFG_VisClasificacion?cod_primaria=1000120&codcompeticion={eq["comp"]}&codgrupo={eq["grupo"]}&cod_agrupacion=1')
+    tabla = []
+    for tr in BeautifulSoup(html, 'html.parser').find_all('tr'):
+        a = tr.select_one('a[href*="NFG_VisCompeticiones_Grupo"]')
+        if not a:
+            continue
+        c = [limpio(td.get_text()) for td in tr.find_all('td', recursive=False)]
+        nom = limpio(a.get_text())
+        i = c.index(nom)
+        num = []
+        for x in c[i + 1:]:
+            if not re.fullmatch(r'-?\d+', x):
+                break
+            num.append(int(x))
+        if len(num) >= 11:  # Pts, J G E P en casa, J G E P fuera, goles a favor y en contra
+            fila = dict(pos=int(c[i - 1]), equipo=nom, pts=num[0], j=num[1] + num[5], g=num[2] + num[6], e=num[3] + num[7],
+                        p=num[4] + num[8], gf=num[9], gc=num[10])
+        elif len(num) >= 5:  # tabla resumida: Pts J G E P
+            fila = dict(pos=int(c[i - 1]), equipo=nom, pts=num[0], j=num[1], g=num[2], e=num[3], p=num[4])
+        else:
+            continue
+        previa = next((r for r in tabla if r['equipo'] == nom), None)
+        if previa is None:
+            tabla.append(fila)
+        elif 'gf' in fila:
+            previa.update(fila)
+    return partidos, tabla, escudos
+
+
+# ---------- Liga Educa ----------
+
+def url_educa(eq, extra):
+    return (f'{EDUCA}?id_lan=1&id_geo=8&id_spo=1&id_com_gro0=439&sea=2026&id_rac=1&id_age={eq["age"]}&id_com_gro1={eq["gro1"]}'
+            f'&id_com_sea={eq["sea"]}&id_com_sta={eq["sta"]}&{extra}')
+
+
+def filas_educa(html):
+    sopa = BeautifulSoup(html, 'html.parser')
+    out, titulo = [], None
+    for tr in sopa.find_all('tr'):
+        tds = tr.find_all('td', recursive=False)
+        links = [a for td in tds for a in td.select('a[href*="id_sec=11"]') if limpio(a.get_text())]
+        if len(links) != 2:
+            mj = re.search(r'Jornada:?\s*(\d+)\s*\((\d{2}/\d{2}/\d{4})\)', limpio(tr.get_text()))
+            if mj and len(limpio(tr.get_text())) < 160:
+                titulo = mj
+            continue
+        iL = next(i for i, td in enumerate(tds) if links[0] in td.descendants)
+        iV = next(i for i, td in enumerate(tds) if links[1] in td.descendants)
+        centro = ' '.join(limpio(td.get_text()) for td in tds[iL + 1:iV])
+        g = re.search(r'(\d+)\s*-\s*(\d+)', centro)
+        club = lambda a: (re.search(r'id_clu=(\d+)', a.get('href', '')) or [None, None])[1]
+        antes = [limpio(td.get_text()) for td in tds[:iL] if limpio(td.get_text())]
+        out.append(dict(jornada=int(titulo[1]) if titulo else None, fechaJ=titulo[2] if titulo else None, info=antes,
+                        local=limpio(links[0].get_text()), visitante=limpio(links[1].get_text()),
+                        clubL=club(links[0]), clubV=club(links[1]), goles=[int(g[1]), int(g[2])] if g else None))
+    return out
+
+
+def equipo_educa(eq, pool):
+    cal = filas_educa(bajar(url_educa(eq, 'id_sec=2')))
+    primera = bajar(url_educa(eq, 'num_day=1&id_sec=1'))
+    total = max([int(x) for x in re.findall(r'>\s*Jornada (\d+)\s*</option>', primera)] or [0])
+    paginas = [primera] + list(pool.map(lambda n: bajar(url_educa(eq, f'num_day={n}&id_sec=1')), range(2, total + 1)))
+    partidos, escudos = [], {}
+    for n, html in enumerate(paginas, 1):
+        filas = filas_educa(html)
+        for f in filas:
+            escudos[f['local']] = f['clubL']
+            escudos[f['visitante']] = f['clubV']
+        mj = re.search(r'Jornada:\s*\d+\s*\((\d{2}/\d{2}/\d{4})\)', BeautifulSoup(html, 'html.parser').get_text())
+        fecha_j = fecha_iso(mj[1]) if mj else None
+        m = next((f for f in filas if NOSOTROS.search(f['local']) or NOSOTROS.search(f['visitante'])), None)
+        if not m:
+            partidos.append(dict(j=n, fecha=fecha_j, descansa=True))
+            continue
+        casa = bool(NOSOTROS.search(m['local']))
+        c = next((x for x in cal if x['jornada'] == n and x['local'] == m['local'] and x['visitante'] == m['visitante']), None)
+        info = ' '.join(c['info']) if c else ''
+        hora = (re.search(r'(\d{1,2}:\d{2})', info) or [None, None])[1]
+        fecha = fecha_j
+        dia = re.match(r'\D*(\d{1,2})\b', info)
+        if fecha and dia:  # "Vie 16 17:00": el día real puede no ser el de la jornada
+            base = datetime.strptime(fecha, '%Y-%m-%d')
+            for k in range(-3, 7):
+                x = base + timedelta(days=k)
+                if x.day == int(dia[1]):
+                    fecha = x.strftime('%Y-%m-%d')
+                    break
+        estado = m['info'][0] if m['info'] else ''
+        campo = ' '.join(m['info'][1:]) or None
+        todo = estado + ' ' + info
+        partidos.append(dict(j=n, fecha=fecha, hora=hora, casa=casa, rival=m['visitante'] if casa else m['local'], campo=campo,
+                             estado='Aplazado' if re.search(r'aplaz|suspend', todo, re.I) else None,
+                             goles=m['goles'] if re.search(r'Finalizado', todo, re.I) else None))
+
+    # La tabla de la Liga Educa está mal cerrada en el HTML: se lee del texto, buscando cada equipo por su nombre
+    texto = limpio(BeautifulSoup(bajar(url_educa(eq, 'id_sec=4')), 'html.parser').get_text(' '))
+    texto = texto[texto.find('Pt Equipo'):]
+    tabla = []
+    for nom in escudos:
+        m = re.search(r'(\d+) ' + re.escape(nom) + r' (-?\d+) (\d+) (\d+) (\d+) (\d+) (-?\d+)', texto)
+        if m:
+            v = [int(x) for x in m.groups()]
+            tabla.append(dict(pos=v[0], equipo=nom, pts=v[1], j=v[2], g=v[3], e=v[4], p=v[5], dif=v[6]))
+    tabla.sort(key=lambda r: r['pos'])
+    escudos = {k: f'{EDUCA}t4/images/crests/originals/{v}.jpg' for k, v in escudos.items() if v}
+    return partidos, tabla, escudos
+
+
+# ---------- Escudos ----------
+
+def slug(s):
+    s = unicodedata.normalize('NFD', s).encode('ascii', 'ignore').decode().lower()
+    return re.sub(r'[^a-z0-9]+', '-', s).strip('-')
+
+
+def bajar_escudo(args):
+    nombre, url, origen = args
+    ext = (re.search(r'\.(png|jpe?g|gif|webp)(\?|$)', url, re.I) or [None, 'jpg'])[1].lower().replace('jpeg', 'jpg')
+    fichero = f'{origen}-{slug(nombre)}.{ext}'
+    destino = DIR_ESCUDOS / fichero
+    destino = destino.with_suffix('.png')
+    if not destino.exists():
+        try:
+            datos = bajar(url, binario=True)
+        except Exception:
+            return nombre, None
+        # Escudo pequeño (96 px) para que la app pese poco en el móvil
+        img = Image.open(io.BytesIO(datos)).convert('RGBA')
+        img.thumbnail((96, 96))
+        img.save(destino, optimize=True)
+    return nombre, f'icons/escudos/{destino.name}'
+
+
+def main():
+    DIR_ESCUDOS.mkdir(parents=True, exist_ok=True)
+    salida = dict(actualizado=datetime.now(timezone.utc).isoformat(timespec='seconds'), equipos=[])
+    avisos = []
+    # Con nombres de equipo (p. ej. "infantil") solo se repiten esos y se conservan los demás
+    solo = set(sys.argv[1:])
+    previo = {}
+    fichero = RAIZ / 'js' / 'datos.js'
+    if solo and fichero.exists():
+        txt = fichero.read_text(encoding='utf-8')
+        previo = {e['id']: e for e in json.loads(txt[txt.index('{'):txt.rindex('}') + 1])['equipos']}
+    bajar('https://www.rfaf.es/pnfg/')
+    with ThreadPoolExecutor(6) as pool:
+        for eq in EQUIPOS:
+            if solo and eq['id'] not in solo and eq['id'] in previo:
+                salida['equipos'].append(previo[eq['id']])
+                continue
+            t = time.time()
+            partidos, tabla, escudos = (equipo_rfaf if eq['web'] == 'rfaf' else equipo_educa)(eq, pool)
+            locales = dict(pool.map(bajar_escudo, [(k, v if v.startswith('http') else 'https://www.rfaf.es' + v, eq['web'])
+                                                    for k, v in escudos.items()]))
+            if len(partidos) != eq['jornadas']:
+                avisos.append(f'{eq["nombre"]}: {len(partidos)} jornadas en la web (se esperaban {eq["jornadas"]})')
+            fila = next((r for r in tabla if NOSOTROS.search(r['equipo'])), None)
+            jug = [p for p in partidos if p.get('goles')]
+            gf = sum(p['goles'][0 if p['casa'] else 1] for p in jug)
+            gc = sum(p['goles'][1 if p['casa'] else 0] for p in jug)
+            if fila and 'gf' in fila and (gf, gc) != (fila['gf'], fila['gc']):
+                avisos.append(f'{eq["nombre"]}: goles {gf}-{gc} en los partidos y {fila["gf"]}-{fila["gc"]} en la clasificación')
+            if fila and 'dif' in fila and gf - gc != fila['dif']:
+                avisos.append(f'{eq["nombre"]}: diferencia {gf - gc} en los partidos y {fila["dif"]} en la clasificación')
+            if fila and fila['j'] != len(jug):
+                avisos.append(f'{eq["nombre"]}: {len(jug)} partidos con resultado y {fila["j"]} jugados en la clasificación')
+            salida['equipos'].append(dict(id=eq['id'], nombre=eq['nombre'], cat=eq['cat'], fuente='RFAF' if eq['web'] == 'rfaf' else 'Liga Educa',
+                                          partidos=partidos, tabla=tabla, escudos=locales))
+            print(f'{eq["nombre"]}: {sum(1 for p in partidos if not p.get("descansa"))} partidos, '
+                  f'{len(tabla)} equipos en la tabla, {sum(1 for v in locales.values() if v)}/{len(locales)} escudos '
+                  f'({time.time() - t:.0f}s)', flush=True)
+    salida['avisos'] = avisos
+    js = ('/* Generado por herramientas/actualizar.py desde rfaf.es y educationleague.es. No editar a mano. */\n'
+          f'window.DATOS = {json.dumps(salida, ensure_ascii=False, indent=1)};\n')
+    (RAIZ / 'js' / 'datos.js').write_text(js, encoding='utf-8')
+    print('Avisos:\n- ' + '\n- '.join(avisos) if avisos else 'Sin avisos.')
+
+
+if __name__ == '__main__':
+    sys.exit(main())

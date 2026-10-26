@@ -343,3 +343,29 @@ html.big .act { flex-direction: row; justify-content: flex-start; min-height: 66
 @media (min-width: 1280px) {
   .coach-home { grid-template-columns: 18rem minmax(0, 1fr) 18rem; grid-template-areas: "match hero attend" "teams agenda notice" "teams reqs notice"; }
 }
+
+/* ---------- Partidos y clasificación reales ---------- */
+.mini.img { background: #fff; border: 1px solid var(--line); }
+.mini.img img { width: 22px; height: 22px; object-fit: contain; }
+.ring img { height: 44px; object-fit: contain; }
+.tag.src { background: var(--club-soft); color: var(--club); }
+.res { display: inline-flex; align-items: center; justify-content: center; min-width: 54px; padding: 4px 10px; border-radius: 10px; font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; flex: none; color: #fff; }
+.res.G { background: var(--ok); } .res.P { background: var(--bad); } .res.E { background: #8A93A8; }
+.mt { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.mt:last-child { border-bottom: 0; }
+.mt .cal-d { width: 46px; } .mt .cal-d b { font-size: 1.15rem; }
+.mt .grow { flex: 1; min-width: 0; } .mt b { display: block; font-weight: 600; } .mt small { display: block; color: var(--muted); font-size: .82rem; }
+.mt.rest { opacity: .6; }
+.mt.next { background: var(--gold-soft); margin: 0 -10px; padding-left: 10px; padding-right: 10px; border-radius: 14px; }
+.mt .pill { flex: none; }
+.tbl { display: flex; flex-direction: column; font-variant-numeric: tabular-nums; }
+.tbl .tr { display: grid; grid-template-columns: 26px minmax(0, 1fr) 30px 38px 36px; gap: 8px; align-items: center; padding: 8px 6px; border-bottom: 1px solid var(--line); text-align: center; }
+.tbl .tr:last-child { border-bottom: 0; }
+.tbl .th { color: var(--muted); font-size: .78rem; font-weight: 700; }
+.tbl .th span:nth-child(2) { text-align: left; }
+.tbl .tn { display: flex; align-items: center; gap: 8px; min-width: 0; text-align: left; }
+.tbl .tr.us { background: var(--club-soft); border-radius: 12px; color: var(--club); }
+.mt b, .mt small, .tbl .tn b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.tbl .tn b { font-weight: 600; }
+.tm .k { font-variant-numeric: tabular-nums; }
+a.btn { text-decoration: none; }

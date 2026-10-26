@@ -1,6 +1,6 @@
 // Guarda la app en el móvil para que abra rápido y sin cobertura en el campo.
-const CACHE = 'cd-aznalcollar-v7';
-const FILES = ['./', 'index.html', 'css/app.css', 'js/app.js', 'manifest.webmanifest', 'icons/escudo-160.png', 'icons/escudo.png', 'icons/icon-192.png', 'icons/icon-512.png'];
+const CACHE = 'cd-aznalcollar-v8';
+const FILES = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/datos.js', 'manifest.webmanifest', 'icons/escudo-160.png', 'icons/escudo.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
