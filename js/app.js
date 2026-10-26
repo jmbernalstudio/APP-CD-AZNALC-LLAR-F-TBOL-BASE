@@ -94,7 +94,6 @@ const CLUB = 'C.D. Aznalcóllar';
 const greet = () => { const h = new Date().getHours(); return h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches'; };
 const crestImg = (cls = '') => `<img class="cr ${cls}" src="${CREST}" alt="">`;
 const rivalMini = m => `<span class="mini" style="background:${m.color}" aria-hidden="true">${initials(m.rival.replace(/^(CD|UD) /, ''))}</span>`;
-const usMini = () => `<span class="mini" aria-hidden="true">${crestImg()}</span>`;
 
 /* Agenda de la semana (datos de ejemplo) */
 const AGENDA = [
@@ -168,8 +167,7 @@ function agendaRow(e, withAct) {
   let what;
   if (e.kind === 'match') {
     const m = S.teams[e.team].match;
-    const us = `${usMini()}<span class="nm">Aznalcóllar</span>`, them = `${rivalMini(m)}<span class="nm">${esc(m.rival)}</span>`;
-    what = `<span class="vsl">${m.home ? us : them}<span class="pill gold">vs</span>${m.home ? them : us}</span><span class="where">${esc(m.where)}</span>`;
+    what = `<span class="vsl"><span class="pill gold">vs</span>${rivalMini(m)}<span class="nm">${esc(m.rival)}</span></span><span class="where">${m.home ? 'En casa' : 'Fuera'} · ${esc(m.where)}</span>`;
   } else if (e.kind === 'club') what = `<span class="t">${e.title}</span><span class="where">${e.where}</span>`;
   else what = `<span class="t">Entreno · ${e.team}</span>${e.today ? '<span class="pill">Hoy</span>' : ''}<span class="where">${e.where}</span>`;
   const act = withAct && e.today && e.kind === 'train'
