@@ -23,15 +23,47 @@ const I = {
 const ic = n => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
 
 const STATES = ['Enviada', 'Vista', 'En marcha', 'Resuelta'];
+
+/* Equipos, partidos y clasificaciones reales (js/datos.js, sacado de rfaf.es y educationleague.es) */
+const D = window.DATOS || { equipos: [] };
+const EQ = Object.fromEntries(D.equipos.map(e => [e.nombre, e]));
+const US = /AZNALC/i;
+const ISO = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+const TODAY = ISO(new Date());
+const WD = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+const MES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+const toDate = iso => new Date(iso + 'T12:00:00');
+const dayLbl = iso => { const d = toDate(iso); return `${WD[d.getDay()]} ${d.getDate()}`; };
+const dateLbl = iso => { const d = toDate(iso); return `${WD[d.getDay()]} ${d.getDate()} ${MES[d.getMonth()]}`; };
+/* "C.D. ATLÉTICO SAN JUAN" -> "C.D. Atlético San Juan" */
+const nice = n => n === n.toUpperCase()
+  ? n.split(' ').map(w => /\.|^"|^[IVX]+$/.test(w) ? w : w.charAt(0) + w.slice(1).toLowerCase()).join(' ').replace(/ (De|Del|La|Las|Los|Y) /g, m => m.toLowerCase())
+  : n;
+/* "Alevín 2º año" -> "A2", "Infantil" -> "In" */
+const abbr = n => { const m = /(\d)º/.exec(n); return n.slice(0, m ? 1 : 2) + (m ? m[1] : ''); };
+const crestOf = (e, name) => e.escudos[name] || null;
+const usName = e => (e.tabla.find(r => US.test(r.equipo)) || {}).equipo || Object.keys(e.escudos).find(n => US.test(n));
+const nextMatch = e => e.partidos.find(p => !p.descansa && !p.goles && p.fecha >= TODAY) || null;
+const played = e => e.partidos.filter(p => p.goles);
+const lastMatch = e => played(e).slice(-1)[0] || null;
+const outcome = p => { const [a, b] = p.casa ? p.goles : [p.goles[1], p.goles[0]]; return a > b ? 'G' : a < b ? 'P' : 'E'; };
+const scoreTxt = p => `${p.goles[0]}–${p.goles[1]}`;
+const ourRow = e => e.tabla.find(r => US.test(r.equipo));
+const placeOf = p => (p.campo || '').replace(/\s*\((F11|F7)[^)]*\)/gi, '').trim().split(' - ').map(x => nice(x.trim())).join(' · ');
+const updated = () => { const d = new Date(D.actualizado); return isNaN(d) ? '' : `${d.getDate()} ${MES[d.getMonth()]}`; };
+function crestBadge(e, name, cls = 'mini') {
+  const src = US.test(name) ? CREST_SRC : crestOf(e, name);
+  return src ? `<span class="${cls} img" aria-hidden="true"><img src="${src}" alt="" loading="lazy"></span>`
+    : `<span class="${cls}" style="background:var(--navy)" aria-hidden="true">${initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, ''))}</span>`;
+}
 const S = {
   role: 'coach', tab: 'home', sub: null,
-  coach: 'Paco', team: 'Alevín A',
+  coach: 'Paco', team: 'Alevín 2º año',
+  /* Equipos de Paco (entrenador de ejemplo). Los partidos son reales; la plantilla aún es de ejemplo. */
   teams: {
-    'Alevín A': { cat: 'Alevín · F7', next: { h: '18:00', what: 'Entrenamiento', where: 'Campo 2' },
-      match: { rival: 'CD Las Eras', day: 'Sábado 31', h: '10:30', where: 'Polideportivo Norte', home: false, color: '#C8102E', jornada: 7 },
+    'Alevín 2º año': { cat: 'Alevín · F7', next: { h: '18:00', what: 'Entrenamiento', where: 'Campo 2' },
       players: ['Lucas Romero', 'Hugo Sanz', 'Martín Gil', 'Pablo Ortega', 'Daniel Ruiz', 'Álvaro Vidal', 'Leo Navarro', 'Mateo Cano', 'Izan Molina', 'Adrián Prieto', 'Marcos León', 'Bruno Díez'] },
-    'Infantil B': { cat: 'Infantil · F11', next: { h: '19:30', what: 'Entrenamiento', where: 'Campo 1' },
-      match: { rival: 'UD Gerena', day: 'Domingo 1', h: '12:00', where: 'Campo municipal', home: true, color: '#0E7A3E', jornada: 5 },
+    'Infantil': { cat: 'Infantil · F11', next: { h: '19:30', what: 'Entrenamiento', where: 'Campo 1' },
       players: ['Sara Blanco', 'Nerea Gómez', 'Lucía Pastor', 'Carla Ibáñez', 'Alba Rubio', 'Irene Moya', 'Paula Crespo', 'Vega Herrero', 'Noa Garrido', 'Elena Soler'] }
   },
   attend: {},
@@ -90,21 +122,26 @@ function say(msg, undo) {
 
 
 const CREST = 'icons/escudo-160.png';
+const CREST_SRC = CREST;
 const CLUB = 'C.D. Aznalcóllar';
 const greet = () => { const h = new Date().getHours(); return h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches'; };
 const crestImg = (cls = '') => `<img class="cr ${cls}" src="${CREST}" alt="">`;
-const rivalMini = m => `<span class="mini" style="background:${m.color}" aria-hidden="true">${initials(m.rival.replace(/^(CD|UD) /, ''))}</span>`;
 
-/* Agenda de la semana (datos de ejemplo) */
-const AGENDA = [
-  { day: 'Hoy', h: '18:00', kind: 'train', team: 'Alevín A', where: 'Campo 2', today: true },
-  { day: 'Hoy', h: '19:30', kind: 'train', team: 'Infantil B', where: 'Campo 1', today: true },
-  { day: 'Mié 28', h: '18:00', kind: 'train', team: 'Alevín A', where: 'Campo 2' },
-  { day: 'Jue 29', h: '19:30', kind: 'train', team: 'Infantil B', where: 'Campo 1' },
-  { day: 'Sáb 31', h: '10:30', kind: 'match', team: 'Alevín A' },
-  { day: 'Dom 1', h: '12:00', kind: 'match', team: 'Infantil B' },
-  { day: 'Sáb 31', h: '9:00', kind: 'club', title: 'Fotos oficiales del club', where: 'Campo 1' }
-];
+
+/* Agenda: entrenos de ejemplo + partidos reales de los próximos 7 días */
+const WEEK = [...Array(7)].map((_, i) => { const d = new Date(); d.setDate(d.getDate() + i); return ISO(d); });
+function buildAgenda() {
+  const ev = [];
+  const trains = { 'Alevín 2º año': [0, 2], 'Infantil': [0, 3] };
+  for (const [team, days] of Object.entries(trains)) for (const i of days) {
+    const t = S.teams[team].next;
+    ev.push({ iso: WEEK[i], day: i === 0 ? 'Hoy' : dayLbl(WEEK[i]), h: t.h, kind: 'train', team, where: t.where, today: i === 0 });
+  }
+  for (const e of D.equipos) for (const p of e.partidos)
+    if (!p.descansa && p.fecha >= WEEK[0] && p.fecha <= WEEK[6]) ev.push({ iso: p.fecha, day: p.fecha === TODAY ? 'Hoy' : dayLbl(p.fecha), h: p.hora || '--:--', kind: 'match', team: e.nombre, p, e });
+  return ev.sort((a, b) => (a.iso + a.h).localeCompare(b.iso + b.h));
+}
+const AGENDA = buildAgenda();
 
 function tabsFor() {
   const unread = S.notices.filter(n => !n.read).length;
@@ -158,16 +195,19 @@ function card(id, title, body, cls = '', more = '') {
   return `<section class="card ${cls}" aria-labelledby="${id}"><div class="card-h"><h2 id="${id}">${title}</h2>${more}</div>${body}</section>`;
 }
 function scoreHTML(team) {
-  const m = S.teams[team].match;
+  const e = EQ[team];
+  const m = e && nextMatch(e);
+  if (!m) return `<p style="margin:8px 0 0">No hay más partidos publicados por ahora.</p>`;
   const us = `<div><div class="ring">${crestImg()}</div><b>Aznalcóllar</b><small>${team}</small></div>`;
-  const them = `<div><div class="ring rv" style="background-color:${m.color}" aria-hidden="true">${initials(m.rival.replace(/^(CD|UD) /, ''))}</div><b>${esc(m.rival)}</b><small>${m.home ? 'Visitante' : 'Local'}</small></div>`;
-  return `<div class="score">${m.home ? us : them}<div><div class="vs-time">${m.h}</div><small>Jornada ${m.jornada}</small></div>${m.home ? them : us}</div>`;
+  const src = crestOf(e, m.rival);
+  const them = `<div><div class="ring ${src ? '' : 'rv'}" aria-hidden="true">${src ? `<img src="${src}" alt="">` : initials(nice(m.rival))}</div><b title="${esc(nice(m.rival))}">${esc(nice(m.rival))}</b><small>${m.casa ? 'Visitante' : 'Local'}</small></div>`;
+  return `<div class="score">${m.casa ? us : them}<div><div class="vs-time">${m.hora || '--:--'}</div><small>${m.hora ? 'Jornada ' + m.j : 'Hora por confirmar'}</small></div>${m.casa ? them : us}</div>`;
 }
 function agendaRow(e, withAct) {
   let what;
   if (e.kind === 'match') {
-    const m = S.teams[e.team].match;
-    what = `<span class="vsl"><span class="pill gold">vs</span>${rivalMini(m)}<span class="nm">${esc(m.rival)}</span></span><span class="where">${m.home ? 'En casa' : 'Fuera'} · ${esc(m.where)}</span>`;
+    const p = e.p;
+    what = `<span class="vsl"><span class="pill gold">vs</span>${crestBadge(e.e, p.rival)}<span class="nm">${esc(nice(p.rival))}</span></span><span class="where">${p.casa ? 'En casa' : 'Fuera'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</span>`;
   } else if (e.kind === 'club') what = `<span class="t">${e.title}</span><span class="where">${e.where}</span>`;
   else what = `<span class="t">Entreno · ${e.team}</span>${e.today ? '<span class="pill">Hoy</span>' : ''}<span class="where">${e.where}</span>`;
   const act = withAct && e.today && e.kind === 'train'
@@ -175,11 +215,25 @@ function agendaRow(e, withAct) {
     : `<span class="pill ${e.kind === 'match' ? 'gold' : e.kind === 'club' ? 'grey' : 'blue'} ev-act">${e.kind === 'club' ? 'Club' : e.team}</span>`;
   return `<div class="ev"><div class="when"><b>${e.h}</b><small>${e.day}</small></div><div class="what">${what}</div>${act}</div>`;
 }
+/* Un partido de la temporada: fecha, rival con escudo, resultado o hora */
+function matchRow(e, p) {
+  if (p.descansa) return `<div class="mt rest"><div class="cal-d"><span>J${p.j}</span><b>${p.fecha ? toDate(p.fecha).getDate() : '–'}</b></div><div class="grow"><b>Descansa</b><small>${p.fecha ? dateLbl(p.fecha) : ''}</small></div></div>`;
+  const res = p.goles ? outcome(p) : null;
+  const right = res ? `<span class="res ${res}" aria-label="${res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado'} ${scoreTxt(p)}">${scoreTxt(p)}</span>`
+    : p.estado ? `<span class="pill red">${p.estado}</span>` : `<span class="pill ${p.hora ? 'blue' : 'grey'}" ${p.hora ? '' : 'title="Hora por confirmar"'}>${p.hora || 'Sin hora'}</span>`;
+  return `<div class="mt ${p.fecha === (nextMatch(e) || {}).fecha ? 'next' : ''}"><div class="cal-d"><span>J${p.j}</span><b>${toDate(p.fecha).getDate()}</b></div>${crestBadge(e, p.rival)}
+    <div class="grow"><b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b><small>${dateLbl(p.fecha)} · ${p.casa ? 'En casa' : 'Fuera'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></div>${right}</div>`;
+}
+function tableHTML(e) {
+  const gd = r => r.gf != null ? r.gf - r.gc : r.dif;
+  return `<div class="tbl" role="table" aria-label="Clasificación"><div class="tr th" role="row"><span role="columnheader">#</span><span role="columnheader">Equipo</span><span role="columnheader" title="Jugados">PJ</span><span role="columnheader" title="Diferencia de goles">DG</span><span role="columnheader">Pts</span></div>
+    ${e.tabla.map(r => `<div class="tr ${US.test(r.equipo) ? 'us' : ''}" role="row"><span role="cell">${r.pos}</span><span role="cell" class="tn">${crestBadge(e, r.equipo)}<b title="${esc(nice(r.equipo))}">${esc(US.test(r.equipo) ? 'C.D. Aznalcóllar F.B.' : nice(r.equipo))}</b></span><span role="cell">${r.j}</span><span role="cell">${gd(r) > 0 ? '+' : ''}${gd(r)}</span><span role="cell"><b>${r.pts}</b></span></div>`).join('')}</div>`;
+}
 function agendaCard(filter) {
   const f = filter || 'all';
-  const list = AGENDA.filter(e => f === 'all' || e.kind === f);
-  return card('h-ag', 'Esta semana', `
-    <div class="tabs" role="group" aria-label="Filtrar agenda">${[['all', 'Todo'], ['train', 'Entrenos'], ['match', 'Partidos'], ['club', 'Club']].map(([k, l]) =>
+  const list = AGENDA.filter(e => (e.kind !== 'match' || S.teams[e.team]) && (f === 'all' || e.kind === f));
+  return card('h-ag', 'Próximos 7 días', `
+    <div class="tabs" role="group" aria-label="Filtrar agenda">${[['all', 'Todo'], ['train', 'Entrenos'], ['match', 'Partidos']].map(([k, l]) =>
       `<button type="button" data-ag="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>
     <div id="ag-list">${list.map(e => agendaRow(e, true)).join('')}</div>`, 'a-agenda');
 }
@@ -188,7 +242,7 @@ function bindAgenda() {
   document.querySelectorAll('[data-team-go]').forEach(b => b.onclick = () => { S.team = b.dataset.teamGo; go('team', 'list'); });
 }
 function attendanceCard(team, id) {
-  const pct = team === 'Alevín A' ? [75, 83, 92, 67, 92, 100, 83, 92] : [80, 90, 100, 70, 90, 100, 90, 100];
+  const pct = team === 'Alevín 2º año' ? [75, 83, 92, 67, 92, 100, 83, 92] : [80, 90, 100, 70, 90, 100, 90, 100];
   const avg = Math.round(pct.reduce((a, b) => a + b) / pct.length);
   const a = S.attend[`${team} ${today()}`];
   const n = S.teams[team].players.length;
@@ -209,19 +263,20 @@ const COACH = {
     const t = S.teams[S.team];
     const mine = S.requests.filter(r => r.by === S.coach && r.st < 3);
     const notice = S.notices.find(n => !n.read) || S.notices[0];
-    const days = ['Lun 26', 'Mar 27', 'Mié 28', 'Jue 29', 'Vie 30', 'Sáb 31', 'Dom 1'];
+    const nm = EQ[S.team] && nextMatch(EQ[S.team]);
+    const mine2 = new Set(AGENDA.filter(x => x.kind === 'match' && S.teams[x.team]).map(x => x.iso));
     return {
       kicker: `${greet()},`, title: 'Paco Martín', layout: '',
       body: `
-      <div class="days" aria-label="Esta semana">${days.map((d, i) => { const [w, n] = d.split(' '); return `<span class="${i === 0 ? 'today' : ''} ${i >= 5 ? 'has-match' : ''}">${w}<b>${n}</b></span>`; }).join('')}</div>
+      <div class="days" aria-label="Próximos 7 días">${WEEK.map((iso, i) => { const [w, n] = dayLbl(iso).split(' '); return `<span class="${i === 0 ? 'today' : ''} ${mine2.has(iso) ? 'has-match' : ''}">${w}<b>${n}</b></span>`; }).join('')}</div>
       <div class="grid coach-home">
         ${card('h-m', 'Próximo partido', `${scoreHTML(S.team)}
-          <div class="match-btns"><button type="button" class="btn gold" data-say="La convocatoria llegará en la próxima versión.">Convocatoria</button><button type="button" class="btn glass" data-say="${esc(t.match.where)}">${ic('pin')}Cómo llegar</button></div>`,
-          'match a-match', `<span class="tag gold">${t.match.day}</span>`)}
+          <div class="match-btns"><button type="button" class="btn gold" data-say="La convocatoria llegará en la próxima versión.">Convocatoria</button>${nm && nm.campo ? `<a class="btn glass" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" data-say="Campo por confirmar">${ic('pin')}Cómo llegar</button>`}</div>`,
+          'match a-match', nm ? `<span class="tag gold">${dateLbl(nm.fecha)}</span>` : '')}
         <section class="hero a-hero" aria-labelledby="h-hero">${crestImg('big-crest')}
           <span class="kick">Hoy · ${t.next.what} ${t.next.h} · ${t.next.where}</span>
           <h2 id="h-hero">Semana de partido para el ${S.team}</h2>
-          <p>El ${t.match.day.toLowerCase()} ${t.match.home ? 'recibís al' : 'visitáis al'} ${esc(t.match.rival)}. Pasa lista hoy y prepara la convocatoria.</p>
+          <p>${nm ? `El ${dateLbl(nm.fecha).toLowerCase()} ${nm.casa ? 'recibís al' : 'visitáis al'} ${esc(nice(nm.rival))}. ` : ''}Pasa lista hoy y prepara la convocatoria.</p>
           <div class="btns"><button type="button" class="btn gold" data-go="team:list">Pasar lista</button><button type="button" class="btn glass" data-go="ask:material">Pedir algo a la junta</button></div>
         </section>
         <section class="actions a-actions" aria-label="Acciones rápidas">
@@ -234,7 +289,7 @@ const COACH = {
         ${noticeCard(notice, 'a-notice')}
         ${card('h-rq', 'Mis peticiones', mine.length ? mine.map(r => reqRow(r)).join('') : '<p class="muted">No tienes peticiones abiertas.</p>', 'a-reqs', '<button type="button" class="more" data-go="ask">Nueva</button>')}
         ${card('h-tm', 'Mis equipos', Object.entries(S.teams).map(([n, x], i) => `<button type="button" class="tm" data-team-go="${n}" style="width:100%;border:0;background:none;cursor:pointer;text-align:left;font:inherit">
-          <span class="k">${n[0]}${n.split(' ')[1]}</span><span class="grow"><b>${n}</b><small>${x.cat} · ${x.players.length} jugadores</small></span><span class="pill">${[86, 91][i]}%</span></button>`).join(''), 'a-teams')}
+          <span class="k">${abbr(n)}</span><span class="grow"><b>${n}</b><small>${EQ[n] ? EQ[n].cat : x.cat}</small></span>${ourRow(EQ[n]) ? `<span class="pill blue">${ourRow(EQ[n]).pos}º</span>` : ''}</button>`).join(''), 'a-teams')}
       </div>`,
       bind() {
         bindAgenda();
@@ -250,7 +305,7 @@ const COACH = {
     const pct = () => Math.round(a.size / t.players.length * 100);
     const head = `<div class="stack" style="margin-bottom:16px">
       <div class="chips" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n => `<button type="button" class="chip" data-team="${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>
-      <div class="tabs" role="group" aria-label="Vista">${[['list', 'Pasar lista'], ['roster', 'Plantilla'], ['cal', 'Calendario']].map(([k, l]) =>
+      <div class="tabs" role="group" aria-label="Vista">${[['list', 'Pasar lista'], ['games', 'Partidos'], ['table', 'Clasificación'], ['roster', 'Plantilla']].map(([k, l]) =>
         `<button type="button" data-sub="${k}" aria-pressed="${sub === k}">${l}</button>`).join('')}</div></div>`;
     let body = '';
     if (sub === 'list') body = `<div class="split"><div class="stack">
@@ -265,9 +320,11 @@ const COACH = {
       ${attendanceCard(S.team, 'h-at2')}</div>`;
     if (sub === 'roster') body = card('h-pl', `Plantilla · ${t.players.length} jugadores`, t.players.map((p, i) => `<div class="tm"><span class="k">${i + 1}</span>
       <div class="grow"><b>${p}</b><small>Familia: 6${String(10 + i * 7).padStart(2, '0')} 45${String(20 + i).padStart(2, '0')} 1${i}</small></div></div>`).join(''));
-    if (sub === 'cal') body = card('h-cal', 'Esta semana', AGENDA.filter(e => e.team === S.team || e.kind === 'club').map(e => agendaRow(e, false)).join(''));
+    const e = EQ[S.team];
+    if (sub === 'games') body = card('h-gm', `Temporada · ${e.partidos.length} jornadas`, e.partidos.map(p => matchRow(e, p)).join(''), '', `<span class="tag src">${e.fuente}</span>`);
+    if (sub === 'table') body = card('h-tb', e.cat, tableHTML(e), '', `<span class="tag src">${e.fuente}</span>`);
     return {
-      kicker: `Mi equipo · ${t.cat}`, title: S.team,
+      kicker: `Mi equipo · ${EQ[S.team] ? EQ[S.team].cat : t.cat}`, title: S.team,
       body: head + body,
       bind() {
         document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; render(); });
@@ -357,9 +414,13 @@ const COACH = {
 };
 
 /* ---------- JUNTA ---------- */
-const TEAMS = [['Alevín A', 'Paco Martín', 12, 86], ['Infantil B', 'Paco Martín', 10, 91], ['Cadete A', 'Raquel Torres', 16, 78], ['Benjamín C', 'Manolo Fuentes', 11, 94], ['Juvenil A', 'Iker Domínguez', 18, 72]];
-const teamsList = () => TEAMS.map(([t, c, n, p]) => `<div class="tm"><span class="k">${t[0]}${t.split(' ')[1]}</span><div class="grow"><b>${t}</b><small>${c} · ${n} jugadores</small>
-  <div class="meter" aria-hidden="true"><i style="width:${p}%;background:var(${p >= 85 ? '--ok' : p >= 75 ? '--gold' : '--bad'})"></i></div></div><span class="pill ${p >= 85 ? '' : p >= 75 ? 'gold' : 'red'}">${p}%</span></div>`).join('');
+/* Los 10 equipos del club con su clasificación y su último resultado reales */
+const teamsList = () => D.equipos.map(e => {
+  const r = ourRow(e), l = lastMatch(e), n = nextMatch(e);
+  const res = l ? outcome(l) : null;
+  return `<div class="tm"><span class="k">${r ? r.pos + 'º' : '–'}</span><div class="grow"><b>${e.nombre}</b><small>${r ? r.pts + ' pts · ' : ''}${n ? 'Próximo: ' + dayLbl(n.fecha) + ' vs ' + esc(nice(n.rival)) : 'Sin próximos partidos'}</small></div>
+    ${l ? `<span class="res ${res}" title="Último: ${esc(nice(l.rival))}">${scoreTxt(l)}</span>` : ''}</div>`;
+}).join('');
 const BOARD = {
   home() {
     const open = S.requests.filter(r => r.st < 3);
@@ -374,7 +435,7 @@ const BOARD = {
           <div class="kpi"><small>Resueltas</small><b>${S.requests.filter(r => r.st === 3).length}</b></div></div>
         ${card('h-in', 'Peticiones recibidas', order.map(r => reqRow(r, `<div class="ctl"><label for="s${r.id}">Estado</label>
           <select id="s${r.id}" data-st="${r.id}">${STATES.map((s, i) => `<option value="${i}" ${i === r.st ? 'selected' : ''}>${s}</option>`).join('')}</select></div>`)).join(''), 'a-inbox')}
-        ${card('h-tm', 'Asistencia por equipo', teamsList(), 'a-teams', '<button type="button" class="more" data-go="team">Ver equipos</button>')}
+        ${card('h-tm', 'Nuestros equipos', teamsList(), 'a-teams', '<button type="button" class="more" data-go="team">Ver todos</button>')}
         ${noticeCard(S.notices[0], 'a-notice')}
       </div>`,
       bind() { document.querySelectorAll('[data-st]').forEach(s => s.onchange = () => {
@@ -383,15 +444,18 @@ const BOARD = {
     };
   },
   team() {
-    const avg = Math.round(TEAMS.reduce((s, r) => s + r[3], 0) / TEAMS.length);
+    const all = D.equipos.flatMap(e => played(e));
+    const wins = all.filter(p => outcome(p) === 'G').length;
+    const week = AGENDA.filter(x => x.kind === 'match');
     return {
-      kicker: 'Club · Temporada 2026/27', title: 'Equipos',
+      kicker: `Club · Temporada 2026/27 · actualizado ${updated()}`, title: 'Equipos',
       body: `<div class="stack"><div class="kpis">
-          <div class="kpi dark"><small>Equipos</small><b>${TEAMS.length}</b></div>
-          <div class="kpi"><small>Jugadores</small><b>${TEAMS.reduce((s, r) => s + r[2], 0)}</b></div>
-          <div class="kpi"><small>Entrenadores</small><b>${new Set(TEAMS.map(r => r[1])).size}</b></div>
-          <div class="kpi"><small>Asistencia media</small><b>${avg}%</b></div></div>
-        ${card('h-eq', 'Asistencia del último mes', teamsList())}</div>`
+          <div class="kpi dark"><small>Equipos</small><b>${D.equipos.length}</b></div>
+          <div class="kpi"><small>Partidos jugados</small><b>${all.length}</b></div>
+          <div class="kpi"><small>Victorias</small><b>${wins}</b></div>
+          <div class="kpi"><small>Partidos esta semana</small><b>${week.length}</b></div></div>
+        ${card('h-eq', 'Clasificación y último resultado', teamsList())}
+        ${week.length ? card('h-wk', 'Partidos de los próximos 7 días', week.map(x => agendaRow(x, false)).join('')) : ''}</div>`
     };
   },
   ask() {
