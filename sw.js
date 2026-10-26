@@ -1,5 +1,5 @@
 // Guarda la app en el móvil para que abra rápido y sin cobertura en el campo.
-const CACHE = 'cd-aznalcollar-v5';
+const CACHE = 'cd-aznalcollar-v6';
 const FILES = ['./', 'index.html', 'css/app.css', 'js/app.js', 'manifest.webmanifest', 'icons/escudo-160.png', 'icons/escudo.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
