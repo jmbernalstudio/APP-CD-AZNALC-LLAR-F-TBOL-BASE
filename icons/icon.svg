@@ -1,5 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" fill="#123B7A"/>
-  <path d="M256 92l132 44v108c0 88-56 150-132 176-76-26-132-88-132-176V136z" fill="#F2B705"/>
-  <text x="256" y="318" text-anchor="middle" font-family="Arial Narrow, Arial, sans-serif" font-weight="700" font-size="120" fill="#123B7A">CDA</text>
-</svg>

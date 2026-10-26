@@ -15,28 +15,11 @@ const I = {
   send: '<path d="M4 12l16-8-6 16-2.5-6.5z"/>',
   inbox: '<path d="M3.5 13l2.5-8h12l2.5 8v6h-17z"/><path d="M3.5 13H9l1 2h4l1-2h5.5"/>',
   pin: '<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  chev: '<path d="M9 5l7 7-7 7"/>',
+  clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   whistle: '<circle cx="9" cy="14" r="5"/><path d="M12.5 10.5L20 6v4l-5 2"/>'
 };
 const ic = n => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
-
-/* Escudo provisional: se sustituye por el oficial en icons/escudo.svg o .png cuando lo tengamos. */
-function crest(a = 'var(--club)', b = 'var(--club-2)', c = 'var(--gold)', txt = 'CDA') {
-  return `<svg class="crest" viewBox="0 0 100 118" aria-hidden="true">
-    <defs><clipPath id="sh${txt}"><path d="M50 4l42 12v38c0 30-19 50-42 60C27 104 8 84 8 54V16z"/></clipPath></defs>
-    <path d="M50 4l42 12v38c0 30-19 50-42 60C27 104 8 84 8 54V16z" fill="${c}"/>
-    <g clip-path="url(#sh${txt})" transform="translate(50 59) scale(.88) translate(-50 -59)">
-      <rect width="100" height="118" fill="${b}"/>
-      <rect x="18" width="16" height="118" fill="${a}"/><rect x="50" width="16" height="118" fill="${a}"/><rect x="82" width="16" height="118" fill="${a}"/>
-      <rect y="0" width="100" height="34" fill="${a}"/>
-      <text x="50" y="25" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="22" fill="${b}">${txt}</text>
-    </g>
-    <circle cx="50" cy="76" r="15" fill="${b}" stroke="${c}" stroke-width="3"/>
-    <path d="M50 64l5 4-2 6h-6l-2-6zM45 74l-6 2M55 74l6 2M47 80l-3 6M53 80l3 6" stroke="#0B1430" stroke-width="2" fill="none"/>
-  </svg>`;
-}
-function kit(a = 'var(--club)', b = 'var(--club-2)') {
-  return `<svg class="kit" viewBox="0 0 40 40" aria-hidden="true"><path d="M13 5l-9 5 3 8 4-2v19h18V16l4 2 3-8-9-5c-1 3-4 5-7 5s-6-2-7-5z" fill="${a}" stroke="${b}" stroke-width="1.5"/><path d="M17 10v25M23 10v25" stroke="${b}" stroke-width="2.5" opacity=".7"/></svg>`;
-}
 
 const STATES = ['Enviada', 'Vista', 'En marcha', 'Resuelta'];
 const S = {
@@ -104,12 +87,17 @@ function say(msg, undo) {
   if (undo) $('#undo').onclick = () => { undo(); t.hidden = true; render(); };
 }
 
+
+const CREST = 'icons/escudo-160.png';
+const CLUB = 'C.D. Aznalcóllar';
+const greet = () => { const h = new Date().getHours(); return h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches'; };
+
 function tabsFor() {
   const unread = S.notices.filter(n => !n.read).length;
   const open = S.requests.filter(r => r.st < 3).length;
   return S.role === 'coach'
-    ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team'], ['ask', 'Pedir', 'plus', 'center'], ['msg', 'Mensajes', 'chat', '', unread]]
-    : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Aviso', 'send', 'center'], ['msg', 'Enviados', 'chat']];
+    ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team'], ['ask', 'Pedir o avisar', 'plus', 'center'], ['msg', 'Mensajes', 'chat', '', unread]]
+    : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Enviar aviso', 'send', 'center'], ['msg', 'Avisos enviados', 'chat']];
 }
 
 function go(tab, sub = null) { S.tab = tab; S.sub = sub; if (tab !== 'ask') S.draft = null; render(true); }
@@ -119,10 +107,18 @@ function render(focus) {
   $('#tabs').innerHTML = tabsFor().map(([k, l, i, cls, n]) =>
     `<li><button type="button" class="${cls || ''}" data-tab="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span>${n ? `<span class="badge" aria-label="${n} pendientes">${n}</span>` : ''}</button></li>`).join('');
   const v = (S.role === 'coach' ? COACH : BOARD)[S.tab]();
+  const date = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
   $('#top').innerHTML = `
-    <div class="hero-top">${crest()}<div class="club-name">CD Aznalcóllar<small>Fútbol base · ${S.role === 'coach' ? 'Entrenadores' : 'Junta directiva'}</small></div></div>
-    ${v.back ? `<button type="button" class="back" data-back>${ic('back')} Volver</button>` : ''}
-    <h1 id="title">${v.title}</h1>${v.sub ? `<p>${v.sub}</p>` : ''}`;
+    <div class="mast">
+      <div class="mast-top"><img src="${CREST}" alt="Escudo del ${CLUB}"><div class="mast-name">${CLUB}<small>Fútbol Base</small></div></div>
+      <div class="mast-rule" aria-hidden="true"></div>
+      <div class="dateline"><span>${date}</span><span>Temporada 2026/27 · ${S.role === 'coach' ? 'Entrenadores' : 'Junta directiva'}</span></div>
+    </div>
+    <div class="headline">
+      ${v.back ? `<button type="button" class="back" data-back>${ic('back')} Volver</button>` : ''}
+      <div class="kicker">${v.kicker}</div>
+      <h1 id="title">${v.title}</h1>${v.sub ? `<p>${v.sub}</p>` : ''}
+    </div>`;
   $('#main').className = 'pad ' + (v.layout || '');
   $('#main').innerHTML = v.body;
   v.bind && v.bind();
@@ -130,25 +126,38 @@ function render(focus) {
   if (focus) { $('#title').setAttribute('tabindex', '-1'); $('#title').focus({ preventScroll: true }); window.scrollTo(0, 0); }
 }
 
-function stepsHTML(r) {
-  return `<ol class="steps" aria-label="Estado: ${STATES[r.st]}, paso ${r.st + 1} de 4">${STATES.map((s, i) =>
-    `<li class="${i <= r.st ? 'on' : ''} ${i === r.st ? 'now' : ''}"><span class="dot">${i <= r.st ? ic('check') : ''}</span>${s}</li>`).join('')}</ol>`;
-}
-function stPill(r) {
-  const cls = r.st === 3 ? 'ok' : r.st === 0 ? 'info' : 'warn';
-  return `<span class="pill ${cls}">${STATES[r.st]}</span>`;
-}
 const kindIco = k => k === 'roto' ? 'wrench' : k === 'material' ? 'box' : 'talk';
 const kindName = k => k === 'roto' ? 'Algo roto' : k === 'material' ? 'Material' : 'Otra petición';
-
+function stPill(r) {
+  if (r.urgent && r.st < 3) return '<span class="pill bad">Urgente</span>';
+  return `<span class="pill ${r.st === 3 ? 'ok' : r.st === 0 ? 'info' : 'warn'}">${STATES[r.st]}</span>`;
+}
+function trackHTML(r) {
+  return `<div role="img" aria-label="Estado: ${STATES[r.st]}, paso ${r.st + 1} de 4">
+    <div class="track" aria-hidden="true">${STATES.map((_, i) => `<span class="${i <= r.st ? 'on' : ''}"></span>`).join('')}</div>
+    <div class="track-lbl" aria-hidden="true">${STATES.map((s, i) => `<span class="${i <= r.st ? 'on' : ''}">${s}</span>`).join('')}</div></div>`;
+}
+function reqRow(r, extra = '') {
+  return `<li><span class="ti">${ic(kindIco(r.kind))}</span>
+    <div class="title"><span>${esc(r.title)}</span>${stPill(r)}</div>
+    <div class="meta">${S.role === 'board' ? `${r.by} · ${r.team} · ` : ''}${kindName(r.kind)}${r.where ? ' · ' + esc(r.where) : ''} · ${r.when}</div>
+    <div class="extra">${trackHTML(r)}${extra}</div></li>`;
+}
+function panel(title, body, cls = '', action = '') {
+  return `<section class="panel ${cls}" aria-label="${title}"><div class="panel-h"><h2>${title}</h2>${action}</div>${body}</section>`;
+}
+function kpis(list) {
+  return `<div class="kpis">${list.map(([l, v, note, cls]) => `<div class="kpi ${cls || ''}"><span class="lbl">${l}</span><span class="val">${v}</span>${note ? `<span class="note">${note}</span>` : ''}</div>`).join('')}</div>`;
+}
 function matchHTML(team) {
   const m = S.teams[team].match;
-  const us = `<div class="side">${crest()}<b>CD Aznalcóllar</b></div>`;
-  const them = `<div class="side">${crest('#C8102E', '#FFFFFF', '#1B1B1B', initials(m.rival.replace('CD ', '').replace('UD ', '')).toUpperCase())}<b>${esc(m.rival)}</b></div>`;
-  return `<article class="match" aria-label="Próximo partido: ${team} contra ${esc(m.rival)}, ${m.day} a las ${m.h}">
-    <div class="match-label"><span>Próximo partido</span><span class="live">${team}</span></div>
-    <div class="match-row">${m.home ? us : them}<div class="vs"><span class="clock">${m.h}</span><small>${m.day}</small></div>${m.home ? them : us}</div>
-    <div class="match-foot">${ic('pin')} ${m.home ? 'En casa' : 'Fuera'} · ${esc(m.where)}</div></article>`;
+  const [wd, d] = m.day.split(' ');
+  const us = `<div class="team-line"><img src="${CREST}" alt="">${CLUB}</div>`;
+  const them = `<div class="team-line"><span class="rival-badge" aria-hidden="true">${initials(m.rival.replace(/^(CD|UD) /, ''))}</span>${esc(m.rival)}</div>`;
+  return `<div class="match">
+    <div class="match-date"><span class="m">${wd}</span><span class="d">${d}</span><span class="m">Oct</span></div>
+    <div class="versus">${m.home ? us + them : them + us}
+      <div class="match-meta"><span class="kick">${m.h}</span><span>${ic('pin')} ${m.home ? 'En casa' : 'Fuera'} · ${esc(m.where)}</span></div></div></div>`;
 }
 
 /* ---------- ENTRENADOR ---------- */
@@ -157,33 +166,31 @@ const COACH = {
     const t = S.teams[S.team];
     const mine = S.requests.filter(r => r.by === S.coach && r.st < 3);
     const unread = S.notices.filter(n => !n.read);
+    const a = S.attend[`${S.team} ${today()}`];
     return {
-      title: `Hola, <em>${S.coach}</em>`, sub: `Entrenas a ${Object.keys(S.teams).join(' e ')}`,
+      kicker: 'Panel del entrenador', title: `${greet()}, ${S.coach}`, sub: `Entrenas a ${Object.keys(S.teams).join(' e ')}. Esto es lo que tienes hoy.`,
       body: `
-      ${matchHTML(S.team)}
-      <section aria-labelledby="h-today">
-        <h2 id="h-today">Hoy</h2>
-        <div class="glass training"><span class="clock">${t.next.h}</span><div><strong>${t.next.what} · ${S.team}</strong><br><span class="muted">${t.next.where}</span></div></div>
-      </section>
-      <section aria-labelledby="h-do">
-        <h2 id="h-do">¿Qué quieres hacer?</h2>
-        <div class="tiles">
-          <button type="button" class="tile wide" data-go="team:list"><span class="ti">${ic('list')}</span><span><b>Pasar lista</b><small>Marca quién ha venido hoy</small></span></button>
-          <button type="button" class="tile" data-go="ask:material"><span class="ti">${ic('box')}</span><span><b>Pedir algo</b><small>Material, horarios…</small></span></button>
-          <button type="button" class="tile" data-go="ask:roto"><span class="ti">${ic('wrench')}</span><span><b>Algo roto</b><small>Avisa con una foto</small></span></button>
-        </div>
-      </section>
-      ${unread.length ? `<section aria-labelledby="h-new"><h2 id="h-new">Aviso nuevo</h2>
-        <button type="button" class="btn unread" data-go="msg" style="justify-content:flex-start">${ic('bell')}<span>${esc(unread[0].title)}<br><small class="muted">De ${esc(unread[0].from)} · toca para leer</small></span></button></section>` : ''}
-      <section aria-labelledby="h-req">
-        <h2 id="h-req">Mis peticiones</h2>
-        <div class="stack">${mine.length ? mine.map(r => `
-          <article class="glass req">
-            <div class="req-head"><span class="ti">${ic(kindIco(r.kind))}</span><div class="grow"><strong>${esc(r.title)}</strong><span class="muted">${kindName(r.kind)} · ${r.when}</span></div></div>
-            ${stepsHTML(r)}
-          </article>`).join('') : '<p class="muted">No tienes peticiones abiertas.</p>'}</div>
-      </section>`,
-      bind: bindGo, layout: 'split'
+      ${kpis([
+        ['Asistencia hoy', `${a ? a.size : 0}<small> / ${t.players.length}</small>`, S.team],
+        ['Próximo partido', t.match.h, `${t.match.day} · ${t.match.home ? 'en casa' : 'fuera'}`],
+        ['Mis peticiones', mine.length, 'abiertas'],
+        ['Avisos', unread.length, 'sin leer', unread.length ? 'alert' : '']
+      ])}
+      <div class="grid">
+        ${panel('Acciones rápidas', `<div class="actions">
+          <button type="button" class="act primary" data-go="team:list"><span class="ti">${ic('list')}</span><span><b>Pasar lista</b><small>Marca quién ha venido hoy</small></span><span class="go">${ic('chev')}</span></button>
+          <button type="button" class="act" data-go="ask:material"><span class="ti">${ic('box')}</span><span><b>Pedir algo a la junta</b><small>Material, horarios, campos</small></span><span class="go">${ic('chev')}</span></button>
+          <button type="button" class="act" data-go="ask:roto"><span class="ti">${ic('wrench')}</span><span><b>Avisar de algo roto</b><small>Con una foto, en tres pasos</small></span><span class="go">${ic('chev')}</span></button>
+        </div>`, 'c5')}
+        ${panel(`Próximo partido · ${S.team}`, matchHTML(S.team), 'c7 feature')}
+        ${panel('Hoy', `<div class="stack">
+          <div class="row"><div class="cal-date"><span>Hoy</span><b>${t.next.h.split(':')[0]}h</b></div><div class="grow"><strong>${t.next.what} · ${S.team}</strong><br><span class="muted">${t.next.h} · ${t.next.where}</span></div></div>
+          ${unread.length ? `<button type="button" class="act unread" data-go="msg"><span class="ti">${ic('bell')}</span><span><b>${esc(unread[0].title)}</b><small>Aviso de ${esc(unread[0].from)}</small></span><span class="go">${ic('chev')}</span></button>` : ''}
+        </div>`, 'c5')}
+        ${panel('Mis peticiones', mine.length ? `<ul class="rows">${mine.map(r => reqRow(r)).join('')}</ul>` : '<p class="muted">No tienes peticiones abiertas.</p>', 'c7',
+          '<button type="button" class="link" data-go="ask">Nueva</button>')}
+      </div>`,
+      bind: bindGo
     };
   },
   team() {
@@ -192,36 +199,35 @@ const COACH = {
     const key = `${S.team} ${today()}`;
     const a = S.attend[key] || (S.attend[key] = new Set());
     const pct = () => Math.round(a.size / t.players.length * 100);
-    const teamCards = `<div class="teams" role="group" aria-label="Elige equipo">${Object.entries(S.teams).map(([n, x]) =>
-      `<button type="button" class="team-card" data-team="${n}" aria-pressed="${n === S.team}">${kit()}<span><b>${n}</b><small>${x.cat}</small></span></button>`).join('')}</div>`;
+    const teamBtns = `<div class="teams" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n =>
+      `<button type="button" class="team-btn" data-team="${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>`;
     const views = `<div class="tabs-in" role="group" aria-label="Vista">${[['list', 'Pasar lista'], ['roster', 'Plantilla'], ['cal', 'Calendario']].map(([k, l]) =>
       `<button type="button" data-sub="${k}" aria-pressed="${sub === k}">${l}</button>`).join('')}</div>`;
     let body = '';
-    if (sub === 'list') body = `
-      <div class="glass"><div class="score"><div><span class="muted">Han venido hoy</span><div class="big" id="cnt">${a.size}<span> / ${t.players.length}</span></div></div>
-        <button type="button" class="btn club" id="all" style="width:auto;min-height:52px">${ic('check')} Todos</button></div>
-        <div class="bar" aria-hidden="true"><i id="bar" style="width:${pct()}%"></i></div></div>
-      <p class="muted" style="margin:0">Toca la ficha de cada jugador que ha venido. Se guarda solo.</p>
-      <ul class="cards">${t.players.map((p, i) => `<li><button type="button" class="cromo" data-p="${i}" aria-pressed="${a.has(i)}" aria-label="${p}, dorsal ${i + 1}">
-        <span class="dorsal" aria-hidden="true">${i + 1}</span><span class="avatar" aria-hidden="true">${initials(p)}</span><span class="stamp" aria-hidden="true">${ic('check')}</span>
-        <span class="pname">${short(p)}</span><span class="pstate">${a.has(i) ? 'Ha venido' : 'Sin marcar'}</span></button></li>`).join('')}</ul>`;
-    if (sub === 'roster') body = `<div class="stack">${t.players.map((p, i) => `<div class="glass row">
-        <span class="cromo" style="min-height:0;width:56px;height:56px;padding:0;place-items:center;display:grid;border-radius:50%"><b style="font-family:var(--display);font-size:1.5rem">${i + 1}</b></span>
-        <div class="grow"><strong>${p}</strong><br><span class="muted">Familia: 6${String(10 + i * 7).padStart(2, '0')} 45${String(20 + i).padStart(2, '0')} 1${i}</span></div></div>`).join('')}</div>`;
-    if (sub === 'cal') body = `<div class="stack">${S.cal.map(c => `<div class="glass row"><div class="cal-date"><span>${c.wd}</span><b>${c.d}</b></div>
-        <div class="grow"><strong>${c.t}</strong><br><span class="muted">${c.h} · ${c.w}</span></div></div>`).join('')}</div>`;
+    if (sub === 'list') body = panel(`Asistencia · ${new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}`, `
+      <div class="attend-head"><div><span class="muted">Han venido</span><div class="val" id="cnt">${a.size}<small> / ${t.players.length}</small></div></div>
+        <button type="button" class="btn primary inline" id="all">${ic('check')} Marcar a todos</button></div>
+      <div class="bar" aria-hidden="true"><i id="bar" style="width:${pct()}%"></i></div>
+      <p class="muted">Toca a cada jugador que ha venido. Se guarda solo.</p>
+      <ul class="players">${t.players.map((p, i) => `<li><button type="button" class="player" data-p="${i}" aria-pressed="${a.has(i)}">
+        <span class="dorsal" aria-hidden="true">${i + 1}</span><span class="pname">${p}</span>
+        <span class="pstate">${a.has(i) ? ic('check') + 'Ha venido' : 'Sin marcar'}</span></button></li>`).join('')}</ul>`);
+    if (sub === 'roster') body = panel('Plantilla', `<div class="table-wrap"><table class="data"><thead><tr><th>Dorsal</th><th>Jugador</th><th>Contacto familia</th></tr></thead><tbody>
+      ${t.players.map((p, i) => `<tr><td class="n">${i + 1}</td><td><strong>${p}</strong></td><td class="muted">6${String(10 + i * 7).padStart(2, '0')} 45${String(20 + i).padStart(2, '0')} 1${i}</td></tr>`).join('')}</tbody></table></div>`);
+    if (sub === 'cal') body = panel('Esta semana', `<ul class="rows">${S.cal.map(c => `<li><div class="cal-date" style="grid-row:span 2"><span>${c.wd}</span><b>${c.d}</b></div>
+      <div class="title"><span>${c.t}</span></div><div class="meta">${c.h} · ${c.w}</div></li>`).join('')}</ul>`);
     return {
-      title: S.team, sub: `${t.cat} · ${t.players.length} jugadores`,
-      body: `${teamCards}${views}${body}`,
+      kicker: 'Mi equipo', title: S.team, sub: `${t.cat} · ${t.players.length} jugadores`,
+      body: `${teamBtns}${views}${body}`,
       bind() {
         document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; render(); });
         document.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { S.sub = b.dataset.sub; render(); });
-        const upd = () => { $('#cnt').innerHTML = `${a.size}<span> / ${t.players.length}</span>`; $('#bar').style.width = pct() + '%'; };
         document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
           const i = +b.dataset.p; a.has(i) ? a.delete(i) : a.add(i);
           b.setAttribute('aria-pressed', a.has(i));
-          b.querySelector('.pstate').textContent = a.has(i) ? 'Ha venido' : 'Sin marcar';
-          upd(); save();
+          b.querySelector('.pstate').innerHTML = a.has(i) ? ic('check') + 'Ha venido' : 'Sin marcar';
+          $('#cnt').innerHTML = `${a.size}<small> / ${t.players.length}</small>`; $('#bar').style.width = pct() + '%';
+          save();
           $('#live').textContent = `${t.players[i]}: ${a.has(i) ? 'ha venido' : 'sin marcar'}. ${a.size} de ${t.players.length}.`;
         });
         const all = $('#all');
@@ -233,19 +239,20 @@ const COACH = {
     const d = S.draft || (S.draft = { step: S.sub ? 2 : 1, kind: S.sub || null, text: '', where: '', urgent: false, photo: null });
     S.sub = null;
     const stepper = `<div><div class="stepper" aria-hidden="true">${[1, 2, 3].map(i => `<span class="${i <= d.step ? 'on' : ''}"></span>`).join('')}</div>
-      <p class="muted" style="margin:.5rem 0 0;font-weight:700">Paso ${d.step} de 3 · ${['¿Qué necesitas?', 'Cuéntanos', 'Revisa y envía'][d.step - 1]}</p></div>`;
+      <p class="step-lbl">Paso ${d.step} de 3 · ${['¿Qué necesitas?', 'Cuéntanos', 'Revisa y envía'][d.step - 1]}</p></div>`;
     const back = d.step > 1 && d.step < 4 ? () => { d.step--; render(true); } : null;
-    if (d.step === 1) return {
-      title: 'Pedir o <em>avisar</em>', sub: 'La junta lo recibe al momento', back, layout: 'narrow',
-      body: `${stepper}<div class="stack">
-        <button type="button" class="btn opt" data-k="material"><span class="ti">${ic('box')}</span><span><b>Pedir material</b><small>Balones, petos, conos, botiquín…</small></span></button>
-        <button type="button" class="btn opt" data-k="roto"><span class="ti">${ic('wrench')}</span><span><b>Algo roto</b><small>Porterías, luces, vestuarios…</small></span></button>
-        <button type="button" class="btn opt" data-k="otra"><span class="ti">${ic('talk')}</span><span><b>Otra cosa</b><small>Horarios, campos, dudas, ideas</small></span></button></div>`,
+    const base = { kicker: 'Pedir o avisar', layout: 'narrow', back };
+    if (d.step === 1) return { ...base,
+      title: '¿Qué necesitas?', sub: 'La junta lo recibe al momento y verás cómo avanza.',
+      body: `${stepper}<div class="actions">
+        <button type="button" class="act" data-k="material"><span class="ti">${ic('box')}</span><span><b>Pedir material</b><small>Balones, petos, conos, botiquín…</small></span><span class="go">${ic('chev')}</span></button>
+        <button type="button" class="act" data-k="roto"><span class="ti">${ic('wrench')}</span><span><b>Avisar de algo roto</b><small>Porterías, luces, vestuarios…</small></span><span class="go">${ic('chev')}</span></button>
+        <button type="button" class="act" data-k="otra"><span class="ti">${ic('talk')}</span><span><b>Otra cosa</b><small>Horarios, campos, dudas, propuestas</small></span><span class="go">${ic('chev')}</span></button></div>`,
       bind() { document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { d.kind = b.dataset.k; d.step = 2; render(true); }); }
     };
-    if (d.step === 2) return {
-      title: kindName(d.kind), sub: S.team, back, layout: 'narrow',
-      body: `${stepper}<form id="f" class="stack" novalidate>
+    if (d.step === 2) return { ...base,
+      title: kindName(d.kind), sub: S.team,
+      body: `${stepper}<form id="f" class="panel stack" novalidate>
         <label class="f" for="t">${d.kind === 'roto' ? '¿Qué se ha roto?' : d.kind === 'material' ? '¿Qué necesitas?' : '¿Qué quieres decir a la junta?'}
           <span class="hint">${ic('mic')} Con una frase basta. Puedes dictarlo con el micrófono del teclado.</span>
           <textarea id="t" required>${esc(d.text)}</textarea></label>
@@ -256,7 +263,7 @@ const COACH = {
           <input type="file" id="ph" accept="image/*" class="sr">` : ''}
         <label class="toggle" for="u"><input type="checkbox" id="u" ${d.urgent ? 'checked' : ''}> Es urgente</label>
         <p id="err" class="err" role="alert" hidden>Escribe al menos unas palabras para poder seguir.</p>
-        <button class="btn gold" type="submit">Siguiente</button></form>`,
+        <button class="btn primary" type="submit">Siguiente</button></form>`,
       bind() {
         const sync = () => { d.text = $('#t').value.trim(); d.urgent = $('#u').checked; if ($('#w')) d.where = $('#w').value; };
         const ph = $('#ph');
@@ -264,13 +271,13 @@ const COACH = {
         $('#f').onsubmit = e => { e.preventDefault(); sync(); if (!d.text) { $('#err').hidden = false; $('#t').focus(); return; } d.step = 3; render(true); };
       }
     };
-    if (d.step === 3) return {
-      title: 'Revisa y <em>envía</em>', sub: 'Así lo verá la junta', back, layout: 'narrow',
-      body: `${stepper}<article class="glass req">
-        <div class="req-head"><span class="ti">${ic(kindIco(d.kind))}</span><div class="grow"><strong>${esc(d.text)}</strong>
-        <span class="muted">${kindName(d.kind)} · ${S.team}${d.where ? ' · ' + esc(d.where) : ''}</span></div>${d.urgent ? '<span class="pill bad">Urgente</span>' : ''}</div>
-        ${d.photo ? `<img src="${d.photo}" alt="Foto adjunta" style="border-radius:14px;max-height:220px;width:100%;object-fit:cover">` : ''}</article>
-        <button type="button" class="btn gold" id="send">${ic('send')} Enviar a la junta</button>`,
+    if (d.step === 3) return { ...base,
+      title: 'Revisa y envía', sub: 'Así lo verá la junta.',
+      body: `${stepper}${panel(kindName(d.kind), `<div class="stack">
+        <p style="margin:0;font-size:1.15rem;font-weight:700">${esc(d.text)}</p>
+        <p class="muted" style="margin:0">${S.team}${d.where ? ' · ' + esc(d.where) : ''}${d.urgent ? ' · <span class="pill bad">Urgente</span>' : ''}</p>
+        ${d.photo ? `<img src="${d.photo}" alt="Foto adjunta" style="border-radius:6px;max-height:240px;width:100%;object-fit:cover">` : ''}</div>`)}
+        <button type="button" class="btn primary" id="send">${ic('send')} Enviar a la junta</button>`,
       bind() {
         $('#send').onclick = () => {
           S.requests.unshift({ id: Date.now(), kind: d.kind, title: d.text, where: d.where, team: S.team, by: S.coach, st: 0, when: 'Ahora', urgent: d.urgent });
@@ -278,24 +285,22 @@ const COACH = {
         };
       }
     };
-    return {
-      title: '¡<em>Enviado</em>!', sub: 'La junta ya lo tiene', layout: 'narrow',
-      body: `<div class="done"><span class="ring">${ic('check')}</span><h2>Recibido</h2>
-        <p style="margin:0;max-width:30ch">Verás cómo avanza en <strong>Inicio</strong>, en “Mis peticiones”. Te avisaremos cuando esté resuelta.</p></div>
-        <button type="button" class="btn gold" data-go="home">Volver al inicio</button>`,
+    return { ...base, back: null,
+      title: 'Enviado a la junta', sub: 'Ya lo tienen. Te avisaremos cuando esté resuelto.',
+      body: `<div class="panel done"><span class="ring">${ic('check')}</span>
+        <p style="margin:0">Puedes seguir cómo avanza en <strong>Inicio</strong>, en “Mis peticiones”.</p></div>
+        <button type="button" class="btn primary" data-go="home">Volver al inicio</button>`,
       bind() { S.draft = null; bindGo(); }
     };
   },
   msg() {
     return {
-      title: 'Mensajes', sub: 'Avisos del club y de la junta',
-      body: `<div class="stack grid2">${S.notices.map(n => `
-        <article class="glass stack ${n.read ? '' : 'unread'}" aria-labelledby="n${n.id}">
-          <div class="req-head"><span class="ti">${ic('bell')}</span><div class="grow"><strong id="n${n.id}">${esc(n.title)}</strong><span class="muted">De ${esc(n.from)}</span></div>
-          ${n.read ? '<span class="pill ok">Leído</span>' : '<span class="pill warn">Nuevo</span>'}</div>
-          <p style="margin:0">${esc(n.body)}</p>
-          ${n.read ? '' : `<button type="button" class="btn gold" data-read="${n.id}">${ic('check')} Entendido</button>`}
-        </article>`).join('')}</div>`,
+      kicker: 'Mensajes', title: 'Avisos del club', sub: 'Comunicados de la junta y la coordinación deportiva.', layout: 'narrow',
+      body: S.notices.map(n => `<article class="panel stack ${n.read ? '' : 'unread'}" aria-labelledby="n${n.id}">
+          <div class="panel-h" style="margin:0"><h2 id="n${n.id}" style="text-transform:none;letter-spacing:0;font-size:1.3rem">${esc(n.title)}</h2>${n.read ? '<span class="pill ok">Leído</span>' : '<span class="pill warn">Nuevo</span>'}</div>
+          <p style="margin:0">${esc(n.body)}</p><span class="muted">${esc(n.from)}</span>
+          ${n.read ? '' : `<button type="button" class="btn primary" data-read="${n.id}">${ic('check')} Entendido</button>`}
+        </article>`).join(''),
       bind() { document.querySelectorAll('[data-read]').forEach(b => b.onclick = () => {
         const n = S.notices.find(x => x.id == b.dataset.read); n.read = true; n.readBy++; render(); say('Marcado como leído. La junta lo verá.'); }); }
     };
@@ -308,20 +313,16 @@ const BOARD = {
     const open = S.requests.filter(r => r.st < 3);
     const order = [...S.requests].sort((a, b) => (a.st === 3) - (b.st === 3) || b.urgent - a.urgent || a.st - b.st);
     return {
-      title: 'La <em>bandeja</em>', sub: 'Lo que piden y avisan los entrenadores',
-      body: `<div class="kpis">
-          <div class="kpi"><b>${open.length}</b><span>Abiertas</span></div>
-          <div class="kpi hot"><b>${open.filter(r => r.urgent).length}</b><span>Urgentes</span></div>
-          <div class="kpi"><b>${S.requests.filter(r => r.st === 0).length}</b><span>Sin ver</span></div></div>
-        <section aria-labelledby="h-in"><h2 id="h-in">Peticiones y avisos</h2><div class="stack grid2">${order.map(r => `
-          <article class="glass req ${r.urgent && r.st < 3 ? 'urgent' : ''}" aria-labelledby="r${r.id}">
-            <div class="req-head"><span class="ti">${ic(kindIco(r.kind))}</span>
-              <div class="grow"><strong id="r${r.id}">${esc(r.title)}</strong><span class="muted">${r.by} · ${r.team}${r.where ? ' · ' + esc(r.where) : ''} · ${r.when}</span></div>
-              ${r.urgent && r.st < 3 ? '<span class="pill bad">Urgente</span>' : stPill(r)}</div>
-            ${stepsHTML(r)}
-            <label class="f" for="s${r.id}"><span class="hint">Cambiar estado</span>
-              <select id="s${r.id}" data-st="${r.id}">${STATES.map((s, i) => `<option value="${i}" ${i === r.st ? 'selected' : ''}>${s}</option>`).join('')}</select></label>
-          </article>`).join('')}</div></section>`,
+      kicker: 'Panel de la junta', title: 'Bandeja de entrada', sub: 'Todo lo que piden y avisan los entrenadores, ordenado por urgencia.',
+      body: `${kpis([
+          ['Abiertas', open.length, 'peticiones'],
+          ['Urgentes', open.filter(r => r.urgent).length, 'por atender', open.some(r => r.urgent) ? 'alert' : ''],
+          ['Sin ver', S.requests.filter(r => r.st === 0).length, 'nuevas'],
+          ['Resueltas', S.requests.filter(r => r.st === 3).length, 'esta temporada']
+        ])}
+        ${panel('Peticiones y avisos', `<ul class="rows">${order.map(r => reqRow(r, `
+            <label class="f" for="s${r.id}" style="max-width:280px"><span class="hint">Cambiar estado</span>
+              <select id="s${r.id}" data-st="${r.id}">${STATES.map((s, i) => `<option value="${i}" ${i === r.st ? 'selected' : ''}>${s}</option>`).join('')}</select></label>`)).join('')}</ul>`)}`,
       bind() { document.querySelectorAll('[data-st]').forEach(s => s.onchange = () => {
         const r = S.requests.find(x => x.id == s.dataset.st); const prev = r.st; r.st = +s.value; render();
         say(`“${r.title}” pasa a ${STATES[r.st]}. ${r.by} lo verá en su móvil.`, () => { r.st = prev; }); }); }
@@ -329,24 +330,25 @@ const BOARD = {
   },
   team() {
     const rows = [['Alevín A', 'Paco Martín', 12, 86], ['Infantil B', 'Paco Martín', 10, 91], ['Cadete A', 'Raquel Torres', 16, 78], ['Benjamín C', 'Manolo Fuentes', 11, 94], ['Juvenil A', 'Iker Domínguez', 18, 72]];
+    const avg = Math.round(rows.reduce((s, r) => s + r[3], 0) / rows.length);
     return {
-      title: 'Los <em>equipos</em>', sub: `${rows.length} equipos · asistencia del último mes`,
-      body: `<div class="stack grid2">${rows.map(([t, c, n, p]) => `<div class="glass">
-        <div class="row">${kit()}<div class="grow"><strong style="font-family:var(--display);font-size:1.3rem;text-transform:uppercase">${t}</strong><br><span class="muted">${c} · ${n} jugadores</span></div>
-        <span class="pill ${p >= 85 ? 'ok' : p >= 75 ? 'warn' : 'bad'}">${p}%</span></div>
-        <div class="bar" role="img" aria-label="Asistencia ${p}%"><i style="width:${p}%"></i></div></div>`).join('')}</div>`
+      kicker: 'Club', title: 'Equipos', sub: 'Asistencia media del último mes por equipo.',
+      body: `${kpis([['Equipos', rows.length], ['Jugadores', rows.reduce((s, r) => s + r[2], 0)], ['Entrenadores', new Set(rows.map(r => r[1])).size], ['Asistencia media', `${avg}<small>%</small>`]])}
+        ${panel('Equipos de la temporada', `<div class="table-wrap"><table class="data"><thead><tr><th>Equipo</th><th>Entrenador</th><th>Jugadores</th><th style="min-width:160px">Asistencia</th></tr></thead><tbody>
+        ${rows.map(([t, c, n, p]) => `<tr><td><strong>${t}</strong></td><td>${c}</td><td>${n}</td>
+          <td><div class="row"><div class="bar grow" aria-hidden="true"><i style="width:${p}%;background:var(${p >= 85 ? '--ok' : p >= 75 ? '--warn' : '--bad'})"></i></div><span class="pill ${p >= 85 ? 'ok' : p >= 75 ? 'warn' : 'bad'}">${p}%</span></div></td></tr>`).join('')}
+        </tbody></table></div>`)}`
     };
   },
   ask() {
     return {
-      title: 'Enviar <em>aviso</em>', sub: 'Llega al móvil de los entrenadores',
-      layout: 'narrow',
-      body: `<form id="nf" class="stack" novalidate>
+      kicker: 'Comunicación', title: 'Enviar un aviso', sub: 'Llega al móvil de los entrenadores y verás quién lo ha leído.', layout: 'narrow',
+      body: `<form id="nf" class="panel stack" novalidate>
         <label class="f" for="to">¿A quién?<select id="to"><option>Todos los entrenadores (24)</option><option>Fútbol base (14)</option><option>Categoría alevín (4)</option><option>Solo a Paco Martín</option></select></label>
         <label class="f" for="nt">Título<input type="text" id="nt" value="Reunión de entrenadores"></label>
         <label class="f" for="nb">Mensaje<textarea id="nb">El jueves 29 a las 20:30 en la sede. Hablaremos del torneo de Navidad.</textarea></label>
         <label class="toggle" for="nr"><input type="checkbox" id="nr" checked> Pedir que confirmen “Entendido”</label>
-        <button type="submit" class="btn gold">${ic('send')} Enviar aviso</button></form>`,
+        <button type="submit" class="btn primary">${ic('send')} Enviar aviso</button></form>`,
       bind() { $('#nf').onsubmit = e => { e.preventDefault();
         S.notices.unshift({ id: Date.now(), from: 'Junta directiva', title: $('#nt').value || 'Aviso', body: $('#nb').value, read: false, readBy: 0, total: 24 });
         go('msg'); say('Aviso enviado. Verás quién lo ha leído.'); }; }
@@ -354,11 +356,11 @@ const BOARD = {
   },
   msg() {
     return {
-      title: 'Avisos <em>enviados</em>', sub: 'Quién los ha leído',
-      body: `<div class="stack grid2">${S.notices.map(n => `<article class="glass stack">
-        <div class="req-head"><span class="ti">${ic('bell')}</span><div class="grow"><strong>${esc(n.title)}</strong><span class="muted">${esc(n.body)}</span></div></div>
-        <div><div class="score"><span class="muted">Leído por</span><b style="font-family:var(--display);font-size:1.6rem">${n.readBy} / ${n.total}</b></div>
-        <div class="bar" aria-hidden="true"><i style="width:${n.readBy / n.total * 100}%"></i></div></div></article>`).join('')}</div>`
+      kicker: 'Comunicación', title: 'Avisos enviados', sub: 'Quién los ha leído.',
+      body: panel('Lecturas', `<ul class="rows">${S.notices.map(n => `<li><span class="ti">${ic('bell')}</span>
+        <div class="title"><span>${esc(n.title)}</span><span class="pill ${n.readBy === n.total ? 'ok' : 'info'}">${n.readBy} de ${n.total}</span></div>
+        <div class="meta">${esc(n.body)}</div>
+        <div class="extra"><div class="bar" role="img" aria-label="Leído por ${n.readBy} de ${n.total}"><i style="width:${n.readBy / n.total * 100}%"></i></div></div></li>`).join('')}</ul>`)
     };
   }
 };
@@ -375,7 +377,6 @@ $('#role-coach').onclick = () => setRole('coach');
 $('#role-board').onclick = () => setRole('board');
 $('#bigtext').onchange = e => { document.documentElement.classList.toggle('big', e.target.checked); try { localStorage.setItem('big', e.target.checked ? '1' : ''); } catch (_) {} };
 try { if (localStorage.getItem('big')) { $('#bigtext').checked = true; document.documentElement.classList.add('big'); } } catch (_) {}
-$('#brand-crest').innerHTML = crest();
 load();
 render();
 

@@ -1,4 +1,4 @@
-# CD Aznalcóllar Fútbol Base · App interna
+# C.D. Aznalcóllar Fútbol Base · App interna
 
 App para el móvil que conecta a los entrenadores con la junta directiva del club.
 
