@@ -111,8 +111,8 @@ function tabsFor() {
   const unread = S.notices.filter(n => !n.read).length;
   const open = S.requests.filter(r => r.st < 3).length;
   return S.role === 'coach'
-    ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team'], ['ask', 'Pedir o avisar', 'plus', 'plus'], ['msg', 'Mensajes', 'chat', '', unread]]
-    : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Enviar aviso', 'send', 'plus'], ['msg', 'Avisos enviados', 'chat']];
+    ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team'], ['ask', 'Pedir', 'plus', 'plus'], ['msg', 'Mensajes', 'chat', '', unread]]
+    : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Aviso', 'send', 'plus'], ['msg', 'Enviados', 'chat']];
 }
 
 function go(tab, sub = null) { S.tab = tab; S.sub = sub; if (tab !== 'ask') S.draft = null; render(true); }
@@ -123,7 +123,7 @@ function render(focus) {
   $('#rail-tabs').innerHTML = tabs.map(([k, l, i, cls, n]) =>
     `<li><button type="button" class="${cls || ''}" data-tab="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${ic(i)}<span>${l}</span>${n ? `<span class="badge" aria-label="${n} pendientes">${n}</span>` : ''}</button></li>`).join('');
   $('#bottom-tabs').innerHTML = tabs.map(([k, l, i, cls, n]) =>
-    `<li><button type="button" class="${cls || ''}" data-tab="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${cls === 'plus' ? `<span class="ic">${ic(i)}</span>` : ic(i)}<span>${l.split(' ')[0] === 'Avisos' ? 'Enviados' : l.replace(' o avisar', '').replace('Enviar aviso', 'Aviso')}</span>${n ? `<span class="badge" aria-label="${n} pendientes">${n}</span>` : ''}</button></li>`).join('');
+    `<li><button type="button" class="${cls || ''}" data-tab="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${cls === 'plus' ? `<span class="ic">${ic(i)}</span>` : ic(i)}<span>${l}</span>${n ? `<span class="badge" aria-label="${n} pendientes">${n}</span>` : ''}</button></li>`).join('');
   const v = (S.role === 'coach' ? COACH : BOARD)[S.tab]();
   const unread = S.notices.filter(n => !n.read).length;
   $('#top').innerHTML = `
@@ -152,15 +152,15 @@ function stepsHTML(r, labels) {
 }
 function reqRow(r, ctl = '') {
   return `<div class="rq"><span class="ic ${kindCls(r.kind)}">${ic(kindIco(r.kind))}</span>
-    <div class="grow"><b>${esc(r.title)}</b><small>${S.role === 'board' ? `${r.by} · ${r.team} · ` : ''}${STATES[r.st]} · ${r.when}${r.where ? ' · ' + esc(r.where) : ''}</small>${stepsHTML(r, !!ctl)}</div>
-    ${stPill(r)}${ctl}</div>`;
+    <div class="grow"><b title="${esc(r.title)}">${esc(r.title)}</b><div class="rq-meta">${stPill(r)}<small>${S.role === 'board' ? `${r.by} · ${r.team} · ` : ''}${r.when}${r.where ? ' · ' + esc(r.where) : ''}</small></div>${stepsHTML(r, !!ctl)}</div>
+    ${ctl}</div>`;
 }
 function card(id, title, body, cls = '', more = '') {
   return `<section class="card ${cls}" aria-labelledby="${id}"><div class="card-h"><h2 id="${id}">${title}</h2>${more}</div>${body}</section>`;
 }
 function scoreHTML(team) {
   const m = S.teams[team].match;
-  const us = `<div><div class="ring">${crestImg()}</div><b>${CLUB}</b><small>${team}</small></div>`;
+  const us = `<div><div class="ring">${crestImg()}</div><b>Aznalcóllar</b><small>${team}</small></div>`;
   const them = `<div><div class="ring rv" style="background-color:${m.color}" aria-hidden="true">${initials(m.rival.replace(/^(CD|UD) /, ''))}</div><b>${esc(m.rival)}</b><small>${m.home ? 'Visitante' : 'Local'}</small></div>`;
   return `<div class="score">${m.home ? us : them}<div><div class="vs-time">${m.h}</div><small>Jornada ${m.jornada}</small></div>${m.home ? them : us}</div>`;
 }
@@ -168,10 +168,10 @@ function agendaRow(e, withAct) {
   let what;
   if (e.kind === 'match') {
     const m = S.teams[e.team].match;
-    const us = `${usMini()}Aznalcóllar`, them = `${rivalMini(m)}${esc(m.rival)}`;
+    const us = `${usMini()}<span class="nm">Aznalcóllar</span>`, them = `${rivalMini(m)}<span class="nm">${esc(m.rival)}</span>`;
     what = `<span class="vsl">${m.home ? us : them}<span class="pill gold">vs</span>${m.home ? them : us}</span><span class="where">${esc(m.where)}</span>`;
   } else if (e.kind === 'club') what = `<span class="t">${e.title}</span><span class="where">${e.where}</span>`;
-  else what = `<span class="t">Entrenamiento · ${e.team}</span>${e.today ? '<span class="pill">Hoy</span>' : ''}<span class="where">${e.where}</span>`;
+  else what = `<span class="t">Entreno · ${e.team}</span>${e.today ? '<span class="pill">Hoy</span>' : ''}<span class="where">${e.where}</span>`;
   const act = withAct && e.today && e.kind === 'train'
     ? `<button type="button" class="btn gold sm ev-act" data-team-go="${e.team}">Pasar lista</button>`
     : `<span class="pill ${e.kind === 'match' ? 'gold' : e.kind === 'club' ? 'grey' : 'blue'} ev-act">${e.kind === 'club' ? 'Club' : e.team}</span>`;
@@ -202,7 +202,7 @@ function attendanceCard(team, id) {
 }
 function noticeCard(n, cls = '') {
   return `<section class="card notice ${cls}" aria-labelledby="nt${n.id}"><div class="media">${crestImg()}<span class="lbl">${ic('bell')}Aviso del club</span></div>
-    <span class="eyebrow">${esc(n.from)}</span><h3 id="nt${n.id}">${esc(n.title)}</h3><span class="eyebrow">${esc(n.body)}</span></section>`;
+    <span class="eyebrow">${esc(n.from)}</span><h3 id="nt${n.id}">${esc(n.title)}</h3><p class="eyebrow nb">${esc(n.body)}</p></section>`;
 }
 
 /* ---------- ENTRENADOR ---------- */
@@ -314,7 +314,7 @@ const COACH = {
           <label class="photo" for="ph">${d.photo ? `<img src="${d.photo}" alt="Foto adjunta">` : `<span class="ic">${ic('camera')}</span>`}
           <span>${d.photo ? 'Foto añadida · toca para cambiarla' : 'Añadir una foto (opcional)'}</span></label>
           <input type="file" id="ph" accept="image/*" class="sr">` : ''}
-        <label class="toggle" for="u"><input type="checkbox" id="u" ${d.urgent ? 'checked' : ''}> Es urgente</label>
+        <label class="toggle" for="u"><input type="checkbox" id="u" ${d.urgent ? 'checked' : ''}> <span>Es urgente</span></label>
         <p id="err" class="err" role="alert" hidden>Escribe al menos unas palabras para poder seguir.</p>
         <button class="btn blue block" type="submit">Siguiente</button></form>`,
       bind() {
@@ -374,7 +374,7 @@ const BOARD = {
           <div class="kpi ${open.some(r => r.urgent) ? 'alert' : ''}"><small>Urgentes</small><b>${open.filter(r => r.urgent).length}</b></div>
           <div class="kpi"><small>Sin ver</small><b>${S.requests.filter(r => r.st === 0).length}</b></div>
           <div class="kpi"><small>Resueltas</small><b>${S.requests.filter(r => r.st === 3).length}</b></div></div>
-        ${card('h-in', 'Peticiones y avisos de los entrenadores', order.map(r => reqRow(r, `<div class="ctl"><label for="s${r.id}">Estado</label>
+        ${card('h-in', 'Peticiones recibidas', order.map(r => reqRow(r, `<div class="ctl"><label for="s${r.id}">Estado</label>
           <select id="s${r.id}" data-st="${r.id}">${STATES.map((s, i) => `<option value="${i}" ${i === r.st ? 'selected' : ''}>${s}</option>`).join('')}</select></div>`)).join(''), 'a-inbox')}
         ${card('h-tm', 'Asistencia por equipo', teamsList(), 'a-teams', '<button type="button" class="more" data-go="team">Ver equipos</button>')}
         ${noticeCard(S.notices[0], 'a-notice')}
@@ -403,7 +403,7 @@ const BOARD = {
         <label class="f" for="to">¿A quién?<select id="to"><option>Todos los entrenadores (24)</option><option>Fútbol base (14)</option><option>Categoría alevín (4)</option><option>Solo a Paco Martín</option></select></label>
         <label class="f" for="nt">Título<input type="text" id="nt" value="Reunión de entrenadores"></label>
         <label class="f" for="nb">Mensaje<textarea id="nb">El jueves 29 a las 20:30 en la sede. Hablaremos del torneo de Navidad.</textarea></label>
-        <label class="toggle" for="nr"><input type="checkbox" id="nr" checked> Pedir que confirmen “Entendido”</label>
+        <label class="toggle" for="nr"><input type="checkbox" id="nr" checked> <span>Pedir “Entendido”</span></label>
         <button type="submit" class="btn gold block">${ic('send')} Enviar aviso</button></form>`,
       bind() { $('#nf').onsubmit = e => { e.preventDefault();
         S.notices.unshift({ id: Date.now(), from: 'Junta directiva', title: $('#nt').value || 'Aviso', body: $('#nb').value, read: false, readBy: 0, total: 24 });
