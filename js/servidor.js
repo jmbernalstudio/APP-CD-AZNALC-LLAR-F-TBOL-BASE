@@ -32,6 +32,7 @@
     async aviso(n) { return ok(await sb.from('avisos').insert({ titulo: n.title, texto: n.body }).select('id').single()).id; },
     async leido(id) { ok(await sb.from('avisos_leidos').upsert({ aviso: id }, { ignoreDuplicates: true })); },
     async alta(p) { return ok(await sb.rpc('crear_usuario', { p_usuario: p.usuario, p_clave: p.clave, p_nombre: p.nombre, p_rol: p.rol, p_equipos: p.equipos })); },
+    async entreno(team, t) { ok(await sb.from('equipos').update({ dias: t.dias, hora: t.h, lugar: t.where }).eq('id', idEq(team))); },
     async foto(perfil, foto) { ok(await sb.from('perfiles').update({ foto }).eq('id', perfil)); },
     async clave(perfil, clave) { ok(await sb.rpc('cambiar_clave', { p_perfil: perfil, p_clave: clave })); }
   };
@@ -91,7 +92,11 @@
     S.coach = yo.nombre;
     S.role = junta ? 'board' : 'coach';
     S.teams = {};
-    for (const id of mios) S.teams[nombreEq(id)] = { cat: '', next: null, players: [] };
+    const eqs = ok(await sb.from('equipos').select('id, dias, hora, lugar'));
+    for (const id of mios) {
+      const q = eqs.find(x => x.id === id) || {};
+      S.teams[nombreEq(id)] = { cat: '', train: { dias: q.dias || [], h: q.hora || '', where: q.lugar || '' }, players: [] };
+    }
     const equipoDe = {};
     for (const j of jug) {
       equipoDe[j.id] = nombreEq(j.equipo);

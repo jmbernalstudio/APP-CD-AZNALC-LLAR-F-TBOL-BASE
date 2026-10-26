@@ -13,6 +13,9 @@ create table if not exists public.equipos (
   id     text primary key,          -- igual que en js/datos.js (senior, alevin2…)
   nombre text not null
 );
+-- Entrenos: días (1 = lunes … 7 = domingo), hora y campo. Los elige la junta.
+alter table public.equipos add column if not exists dias int[] not null default array[]::int[],
+  add column if not exists hora text, add column if not exists lugar text;
 
 create table if not exists public.perfiles (
   id      uuid primary key references auth.users on delete cascade,
@@ -103,6 +106,8 @@ alter table public.avisos_leidos     enable row level security;
 
 drop policy if exists "ver equipos" on public.equipos;
 create policy "ver equipos" on public.equipos for select to authenticated using (true);
+drop policy if exists junta_edita_equipos on public.equipos;
+create policy junta_edita_equipos on public.equipos for update to authenticated using (public.es_junta()) with check (public.es_junta());
 
 drop policy if exists "ver perfiles" on public.perfiles;
 create policy "ver perfiles" on public.perfiles for select to authenticated using (id = auth.uid() or public.es_junta());

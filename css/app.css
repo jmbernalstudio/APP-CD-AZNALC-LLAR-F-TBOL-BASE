@@ -237,7 +237,7 @@ main.narrow { max-width: 680px; }
 label.f { display: flex; flex-direction: column; gap: 6px; font-weight: 600; }
 label.f .hint { font-weight: 400; color: var(--muted); font-size: .9rem; display: flex; gap: 6px; align-items: center; }
 label.f .hint .i { width: 18px; height: 18px; }
-input[type=text], input[type=number], input[type=password], input[type=email], textarea, select { width: 100%; min-height: 56px; padding: 12px 14px; border-radius: 16px; border: 1px solid #C9D1E0; background: var(--card); }
+input[type=text], input[type=time], input[type=number], input[type=password], input[type=email], textarea, select { width: 100%; min-height: 56px; padding: 12px 14px; border-radius: 16px; border: 1px solid #C9D1E0; background: var(--card); }
 input[type=text]:focus, input[type=number]:focus, input[type=password]:focus, textarea:focus, select:focus { border-color: var(--club); outline: 3px solid var(--club-soft); }
 textarea { min-height: 120px; resize: vertical; }
 .photo { display: flex; align-items: center; gap: 12px; border: 2px dashed #C9D1E0; border-radius: 18px; padding: 12px; min-height: 76px; cursor: pointer; font-weight: 600; }
@@ -416,3 +416,11 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .photo .av { width: 50px; height: 50px; }
 .tm .av { border-radius: 50%; }
 @media (min-width: 1080px) { .me-t { display: block; } .me .av { width: 50px; height: 50px; } }
+
+/* Entrenos: listas pendientes y días con entreno */
+.pend { margin-bottom: 16px; border: 2px solid var(--gold); }
+.pend .card-h { margin-bottom: 10px; }
+.pend .chip { display: inline-flex; align-items: center; gap: 8px; }
+.pdot { width: 9px; height: 9px; border-radius: 50%; background: var(--bad); display: inline-block; flex: none; }
+.chip { display: inline-flex; align-items: center; gap: 8px; }
+.days span.has-train:not(.today) b { color: var(--club); }
