@@ -58,6 +58,8 @@ function crestBadge(e, name, cls = 'mini') {
 }
 const S = {
   role: 'coach', tab: 'home', sub: null,
+  /* live = true cuando hay sesión iniciada en el servidor del club (js/servidor.js) */
+  live: false, me: { id: null, nombre: 'Paco Martín' }, board: 'Ana Ruiz',
   coach: 'Paco', team: 'Alevín 2º año',
   /* Equipos de Paco (entrenador de ejemplo). Los partidos son reales; la plantilla aún es de ejemplo. */
   teams: {
@@ -67,6 +69,10 @@ const S = {
       players: ['Sara Blanco', 'Nerea Gómez', 'Lucía Pastor', 'Carla Ibáñez', 'Alba Rubio', 'Irene Moya', 'Paula Crespo', 'Vega Herrero', 'Noa Garrido', 'Elena Soler'] }
   },
   attend: {},
+  people: [
+    { id: 'd1', nombre: 'Ana Ruiz', usuario: 'ana@example.com', rol: 'junta', equipos: [] },
+    { id: 'd2', nombre: 'Paco Martín', usuario: 'paco.alevin', rol: 'entrenador', equipos: ['alevin2', 'infantil'] }
+  ],
   cal: [
     { wd: 'Lun', d: '26', h: '18:00', t: 'Entrenamiento', w: 'Campo 2' },
     { wd: 'Mié', d: '28', h: '18:00', t: 'Entrenamiento', w: 'Campo 2' },
@@ -84,9 +90,12 @@ const S = {
   ],
   draft: null
 };
+/* Demo: cada jugador con su id; la asistencia guarda ids */
+for (const t of Object.values(S.teams)) t.players = t.players.map((n, i) => ({ id: i + 1, n }));
 
-/* Guardado en este móvil. Cuando haya servidor, estas dos funciones pasan a hablar con él. */
-const STORE_KEY = 'cd-aznalcollar-v1';
+/* Demo: se guarda en este móvil. Con sesión iniciada, los datos van al servidor (window.API). */
+const STORE_KEY = 'cd-aznalcollar-v2';
+const API = () => (S.live && window.API) || null;
 function load() {
   try {
     const d = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
@@ -97,13 +106,14 @@ function load() {
   } catch (_) {}
 }
 function save() {
+  if (S.live) return;
   try {
     const attend = {};
     for (const k in S.attend) attend[k] = [...S.attend[k]];
     localStorage.setItem(STORE_KEY, JSON.stringify({ requests: S.requests, notices: S.notices, attend }));
   } catch (_) {}
 }
-const today = () => new Date().toISOString().slice(0, 10);
+const today = () => TODAY;
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -125,6 +135,8 @@ const CREST = 'icons/escudo-160.png';
 const CREST_SRC = CREST;
 const CLUB = 'C.D. Aznalcóllar';
 const greet = () => { const h = new Date().getHours(); return h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches'; };
+const myName = () => S.live ? S.me.nombre : S.role === 'coach' ? S.me.nombre : S.board;
+const firstName = () => myName().split(' ')[0];
 const crestImg = (cls = '') => `<img class="cr ${cls}" src="${CREST}" alt="">`;
 
 
@@ -134,14 +146,15 @@ function buildAgenda() {
   const ev = [];
   const trains = { 'Alevín 2º año': [0, 2], 'Infantil': [0, 3] };
   for (const [team, days] of Object.entries(trains)) for (const i of days) {
-    const t = S.teams[team].next;
+    const t = S.teams[team] && S.teams[team].next;
+    if (!t) continue;
     ev.push({ iso: WEEK[i], day: i === 0 ? 'Hoy' : dayLbl(WEEK[i]), h: t.h, kind: 'train', team, where: t.where, today: i === 0 });
   }
   for (const e of D.equipos) for (const p of e.partidos)
     if (!p.descansa && p.fecha >= WEEK[0] && p.fecha <= WEEK[6]) ev.push({ iso: p.fecha, day: p.fecha === TODAY ? 'Hoy' : dayLbl(p.fecha), h: p.hora || '--:--', kind: 'match', team: e.nombre, p, e });
   return ev.sort((a, b) => (a.iso + a.h).localeCompare(b.iso + b.h));
 }
-const AGENDA = buildAgenda();
+let AGENDA = buildAgenda();
 
 function tabsFor() {
   const unread = S.notices.filter(n => !n.read).length;
@@ -166,7 +179,7 @@ function render(focus) {
     ${v.back ? `<button type="button" class="back" data-back aria-label="Volver">${ic('back')}</button>` : crestImg('logo')}
     <div class="title"><small>${v.kicker}</small><h1 id="title">${v.title}</h1></div>
     ${S.role === 'coach' ? `<button type="button" class="iconbtn" data-go="msg" aria-label="Mensajes${unread ? `, ${unread} sin leer` : ''}">${ic('bell')}${unread ? '<span class="dot"></span>' : ''}</button>` : ''}
-    <div class="who"><div><small>${S.role === 'coach' ? 'Entrenador' : 'Junta directiva'}</small><b>${S.role === 'coach' ? 'Paco Martín' : 'Ana Ruiz'}</b></div><span class="av" aria-hidden="true">${S.role === 'coach' ? 'PM' : 'AR'}</span></div>`;
+    <div class="who"><div><small>${S.role === 'coach' ? 'Entrenador' : 'Junta directiva'}</small><b>${esc(myName())}</b></div><span class="av" aria-hidden="true">${esc(initials(myName()))}</span></div>`;
   $('#main').className = v.layout || '';
   $('#main').innerHTML = v.body;
   v.bind && v.bind();
@@ -241,20 +254,60 @@ function bindAgenda() {
   document.querySelectorAll('[data-ag]').forEach(b => b.onclick = () => { S.ag = b.dataset.ag; const el = b.closest('section'); el.outerHTML = agendaCard(S.ag); bindAgenda(); bindGo(); });
   document.querySelectorAll('[data-team-go]').forEach(b => b.onclick = () => { S.team = b.dataset.teamGo; go('team', 'list'); });
 }
+/* Últimos 8 días con lista pasada. En la demo, cifras de ejemplo. */
+function attendanceHist(team) {
+  const n = S.teams[team].players.length;
+  if (!S.live) return { days: [5, 7, 12, 14, 19, 21, 23, 26], pct: team === 'Alevín 2º año' ? [75, 83, 92, 67, 92, 100, 83, 92] : [80, 90, 100, 70, 90, 100, 90, 100] };
+  const days = Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort().slice(-8);
+  return { days: days.map(d => toDate(d).getDate()), pct: days.map(d => n ? Math.round(S.attend[`${team} ${d}`].size / n * 100) : 0) };
+}
 function attendanceCard(team, id) {
-  const pct = team === 'Alevín 2º año' ? [75, 83, 92, 67, 92, 100, 83, 92] : [80, 90, 100, 70, 90, 100, 90, 100];
-  const avg = Math.round(pct.reduce((a, b) => a + b) / pct.length);
+  const { days, pct } = attendanceHist(team);
+  const avg = pct.length ? Math.round(pct.reduce((a, b) => a + b) / pct.length) : null;
   const a = S.attend[`${team} ${today()}`];
   const n = S.teams[team].players.length;
   return card(id, `Asistencia · ${team}`, `
-    <div class="bignum">${avg}%</div><div class="delta">+4% respecto a septiembre</div>
-    <div class="bars" role="img" aria-label="Asistencia por entrenamiento en octubre: ${pct.join(', ')} por ciento">${pct.map(p => `<span class="${p >= 90 ? 'hi' : p < 70 ? 'lo' : ''}" style="height:${p}%"></span>`).join('')}</div>
-    <div class="bars-x" aria-hidden="true">${[5, 7, 12, 14, 19, 21, 23, 26].map(d => `<span>${d}</span>`).join('')}</div>
-    <div class="last">${ic('check')}Hoy<b class="att-today">${a ? a.size : 0} de ${n}</b></div>`, 'dark a-attend', '<span class="tag">Octubre</span>');
+    <div class="bignum">${avg == null ? '–' : avg + '%'}</div><div class="delta">${avg == null ? 'Aún no has pasado lista' : S.live ? `Media de los últimos ${pct.length} entrenos` : '+4% respecto a septiembre'}</div>
+    <div class="bars" role="img" aria-label="Asistencia por entrenamiento: ${pct.join(', ')} por ciento">${pct.map(p => `<span class="${p >= 90 ? 'hi' : p < 70 ? 'lo' : ''}" style="height:${p}%"></span>`).join('')}</div>
+    <div class="bars-x" aria-hidden="true">${days.map(d => `<span>${d}</span>`).join('')}</div>
+    <div class="last">${ic('check')}Hoy<b class="att-today">${a ? a.size : 0} de ${n}</b></div>`, 'dark a-attend', `<span class="tag">${S.live ? 'Últimos entrenos' : 'Octubre'}</span>`);
 }
 function noticeCard(n, cls = '') {
+  if (!n) return '';
   return `<section class="card notice ${cls}" aria-labelledby="nt${n.id}"><div class="media">${crestImg()}<span class="lbl">${ic('bell')}Aviso del club</span></div>
     <span class="eyebrow">${esc(n.from)}</span><h3 id="nt${n.id}">${esc(n.title)}</h3><p class="eyebrow nb">${esc(n.body)}</p></section>`;
+}
+
+/* Plantilla: lista y alta/baja de jugadores (entrenador de ese equipo o junta) */
+function rosterCard(team) {
+  const t = S.teams[team];
+  const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n));
+  return `<div class="stack">${card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? list.map(p => `<div class="tm"><span class="k">${p.dorsal || '–'}</span>
+      <div class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.nac ? 'Nacido en ' + p.nac : 'Sin año de nacimiento'}</small></div>
+      <button type="button" class="more" data-del="${p.id}" aria-label="Quitar a ${esc(p.n)} de la plantilla">Quitar</button></div>`).join('') : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>')}
+    <form id="pf" class="card stack" novalidate aria-labelledby="h-add"><h2 id="h-add" style="margin:0;font-size:1.1rem">Añadir jugador</h2>
+      <label class="f" for="pn">Nombre y apellidos<input type="text" id="pn" autocomplete="off" required></label>
+      <div class="row2"><label class="f" for="pd">Dorsal<input type="number" id="pd" inputmode="numeric" min="1" max="99"></label>
+      <label class="f" for="py">Año de nacimiento<input type="number" id="py" inputmode="numeric" min="1950" max="${new Date().getFullYear()}"></label></div>
+      <p id="perr" class="err" role="alert" hidden>Escribe el nombre del jugador.</p>
+      <button type="submit" class="btn blue block">${ic('plus')} Añadir a ${esc(team)}</button></form></div>`;
+}
+function bindRoster(team) {
+  const t = S.teams[team], f = $('#pf');
+  if (!f) return;
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const p = { n: $('#pn').value.trim(), dorsal: +$('#pd').value || null, nac: +$('#py').value || null };
+    if (!p.n) { $('#perr').hidden = false; $('#pn').focus(); return; }
+    try { p.id = API() ? await API().jugador(team, p) : Date.now(); } catch (_) { say('No se ha podido guardar. Revisa la conexión.'); return; }
+    t.players.push(p); render(); say(`${p.n} añadido a ${team}`); $('#pn') && $('#pn').focus();
+  };
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+    const p = t.players.find(x => x.id == b.dataset.del);
+    try { API() && await API().quitarJugador(p.id, false); } catch (_) { say('No se ha podido quitar. Revisa la conexión.'); return; }
+    t.players = t.players.filter(x => x !== p); render();
+    say(`${p.n} ya no está en la plantilla`, () => { t.players.push(p); API() && API().quitarJugador(p.id, true); });
+  });
 }
 
 /* ---------- ENTRENADOR ---------- */
@@ -266,7 +319,7 @@ const COACH = {
     const nm = EQ[S.team] && nextMatch(EQ[S.team]);
     const mine2 = new Set(AGENDA.filter(x => x.kind === 'match' && S.teams[x.team]).map(x => x.iso));
     return {
-      kicker: `${greet()},`, title: 'Paco Martín', layout: '',
+      kicker: `${greet()},`, title: esc(myName()), layout: '',
       body: `
       <div class="days" aria-label="Próximos 7 días">${WEEK.map((iso, i) => { const [w, n] = dayLbl(iso).split(' '); return `<span class="${i === 0 ? 'today' : ''} ${mine2.has(iso) ? 'has-match' : ''}">${w}<b>${n}</b></span>`; }).join('')}</div>
       <div class="grid coach-home">
@@ -274,7 +327,7 @@ const COACH = {
           <div class="match-btns"><button type="button" class="btn gold" data-say="La convocatoria llegará en la próxima versión.">Convocatoria</button>${nm && nm.campo ? `<a class="btn glass" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" data-say="Campo por confirmar">${ic('pin')}Cómo llegar</button>`}</div>`,
           'match a-match', nm ? `<span class="tag gold">${dateLbl(nm.fecha)}</span>` : '')}
         <section class="hero a-hero" aria-labelledby="h-hero">${crestImg('big-crest')}
-          <span class="kick">Hoy · ${t.next.what} ${t.next.h} · ${t.next.where}</span>
+          <span class="kick">${t.next ? `Hoy · ${t.next.what} ${t.next.h} · ${t.next.where}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>
           <h2 id="h-hero">Semana de partido para el ${S.team}</h2>
           <p>${nm ? `El ${dateLbl(nm.fecha).toLowerCase()} ${nm.casa ? 'recibís al' : 'visitáis al'} ${esc(nice(nm.rival))}. ` : ''}Pasa lista hoy y prepara la convocatoria.</p>
           <div class="btns"><button type="button" class="btn gold" data-go="team:list">Pasar lista</button><button type="button" class="btn glass" data-go="ask:material">Pedir algo a la junta</button></div>
@@ -302,7 +355,7 @@ const COACH = {
     const sub = S.sub || 'list';
     const key = `${S.team} ${today()}`;
     const a = S.attend[key] || (S.attend[key] = new Set());
-    const pct = () => Math.round(a.size / t.players.length * 100);
+    const pct = () => t.players.length ? Math.round(a.size / t.players.length * 100) : 0;
     const head = `<div class="stack" style="margin-bottom:16px">
       <div class="chips" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n => `<button type="button" class="chip" data-team="${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>
       <div class="tabs" role="group" aria-label="Vista">${[['list', 'Pasar lista'], ['games', 'Partidos'], ['table', 'Clasificación'], ['roster', 'Plantilla']].map(([k, l]) =>
@@ -310,16 +363,16 @@ const COACH = {
     let body = '';
     if (sub === 'list') body = `<div class="split"><div class="stack">
       <section class="card match" aria-label="Resumen de asistencia de hoy"><div class="att-top">
-        <div><span class="tag">Hoy · ${t.next.h} · ${t.next.where}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
+        <div><span class="tag">${t.next ? `Hoy · ${t.next.h} · ${t.next.where}` : `Hoy · ${dateLbl(TODAY)}`}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
         <button type="button" class="btn gold" id="all">${ic('check')} Marcar a todos</button></div>
         <div class="progress" aria-hidden="true"><i id="bar" style="width:${pct()}%"></i></div></section>
       <p class="muted" style="margin:0">Toca a cada jugador que ha venido. Se guarda solo.</p>
-      <ul class="players">${t.players.map((p, i) => `<li><button type="button" class="player" data-p="${i}" aria-pressed="${a.has(i)}">
-        <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${i + 1}</span><span class="pname">${p}</span>
-        <span class="pstate">${a.has(i) ? 'Ha venido' : 'Sin marcar'}</span></button></li>`).join('')}</ul></div>
+      ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
+      <ul class="players">${t.players.map((p, i) => `<li><button type="button" class="player" data-p="${p.id}" aria-pressed="${a.has(p.id)}">
+        <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${p.dorsal || i + 1}</span><span class="pname">${esc(p.n)}</span>
+        <span class="pstate">${a.has(p.id) ? 'Ha venido' : 'Sin marcar'}</span></button></li>`).join('')}</ul></div>
       ${attendanceCard(S.team, 'h-at2')}</div>`;
-    if (sub === 'roster') body = card('h-pl', `Plantilla · ${t.players.length} jugadores`, t.players.map((p, i) => `<div class="tm"><span class="k">${i + 1}</span>
-      <div class="grow"><b>${p}</b><small>Familia: 6${String(10 + i * 7).padStart(2, '0')} 45${String(20 + i).padStart(2, '0')} 1${i}</small></div></div>`).join(''));
+    if (sub === 'roster') body = rosterCard(S.team);
     const e = EQ[S.team];
     if (sub === 'games') body = card('h-gm', `Temporada · ${e.partidos.length} jornadas`, e.partidos.map(p => matchRow(e, p)).join(''), '', `<span class="tag src">${e.fuente}</span>`);
     if (sub === 'table') body = card('h-tb', e.cat, tableHTML(e), '', `<span class="tag src">${e.fuente}</span>`);
@@ -329,17 +382,24 @@ const COACH = {
       bind() {
         document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; render(); });
         document.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { S.sub = b.dataset.sub; render(); });
+        bindRoster(S.team);
         document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
           const i = +b.dataset.p; a.has(i) ? a.delete(i) : a.add(i);
+          API() && API().asistencia(i, TODAY, a.has(i)).catch(() => { a.has(i) ? a.delete(i) : a.add(i); render(); say('No se ha podido guardar. Revisa la conexión.'); });
           b.setAttribute('aria-pressed', a.has(i));
           b.querySelector('.pstate').textContent = a.has(i) ? 'Ha venido' : 'Sin marcar';
           $('#cnt').innerHTML = `${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; $('#bar').style.width = pct() + '%';
           document.querySelectorAll('.att-today').forEach(x => x.textContent = `${a.size} de ${t.players.length}`);
           save();
-          $('#live').textContent = `${t.players[i]}: ${a.has(i) ? 'ha venido' : 'sin marcar'}. ${a.size} de ${t.players.length}.`;
+          $('#live').textContent = `${t.players.find(p => p.id === i).n}: ${a.has(i) ? 'ha venido' : 'sin marcar'}. ${a.size} de ${t.players.length}.`;
         });
         const all = $('#all');
-        if (all) all.onclick = () => { const prev = new Set(a); t.players.forEach((_, i) => a.add(i)); render(); say('Todos marcados como presentes', () => { S.attend[key] = prev; }); };
+        if (all) all.onclick = () => {
+          const prev = new Set(a), added = t.players.filter(p => !a.has(p.id)).map(p => p.id);
+          added.forEach(i => a.add(i)); render();
+          API() && Promise.all(added.map(i => API().asistencia(i, TODAY, true))).catch(() => say('No se ha podido guardar. Revisa la conexión.'));
+          say('Todos marcados como presentes', () => { S.attend[key] = prev; API() && added.forEach(i => API().asistencia(i, TODAY, false)); });
+        };
       }
     };
   },
@@ -386,8 +446,10 @@ const COACH = {
         ${d.photo ? `<img src="${d.photo}" alt="Foto adjunta" style="border-radius:16px;max-height:240px;width:100%;object-fit:cover">` : ''}
         <button type="button" class="btn gold block" id="send">${ic('send')} Enviar a la junta</button></section>`,
       bind() {
-        $('#send').onclick = () => {
-          S.requests.unshift({ id: Date.now(), kind: d.kind, title: d.text, where: d.where, team: S.team, by: S.coach, st: 0, when: 'Ahora', urgent: d.urgent });
+        $('#send').onclick = async () => {
+          const r = { id: Date.now(), kind: d.kind, title: d.text, where: d.where, team: S.team, by: S.coach, st: 0, when: 'Ahora', urgent: d.urgent };
+          try { if (API()) r.id = await API().peticion(r); } catch (_) { say('No se ha podido enviar. Revisa la conexión y vuelve a probar.'); return; }
+          S.requests.unshift(r);
           d.step = 4; render(true);
         };
       }
@@ -408,7 +470,8 @@ const COACH = {
           <h3 id="m${n.id}">${esc(n.title)}</h3><p style="margin:6px 0 0">${esc(n.body)}</p>
           ${n.read ? '' : `<button type="button" class="btn blue block" style="margin-top:14px" data-read="${n.id}">${ic('check')} Entendido</button>`}</section>`).join('')}</div>`,
       bind() { document.querySelectorAll('[data-read]').forEach(b => b.onclick = () => {
-        const n = S.notices.find(x => x.id == b.dataset.read); n.read = true; n.readBy++; render(); say('Marcado como leído. La junta lo verá.'); }); }
+        const n = S.notices.find(x => x.id == b.dataset.read); n.read = true; n.readBy++; render(); say('Marcado como leído. La junta lo verá.');
+        API() && API().leido(n.id).catch(() => {}); }); }
     };
   }
 };
@@ -418,15 +481,73 @@ const COACH = {
 const teamsList = () => D.equipos.map(e => {
   const r = ourRow(e), l = lastMatch(e), n = nextMatch(e);
   const res = l ? outcome(l) : null;
-  return `<div class="tm"><span class="k">${r ? r.pos + 'º' : '–'}</span><div class="grow"><b>${e.nombre}</b><small>${r ? r.pts + ' pts · ' : ''}${n ? 'Próximo: ' + dayLbl(n.fecha) + ' vs ' + esc(nice(n.rival)) : 'Sin próximos partidos'}</small></div>
-    ${l ? `<span class="res ${res}" title="Último: ${esc(nice(l.rival))}">${scoreTxt(l)}</span>` : ''}</div>`;
+  return `<button type="button" class="tm tm-btn" data-eq="${esc(e.nombre)}"><span class="k">${r ? r.pos + 'º' : '–'}</span><div class="grow"><b>${e.nombre}</b><small>${r ? r.pts + ' pts · ' : ''}${n ? 'Próximo: ' + dayLbl(n.fecha) + ' vs ' + esc(nice(n.rival)) : 'Sin próximos partidos'}</small></div>
+    ${l ? `<span class="res ${res}" title="Último: ${esc(nice(l.rival))}">${scoreTxt(l)}</span>` : ''}</button>`;
 }).join('');
+const coachCount = () => S.people.filter(p => p.rol === 'entrenador').length;
+const teamOf = id => (D.equipos.find(e => e.id === id) || {}).nombre || id;
+/* Entrenadores y junta con sus equipos; alta de cuentas nuevas */
+function peopleCard() {
+  return card('h-pp', `Entrenadores y accesos · ${S.people.length}`, (S.people.length ? S.people.map(p => `<div class="tm"><span class="av" aria-hidden="true">${esc(initials(p.nombre))}</span>
+    <div class="grow"><b title="${esc(p.nombre)}">${esc(p.nombre)}</b><small title="${esc(p.usuario)}">${p.rol === 'junta' ? 'Junta directiva' : p.equipos.length ? p.equipos.map(teamOf).join(', ') : 'Sin equipo asignado'} · ${esc(p.usuario)}</small></div>
+    ${p.id !== S.me.id ? `<button type="button" class="more" data-pw="${p.id}" aria-label="Nueva contraseña para ${esc(p.nombre)}">Contraseña</button>` : ''}</div>`).join('') : '<p class="muted" style="margin:0">Aún no hay nadie dado de alta.</p>'),
+    'a-people', '<button type="button" class="more" data-go="team:alta">Dar de alta</button>');
+}
+function bindPeople() {
+  document.querySelectorAll('[data-pw]').forEach(b => b.onclick = () => go('team', 'pw:' + b.dataset.pw));
+}
+function claveForm(p) {
+  return `<form id="cf" class="card stack" novalidate>
+    <p style="margin:0">Escribe una contraseña nueva para <b>${esc(p.nombre)}</b> y dísela en persona. Entrará con “${esc(p.usuario)}”.</p>
+    <label class="f" for="cp">Contraseña nueva<span class="hint">Mínimo 8 caracteres</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
+    <p id="cerr" class="err" role="alert" hidden></p>
+    <button type="submit" class="btn blue block">${ic('check')} Guardar contraseña</button></form>`;
+}
+function bindClave(p) {
+  $('#cf').onsubmit = async e => {
+    e.preventDefault();
+    const pw = $('#cp').value, err = m => { $('#cerr').textContent = m; $('#cerr').hidden = false; };
+    if (pw.length < 8) return err('La contraseña debe tener al menos 8 caracteres.');
+    try { API() && await API().clave(p.id, pw); } catch (_) { return err('No se ha podido cambiar. Revisa la conexión.'); }
+    go('team'); say(`Contraseña cambiada. Dísela a ${p.nombre.split(' ')[0]}.`);
+  };
+}
+function altaForm() {
+  return `<form id="af" class="card stack" novalidate>
+    <label class="f" for="an">Nombre y apellidos<input type="text" id="an" autocomplete="off" required></label>
+    <label class="f" for="au">Usuario o correo<span class="hint">Sin correo: p. ej. manolo.alevin</span><input type="text" id="au" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
+    <label class="f" for="ap">Contraseña<span class="hint">Mínimo 8 caracteres</span><input type="text" id="ap" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
+    <fieldset class="f"><legend>Acceso</legend><div class="chips" role="radiogroup">
+      <label class="chip"><input type="radio" name="ar" value="entrenador" checked> Entrenador</label>
+      <label class="chip"><input type="radio" name="ar" value="junta"> Junta</label></div></fieldset>
+    <fieldset class="f" id="aeq"><legend>Sus equipos</legend><div class="chips">${D.equipos.map(e => `<label class="chip"><input type="checkbox" value="${e.id}"> ${esc(e.nombre)}</label>`).join('')}</div></fieldset>
+    <p id="aerr" class="err" role="alert" hidden></p>
+    <button type="submit" class="btn blue block">${ic('check')} Dar de alta</button></form>`;
+}
+function bindAlta() {
+  const f = $('#af');
+  f.querySelectorAll('[name=ar]').forEach(r => r.onchange = () => { $('#aeq').hidden = f.querySelector('[name=ar]:checked').value === 'junta'; });
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const err = m => { $('#aerr').textContent = m; $('#aerr').hidden = false; };
+    const rol = f.querySelector('[name=ar]:checked').value;
+    const p = { nombre: $('#an').value.trim(), usuario: $('#au').value.trim().toLowerCase(), clave: $('#ap').value, rol,
+      equipos: rol === 'junta' ? [] : [...f.querySelectorAll('#aeq input:checked')].map(x => x.value) };
+    if (!p.nombre) return err('Escribe el nombre.');
+    if (!/^[a-z0-9._@-]{3,}$/.test(p.usuario)) return err('El usuario solo puede llevar letras sin tilde, números y puntos (mínimo 3).');
+    if (p.clave.length < 8) return err('La contraseña debe tener al menos 8 caracteres.');
+    if (rol === 'entrenador' && !p.equipos.length) return err('Marca al menos un equipo.');
+    try { p.id = API() ? await API().alta(p) : String(Date.now()); } catch (x) { return err(/existe/.test(x.message) ? 'Ese usuario ya existe. Elige otro.' : 'No se ha podido dar de alta. Revisa la conexión.'); }
+    S.people.push({ id: p.id, nombre: p.nombre, usuario: p.usuario, rol, equipos: p.equipos });
+    go('team'); say(`${p.nombre} ya puede entrar con “${p.usuario}” y su contraseña.`);
+  };
+}
 const BOARD = {
   home() {
     const open = S.requests.filter(r => r.st < 3);
     const order = [...S.requests].sort((a, b) => (a.st === 3) - (b.st === 3) || b.urgent - a.urgent || a.st - b.st);
     return {
-      kicker: `${greet()}, Ana`, title: 'Bandeja de la junta',
+      kicker: `${greet()}, ${esc(firstName())}`, title: 'Bandeja de la junta',
       body: `<div class="grid board-home">
         <div class="kpis a-kpis">
           <div class="kpi dark"><small>Abiertas</small><b>${open.length}</b></div>
@@ -440,10 +561,21 @@ const BOARD = {
       </div>`,
       bind() { document.querySelectorAll('[data-st]').forEach(s => s.onchange = () => {
         const r = S.requests.find(x => x.id == s.dataset.st); const prev = r.st; r.st = +s.value; render();
-        say(`“${r.title}” pasa a ${STATES[r.st]}. ${r.by} lo verá en su móvil.`, () => { r.st = prev; }); }); }
+        API() && API().estado(r.id, r.st).catch(() => { r.st = prev; render(); say('No se ha podido guardar. Revisa la conexión.'); });
+        say(`“${r.title}” pasa a ${STATES[r.st]}. ${r.by} lo verá en su móvil.`, () => { r.st = prev; API() && API().estado(r.id, prev); }); }); }
     };
   },
   team() {
+    if (S.sub === 'alta') return { kicker: 'Equipos · Accesos', title: 'Dar de alta', layout: 'narrow', back: () => go('team'), body: altaForm(), bind: bindAlta };
+    if (S.sub && S.sub.startsWith('pw:')) {
+      const p = S.people.find(x => x.id === S.sub.slice(3));
+      return { kicker: 'Equipos · Accesos', title: 'Cambiar contraseña', layout: 'narrow', back: () => go('team'), body: claveForm(p), bind: () => bindClave(p) };
+    }
+    if (S.sub && S.sub.startsWith('eq:')) {
+      const team = S.sub.slice(3);
+      S.teams[team] = S.teams[team] || { cat: (EQ[team] || {}).cat || '', next: null, players: [] };
+      return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), layout: 'narrow', back: () => go('team'), body: rosterCard(team), bind: () => bindRoster(team) };
+    }
     const all = D.equipos.flatMap(e => played(e));
     const wins = all.filter(p => outcome(p) === 'G').length;
     const week = AGENDA.filter(x => x.kind === 'match');
@@ -454,30 +586,36 @@ const BOARD = {
           <div class="kpi"><small>Partidos jugados</small><b>${all.length}</b></div>
           <div class="kpi"><small>Victorias</small><b>${wins}</b></div>
           <div class="kpi"><small>Partidos esta semana</small><b>${week.length}</b></div></div>
-        ${card('h-eq', 'Clasificación y último resultado', teamsList())}
-        ${week.length ? card('h-wk', 'Partidos de los próximos 7 días', week.map(x => agendaRow(x, false)).join('')) : ''}</div>`
+        ${peopleCard()}
+        ${card('h-eq', 'Clasificación y plantillas', teamsList())}
+        ${week.length ? card('h-wk', 'Partidos de los próximos 7 días', week.map(x => agendaRow(x, false)).join('')) : ''}</div>`,
+      bind: bindPeople
     };
   },
   ask() {
     return {
       kicker: 'Comunicación', title: 'Enviar un aviso', layout: 'narrow',
       body: `<form id="nf" class="card stack" novalidate>
-        <label class="f" for="to">¿A quién?<select id="to"><option>Todos los entrenadores (24)</option><option>Fútbol base (14)</option><option>Categoría alevín (4)</option><option>Solo a Paco Martín</option></select></label>
-        <label class="f" for="nt">Título<input type="text" id="nt" value="Reunión de entrenadores"></label>
-        <label class="f" for="nb">Mensaje<textarea id="nb">El jueves 29 a las 20:30 en la sede. Hablaremos del torneo de Navidad.</textarea></label>
-        <label class="toggle" for="nr"><input type="checkbox" id="nr" checked> <span>Pedir “Entendido”</span></label>
+        ${S.live ? `<p class="muted" style="margin:0">Lo recibirán todos los entrenadores (${coachCount()}).</p>`
+          : `<label class="f" for="to">¿A quién?<select id="to"><option>Todos los entrenadores (24)</option><option>Fútbol base (14)</option><option>Categoría alevín (4)</option><option>Solo a Paco Martín</option></select></label>`}
+        <label class="f" for="nt">Título<input type="text" id="nt" ${S.live ? 'placeholder="Por ejemplo: Reunión de entrenadores"' : 'value="Reunión de entrenadores"'}></label>
+        <label class="f" for="nb">Mensaje<textarea id="nb">${S.live ? '' : 'El jueves 29 a las 20:30 en la sede. Hablaremos del torneo de Navidad.'}</textarea></label>
+        <p id="nerr" class="err" role="alert" hidden>Escribe el mensaje.</p>
         <button type="submit" class="btn gold block">${ic('send')} Enviar aviso</button></form>`,
-      bind() { $('#nf').onsubmit = e => { e.preventDefault();
-        S.notices.unshift({ id: Date.now(), from: 'Junta directiva', title: $('#nt').value || 'Aviso', body: $('#nb').value, read: false, readBy: 0, total: 24 });
+      bind() { $('#nf').onsubmit = async e => { e.preventDefault();
+        const n = { id: Date.now(), from: 'Junta directiva', title: $('#nt').value.trim() || 'Aviso', body: $('#nb').value.trim(), read: false, readBy: 0, total: S.live ? coachCount() : 24 };
+        if (!n.body) { $('#nerr').hidden = false; $('#nb').focus(); return; }
+        try { if (API()) n.id = await API().aviso(n); } catch (_) { say('No se ha podido enviar. Revisa la conexión.'); return; }
+        S.notices.unshift(n);
         go('msg'); say('Aviso enviado. Verás quién lo ha leído.'); }; }
     };
   },
   msg() {
     return {
       kicker: 'Comunicación', title: 'Avisos enviados', layout: 'narrow',
-      body: card('h-env', 'Quién los ha leído', S.notices.map(n => `<div class="rq"><span class="ic b">${ic('bell')}</span>
-        <div class="grow"><b>${esc(n.title)}</b><small>${esc(n.body)}</small><div class="meter" role="img" aria-label="Leído por ${n.readBy} de ${n.total}"><i style="width:${n.readBy / n.total * 100}%"></i></div></div>
-        <span class="pill ${n.readBy === n.total ? '' : 'blue'}">${n.readBy} de ${n.total}</span></div>`).join(''))
+      body: card('h-env', 'Quién los ha leído', S.notices.length ? S.notices.map(n => `<div class="rq"><span class="ic b">${ic('bell')}</span>
+        <div class="grow"><b>${esc(n.title)}</b><small>${esc(n.body)}</small><div class="meter" role="img" aria-label="Leído por ${n.readBy} de ${n.total}"><i style="width:${n.total ? n.readBy / n.total * 100 : 0}%"></i></div></div>
+        <span class="pill ${n.readBy === n.total ? '' : 'blue'}">${n.readBy} de ${n.total}</span></div>`).join('') : '<p class="muted" style="margin:0">Aún no has enviado avisos.</p>')
     };
   }
 };
@@ -485,6 +623,7 @@ const BOARD = {
 function bindGo() {
   document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { const [t, s] = b.dataset.go.split(':'); go(t, s || null); });
   document.querySelectorAll('[data-team-go]').forEach(b => b.onclick = () => { S.team = b.dataset.teamGo; go('team', 'list'); });
+  document.querySelectorAll('[data-eq]').forEach(b => b.onclick = () => go('team', 'eq:' + b.dataset.eq));
 }
 
 document.addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); });
@@ -495,8 +634,8 @@ $('#role-coach').onclick = () => setRole('coach');
 $('#role-board').onclick = () => setRole('board');
 $('#bigtext').onchange = e => { document.documentElement.classList.toggle('big', e.target.checked); try { localStorage.setItem('big', e.target.checked ? '1' : ''); } catch (_) {} };
 try { if (localStorage.getItem('big')) { $('#bigtext').checked = true; document.documentElement.classList.add('big'); } } catch (_) {}
-load();
-render();
+if (window.SERVIDOR_ON) window.startServer();
+else { load(); render(); }
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
