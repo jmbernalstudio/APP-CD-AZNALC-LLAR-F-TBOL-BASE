@@ -32,6 +32,7 @@
     async aviso(n) { return ok(await sb.from('avisos').insert({ titulo: n.title, texto: n.body }).select('id').single()).id; },
     async leido(id) { ok(await sb.from('avisos_leidos').upsert({ aviso: id }, { ignoreDuplicates: true })); },
     async alta(p) { return ok(await sb.rpc('crear_usuario', { p_usuario: p.usuario, p_clave: p.clave, p_nombre: p.nombre, p_rol: p.rol, p_equipos: p.equipos })); },
+    async foto(perfil, foto) { ok(await sb.from('perfiles').update({ foto }).eq('id', perfil)); },
     async clave(perfil, clave) { ok(await sb.rpc('cambiar_clave', { p_perfil: perfil, p_clave: clave })); }
   };
 
@@ -82,11 +83,11 @@
       sb.from('peticiones').select('*, perfiles(nombre)').order('creada', { ascending: false }),
       sb.from('avisos').select('*').order('creado', { ascending: false }).limit(50),
       sb.from('avisos_leidos').select('aviso, perfil'),
-      junta ? sb.from('perfiles').select('id, usuario, nombre, rol').order('nombre') : Promise.resolve({ data: [] })
+      junta ? sb.from('perfiles').select('id, usuario, nombre, rol, foto').order('nombre') : Promise.resolve({ data: [] })
     ].map(q => Promise.resolve(q).then(ok)));
 
     S.live = true;
-    S.me = { id: yo.id, nombre: yo.nombre };
+    S.me = { id: yo.id, nombre: yo.nombre, foto: yo.foto || null };
     S.coach = yo.nombre;
     S.role = junta ? 'board' : 'coach';
     S.teams = {};
@@ -112,13 +113,7 @@
     return true;
   }
 
-  function barra() {
-    const bar = document.querySelector('.demo');
-    bar.setAttribute('aria-label', 'Sesión');
-    bar.querySelector('span').innerHTML = `<b>${esc(S.me.nombre)}</b> · ${S.role === 'board' ? 'Junta directiva' : 'Entrenador'}`;
-    bar.querySelector('.seg').innerHTML = '<button type="button" id="salir">Salir</button>';
-    $('#salir').onclick = async () => { await sb.auth.signOut(); location.reload(); };
-  }
+  window.logout = async () => { await sb.auth.signOut(); location.reload(); };
 
   async function entrar() {
     try {
@@ -128,7 +123,6 @@
     }
     document.body.classList.remove('sin-sesion');
     if ($('#login')) $('#login').hidden = true;
-    barra();
     if (S.role === 'coach' && !S.team) {
       $('#main').innerHTML = `<section class="card stack"><h1 style="margin:0">Hola, ${esc(S.me.nombre.split(' ')[0])}</h1>
         <p style="margin:0">Todavía no tienes ningún equipo asignado. Pide a la junta que te asigne el tuyo y vuelve a entrar.</p></section>`;

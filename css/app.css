@@ -397,3 +397,22 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .sin-sesion .demo, .sin-sesion .app, .sin-sesion .bottom { display: none !important; }
 .card label.chip { background: var(--shell); box-shadow: none; border: 1px solid #D5DCE8; }
 .card label.chip:has(input:checked) { border-color: var(--navy); }
+
+/* Cuenta: foto en la barra superior; al tocarla, menú con Salir */
+.me-wrap { position: relative; flex: none; }
+.me { display: flex; align-items: center; gap: 12px; border: 0; background: none; padding: 0; cursor: pointer; text-align: right; border-radius: 16px; }
+.me-t { display: none; min-width: 0; }
+.me-t small { color: var(--muted); display: block; font-size: .85rem; } .me-t b { font-weight: 700; display: block; }
+.me-t small, .me-t b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 14rem; }
+.av { width: 46px; height: 46px; border-radius: 50%; background: var(--club); color: #fff; font-weight: 700; display: grid; place-items: center; flex: none; overflow: hidden; font-size: .95rem; }
+.av.ph { background: var(--card); box-shadow: 0 0 0 2px var(--card), 0 0 0 4px var(--club-soft); }
+.av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.av.big { width: 76px; height: 76px; font-size: 1.5rem; }
+.me[aria-expanded="true"] .av { box-shadow: 0 0 0 3px var(--club); }
+.me-menu { position: absolute; right: 0; top: calc(100% + 10px); z-index: 20; width: min(17rem, calc(100vw - 32px)); display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; box-shadow: 0 18px 50px -20px rgba(14, 21, 48, .45); }
+.me-menu > b { font-size: 1.1rem; margin-top: 8px; } .me-menu > small { color: var(--muted); margin-bottom: 12px; }
+.me-menu > b, .me-menu > small { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.btn.out { background: var(--card); color: var(--bad-ink); border: 2px solid var(--bad-soft); }
+.photo .av { width: 50px; height: 50px; }
+.tm .av { border-radius: 50%; }
+@media (min-width: 1080px) { .me-t { display: block; } .me .av { width: 50px; height: 50px; } }
