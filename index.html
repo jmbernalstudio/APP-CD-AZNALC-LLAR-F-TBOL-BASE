@@ -3,33 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CD Aznalcóllar · Entrenadores</title>
+<title>C.D. Aznalcóllar Fútbol Base</title>
 <meta name="description" content="App interna del CD Aznalcóllar Fútbol Base para entrenadores y junta directiva.">
-<meta name="theme-color" content="#123B7A">
+<meta name="theme-color" content="#F3F5FA">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/escudo-160.png" type="image/png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="CD Aznalcóllar">
+<meta name="apple-mobile-web-app-title" content="C.D. Aznalcóllar">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Barlow+Condensed:wght@600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap">
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-<div class="shell">
-  <div class="demo" role="region" aria-label="Modo demostración">
-    <span><b>Demostración</b> · datos de ejemplo</span>
-    <div class="seg" role="group" aria-label="Ver como">
-      <button type="button" id="role-coach" aria-pressed="true">Entrenador</button>
-      <button type="button" id="role-board" aria-pressed="false">Junta</button>
-    </div>
-    <label class="toggle"><input type="checkbox" id="bigtext"> Letra grande</label>
+<div class="demo" role="region" aria-label="Modo demostración">
+  <span><b>Demostración</b> · datos de ejemplo</span>
+  <div class="seg" role="group" aria-label="Ver como">
+    <button type="button" id="role-coach" aria-pressed="true">Entrenador</button>
+    <button type="button" id="role-board" aria-pressed="false">Junta</button>
   </div>
-  <header class="top" id="top"></header>
-  <main id="main" tabindex="-1"></main>
+  <label class="toggle"><input type="checkbox" id="bigtext"> Letra grande</label>
 </div>
-<nav class="tabs" aria-label="Secciones"><ul id="tabs"></ul></nav>
+<div class="app">
+  <nav class="rail" aria-label="Secciones"><img class="cr logo" src="icons/escudo-160.png" alt="C.D. Aznalcóllar Fútbol Base"><ul id="rail-tabs"></ul></nav>
+  <div class="content">
+    <header class="topbar" id="top"></header>
+    <main id="main" tabindex="-1"></main>
+  </div>
+</div>
+<nav class="bottom" aria-label="Secciones"><ul id="bottom-tabs"></ul></nav>
 <div id="live" class="sr" aria-live="polite"></div>
 <div id="toast" class="toast" role="status" hidden></div>
 <noscript><p style="padding:16px">Esta app necesita JavaScript activado.</p></noscript>
