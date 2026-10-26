@@ -1,6 +1,6 @@
 // Guarda la app en el móvil para que abra rápido y sin cobertura en el campo.
-const CACHE = 'cd-aznalcollar-v8';
-const FILES = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/datos.js', 'manifest.webmanifest', 'icons/escudo-160.png', 'icons/escudo.png', 'icons/icon-192.png', 'icons/icon-512.png'];
+const CACHE = 'cd-aznalcollar-v9';
+const FILES = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/datos.js', 'js/config.js', 'js/servidor.js', 'js/vendor/supabase.js', 'manifest.webmanifest', 'icons/escudo-160.png', 'icons/escudo.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
@@ -14,7 +14,8 @@ self.addEventListener('activate', e => {
 
 // Primero la red (para tener siempre la última versión); si no hay, lo guardado.
 self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
+  // Solo los archivos de la app; las llamadas al servidor del club van siempre directas.
+  if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
     fetch(e.request)
       .then(res => {

@@ -1,0 +1,204 @@
+-- C.D. Aznalcóllar Fútbol Base · servidor privado (Supabase)
+-- Se pega UNA vez en Supabase > SQL Editor > New query > Run.
+-- Aquí solo hay estructura y permisos: ningún dato personal.
+--
+-- Quién ve qué:
+--   · Junta: todo (equipos, plantillas, peticiones, avisos, usuarios).
+--   · Entrenador: solo los jugadores y la asistencia de SUS equipos,
+--     sus propias peticiones y los avisos del club.
+--   · Sin iniciar sesión: nada.
+
+-- ---------- Tablas ----------
+create table if not exists public.equipos (
+  id     text primary key,          -- igual que en js/datos.js (senior, alevin2…)
+  nombre text not null
+);
+
+create table if not exists public.perfiles (
+  id      uuid primary key references auth.users on delete cascade,
+  usuario text unique not null,     -- lo que se escribe para entrar (correo o usuario)
+  nombre  text not null,
+  rol     text not null default 'entrenador' check (rol in ('entrenador', 'junta')),
+  creado  timestamptz not null default now()
+);
+
+create table if not exists public.entrenador_equipo (
+  perfil uuid references public.perfiles on delete cascade,
+  equipo text references public.equipos on delete cascade,
+  primary key (perfil, equipo)
+);
+
+create table if not exists public.jugadores (
+  id         bigint generated always as identity primary key,
+  equipo     text not null references public.equipos on delete cascade,
+  nombre     text not null,
+  apellidos  text not null default '',
+  dorsal     int,
+  nacimiento int,                   -- solo el año
+  notas      text not null default '',
+  activo     boolean not null default true
+);
+
+create table if not exists public.asistencia (
+  jugador     bigint references public.jugadores on delete cascade,
+  fecha       date not null,
+  marcado_por uuid default auth.uid() references public.perfiles on delete set null,
+  primary key (jugador, fecha)
+);
+
+create table if not exists public.peticiones (
+  id      bigint generated always as identity primary key,
+  equipo  text references public.equipos on delete set null,
+  autor   uuid not null default auth.uid() references public.perfiles on delete cascade,
+  tipo    text not null check (tipo in ('material', 'roto', 'otra')),
+  titulo  text not null,
+  lugar   text not null default '',
+  urgente boolean not null default false,
+  estado  int not null default 0 check (estado between 0 and 3),  -- Enviada, Vista, En marcha, Resuelta
+  creada  timestamptz not null default now()
+);
+
+create table if not exists public.avisos (
+  id     bigint generated always as identity primary key,
+  titulo text not null,
+  texto  text not null,
+  autor  uuid default auth.uid() references public.perfiles on delete set null,
+  creado timestamptz not null default now()
+);
+
+create table if not exists public.avisos_leidos (
+  aviso    bigint references public.avisos on delete cascade,
+  perfil   uuid references public.perfiles on delete cascade default auth.uid(),
+  leido_en timestamptz not null default now(),
+  primary key (aviso, perfil)
+);
+
+insert into public.equipos (id, nombre) values
+  ('senior', 'Senior'), ('juvenil', 'Juvenil'), ('cadete', 'Cadete F-7'), ('infantil', 'Infantil'),
+  ('alevin2', 'Alevín 2º año'), ('alevin1', 'Alevín 1º año'), ('benjamin2', 'Benjamín 2º año'),
+  ('benjamin1', 'Benjamín 1º año'), ('prebenjamin', 'Prebenjamín 2º año'), ('minis', 'Minis')
+on conflict (id) do update set nombre = excluded.nombre;
+
+-- ---------- Ayudantes de permisos ----------
+create or replace function public.es_junta() returns boolean
+language sql stable security definer set search_path = '' as $$
+  select exists (select 1 from public.perfiles where id = auth.uid() and rol = 'junta');
+$$;
+
+create or replace function public.entrena(eq text) returns boolean
+language sql stable security definer set search_path = '' as $$
+  select exists (select 1 from public.entrenador_equipo where perfil = auth.uid() and equipo = eq);
+$$;
+
+-- ---------- Permisos (Row Level Security) ----------
+alter table public.equipos           enable row level security;
+alter table public.perfiles          enable row level security;
+alter table public.entrenador_equipo enable row level security;
+alter table public.jugadores         enable row level security;
+alter table public.asistencia        enable row level security;
+alter table public.peticiones        enable row level security;
+alter table public.avisos            enable row level security;
+alter table public.avisos_leidos     enable row level security;
+
+drop policy if exists "ver equipos" on public.equipos;
+create policy "ver equipos" on public.equipos for select to authenticated using (true);
+
+drop policy if exists "ver perfiles" on public.perfiles;
+create policy "ver perfiles" on public.perfiles for select to authenticated using (id = auth.uid() or public.es_junta());
+drop policy if exists "junta edita perfiles" on public.perfiles;
+create policy "junta edita perfiles" on public.perfiles for update to authenticated using (public.es_junta());
+
+drop policy if exists "ver asignaciones" on public.entrenador_equipo;
+create policy "ver asignaciones" on public.entrenador_equipo for select to authenticated using (perfil = auth.uid() or public.es_junta());
+drop policy if exists "junta asigna" on public.entrenador_equipo;
+create policy "junta asigna" on public.entrenador_equipo for all to authenticated using (public.es_junta()) with check (public.es_junta());
+
+drop policy if exists "plantilla de mis equipos" on public.jugadores;
+create policy "plantilla de mis equipos" on public.jugadores for all to authenticated
+  using (public.es_junta() or public.entrena(equipo)) with check (public.es_junta() or public.entrena(equipo));
+
+drop policy if exists "asistencia de mis equipos" on public.asistencia;
+create policy "asistencia de mis equipos" on public.asistencia for all to authenticated
+  using (public.es_junta() or public.entrena((select j.equipo from public.jugadores j where j.id = jugador)))
+  with check (public.es_junta() or public.entrena((select j.equipo from public.jugadores j where j.id = jugador)));
+
+drop policy if exists "ver peticiones" on public.peticiones;
+create policy "ver peticiones" on public.peticiones for select to authenticated using (autor = auth.uid() or public.es_junta());
+drop policy if exists "crear peticiones" on public.peticiones;
+create policy "crear peticiones" on public.peticiones for insert to authenticated
+  with check (autor = auth.uid() and (equipo is null or public.es_junta() or public.entrena(equipo)));
+drop policy if exists "junta cambia estado" on public.peticiones;
+create policy "junta cambia estado" on public.peticiones for update to authenticated using (public.es_junta());
+
+drop policy if exists "ver avisos" on public.avisos;
+create policy "ver avisos" on public.avisos for select to authenticated using (true);
+drop policy if exists "junta envia avisos" on public.avisos;
+create policy "junta envia avisos" on public.avisos for all to authenticated using (public.es_junta()) with check (public.es_junta());
+
+drop policy if exists "ver leidos" on public.avisos_leidos;
+create policy "ver leidos" on public.avisos_leidos for select to authenticated using (perfil = auth.uid() or public.es_junta());
+drop policy if exists "marcar leido" on public.avisos_leidos;
+create policy "marcar leido" on public.avisos_leidos for insert to authenticated with check (perfil = auth.uid());
+
+-- ---------- Perfil automático ----------
+-- Cada cuenta nueva recibe su perfil. La PRIMERA cuenta que se cree será de la junta.
+create or replace function public.nuevo_perfil() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  insert into public.perfiles (id, usuario, nombre, rol)
+  values (new.id,
+          coalesce(new.raw_user_meta_data->>'usuario', new.email),
+          coalesce(new.raw_user_meta_data->>'nombre', split_part(new.email, '@', 1)),
+          case when exists (select 1 from public.perfiles) then 'entrenador' else 'junta' end)
+  on conflict (id) do nothing;
+  return new;
+end $$;
+
+drop trigger if exists al_crear_cuenta on auth.users;
+create trigger al_crear_cuenta after insert on auth.users
+  for each row execute function public.nuevo_perfil();
+
+-- ---------- Altas desde la app (solo junta) ----------
+-- Quien no tiene correo entra con un usuario sencillo (p. ej. "manolo.alevin").
+-- Por dentro se guarda como manolo.alevin@usuarios.cdaznalcollar.es (nunca se envían correos ahí).
+create or replace function public.crear_usuario(p_usuario text, p_clave text, p_nombre text, p_rol text, p_equipos text[])
+returns uuid language plpgsql security definer set search_path = '' as $$
+declare
+  v_id uuid := gen_random_uuid();
+  v_usuario text := lower(trim(p_usuario));
+  v_email text := case when position('@' in v_usuario) > 0 then v_usuario else v_usuario || '@usuarios.cdaznalcollar.es' end;
+begin
+  if not public.es_junta() then raise exception 'Solo la junta puede crear usuarios'; end if;
+  if length(p_clave) < 8 then raise exception 'La contraseña debe tener al menos 8 caracteres'; end if;
+  if exists (select 1 from auth.users where email = v_email) then raise exception 'Ese usuario ya existe'; end if;
+
+  insert into auth.users (instance_id, id, aud, role, email, encrypted_password, email_confirmed_at,
+                          raw_app_meta_data, raw_user_meta_data, created_at, updated_at,
+                          confirmation_token, recovery_token, email_change_token_new, email_change,
+                          email_change_token_current, phone_change, phone_change_token, reauthentication_token)
+  values ('00000000-0000-0000-0000-000000000000', v_id, 'authenticated', 'authenticated', v_email,
+          extensions.crypt(p_clave, extensions.gen_salt('bf')), now(),
+          '{"provider":"email","providers":["email"]}', jsonb_build_object('nombre', p_nombre, 'usuario', v_usuario),
+          now(), now(), '', '', '', '', '', '', '', '');
+
+  insert into auth.identities (id, user_id, provider_id, provider, identity_data, last_sign_in_at, created_at, updated_at)
+  values (gen_random_uuid(), v_id, v_id::text, 'email',
+          jsonb_build_object('sub', v_id::text, 'email', v_email, 'email_verified', true), now(), now(), now());
+
+  update public.perfiles set rol = coalesce(nullif(p_rol, ''), 'entrenador'), nombre = p_nombre, usuario = v_usuario where id = v_id;
+  insert into public.entrenador_equipo (perfil, equipo) select v_id, unnest(coalesce(p_equipos, '{}'));
+  return v_id;
+end $$;
+
+create or replace function public.cambiar_clave(p_perfil uuid, p_clave text) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not (public.es_junta() or p_perfil = auth.uid()) then raise exception 'No permitido'; end if;
+  if length(p_clave) < 8 then raise exception 'La contraseña debe tener al menos 8 caracteres'; end if;
+  update auth.users set encrypted_password = extensions.crypt(p_clave, extensions.gen_salt('bf')), updated_at = now() where id = p_perfil;
+end $$;
+
+revoke all on function public.crear_usuario(text, text, text, text, text[]) from public, anon;
+revoke all on function public.cambiar_clave(uuid, text) from public, anon;
+grant execute on function public.crear_usuario(text, text, text, text, text[]) to authenticated;
+grant execute on function public.cambiar_clave(uuid, text) to authenticated;
