@@ -1,6 +1,6 @@
 /* Generado por herramientas/actualizar.py desde rfaf.es y educationleague.es. No editar a mano. */
 window.DATOS = {
- "actualizado": "2026-10-27T02:52:14+00:00",
+ "actualizado": "2026-10-27T12:58:08+00:00",
  "equipos": [
   {
    "id": "senior",
@@ -88,8 +88,8 @@ window.DATOS = {
     },
     {
      "j": 7,
-     "fecha": "2026-11-01",
-     "hora": null,
+     "fecha": "2026-11-30",
+     "hora": "21:00",
      "casa": true,
      "rival": "C.D. SAN JERONIMO",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
@@ -575,8 +575,8 @@ window.DATOS = {
     },
     {
      "j": 6,
-     "fecha": "2026-11-01",
-     "hora": null,
+     "fecha": "2026-10-31",
+     "hora": "20:00",
      "casa": false,
      "rival": "CASTILLEJA C.F.",
      "campo": "Castilleja de la Cuesta - ANTONIO ALMENDRO MUNICIPAL (F11-F7)",
@@ -1001,7 +1001,7 @@ window.DATOS = {
     {
      "j": 6,
      "fecha": "2026-11-01",
-     "hora": null,
+     "hora": "10:00",
      "casa": false,
      "rival": "SEVILLA F.C., S.A.D. \"A\"",
      "campo": "Dos Hermanas - JOSE RAMÓN CISNEROS CIUDAD DEPORTIVA (F11-F7)",
@@ -1463,8 +1463,8 @@ window.DATOS = {
     },
     {
      "j": 3,
-     "fecha": "2026-11-01",
-     "hora": null,
+     "fecha": "2026-10-30",
+     "hora": "17:30",
      "casa": true,
      "rival": "A.D. SAN JOSE \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
@@ -1858,8 +1858,8 @@ window.DATOS = {
     },
     {
      "j": 4,
-     "fecha": "2026-11-01",
-     "hora": null,
+     "fecha": "2026-10-30",
+     "hora": "18:30",
      "casa": true,
      "rival": "C.D. CASTILBLANCO F.C.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
