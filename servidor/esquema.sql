@@ -16,6 +16,8 @@ create table if not exists public.equipos (
 -- Entrenos: días (1 = lunes … 7 = domingo), hora y campo. Los elige la junta.
 alter table public.equipos add column if not exists dias int[] not null default array[]::int[],
   add column if not exists hora text, add column if not exists lugar text;
+-- Hora y campo de cada día por separado: [{"d":1,"h":"18:00","where":"Campo 1"}, …]
+alter table public.equipos add column if not exists sesiones jsonb;
 
 create table if not exists public.perfiles (
   id      uuid primary key references auth.users on delete cascade,

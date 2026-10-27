@@ -34,7 +34,12 @@
     async borrarAviso(id) { ok(await sb.from('avisos').delete().eq('id', id)); },
     async leido(id) { ok(await sb.from('avisos_leidos').upsert({ aviso: id }, { ignoreDuplicates: true })); },
     async alta(p) { return ok(await sb.rpc('crear_usuario', { p_usuario: p.usuario, p_clave: p.clave, p_nombre: p.nombre, p_rol: p.rol, p_equipos: p.equipos })); },
-    async entreno(team, t) { ok(await sb.from('equipos').update({ dias: t.dias, hora: t.h, lugar: t.where }).eq('id', idEq(team))); },
+    async entreno(team, t) {
+      const base = { dias: t.dias, hora: t.h, lugar: t.where };
+      const r = await sb.from('equipos').update({ ...base, sesiones: t.ses }).eq('id', idEq(team));
+      /* Si aún no existe la columna "sesiones", guarda al menos días, hora y campo */
+      ok(r.error && /sesiones/.test(r.error.message || '') ? await sb.from('equipos').update(base).eq('id', idEq(team)) : r);
+    },
     async foto(perfil, foto) { ok(await sb.from('perfiles').update({ foto }).eq('id', perfil)); },
     async clave(perfil, clave) { ok(await sb.rpc('cambiar_clave', { p_perfil: perfil, p_clave: clave })); },
     async nombre(nombre) { ok(await sb.rpc('cambiar_nombre', { p_nombre: nombre })); },
@@ -99,11 +104,11 @@
     S.coach = yo.nombre;
     S.role = junta ? 'board' : 'coach';
     S.teams = {};
-    const eqs = ok(await sb.from('equipos').select('id, dias, hora, lugar'));
+    const eqs = ok(await sb.from('equipos').select('*'));
     mios.sort((a, b) => ORDEN.indexOf(a) - ORDEN.indexOf(b));
     for (const id of mios) {
       const q = eqs.find(x => x.id === id) || {};
-      S.teams[nombreEq(id)] = { cat: '', train: { dias: q.dias || [], h: q.hora || '', where: q.lugar || '' }, players: [] };
+      S.teams[nombreEq(id)] = { cat: '', train: { dias: q.dias || [], h: q.hora || '', where: q.lugar || '', ses: Array.isArray(q.sesiones) ? q.sesiones : null }, players: [] };
     }
     const equipoDe = {};
     for (const j of jug) {
