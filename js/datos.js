@@ -37,12 +37,7 @@ window.DATOS = {
      "goles": [
       1,
       3
-     ],
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     ]
     },
     {
      "j": 3,
@@ -55,12 +50,7 @@ window.DATOS = {
      "goles": [
       1,
       1
-     ],
-     "equipacion": {
-      "camiseta": "Negra",
-      "pantalon": "Negro",
-      "medias": "Blancas"
-     }
+     ]
     },
     {
      "j": 4,
@@ -91,12 +81,7 @@ window.DATOS = {
      "goles": [
       2,
       0
-     ],
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     ]
     },
     {
      "j": 6,
@@ -124,12 +109,7 @@ window.DATOS = {
      "rival": "C.D. SAN JERONIMO",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 8,
@@ -154,12 +134,7 @@ window.DATOS = {
      "rival": "AA.AA. COLSPE",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Negro",
-      "medias": "Amarilla"
-     }
+     "goles": null
     },
     {
      "j": 10,
@@ -184,12 +159,7 @@ window.DATOS = {
      "rival": "C.D. UNIÓN GERENA",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Roja y negra",
-      "pantalon": "Negro",
-      "medias": "Rojas"
-     }
+     "goles": null
     },
     {
      "j": 12,
@@ -214,12 +184,7 @@ window.DATOS = {
      "rival": "U.D. LORETO",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Celeste",
-      "pantalon": "Celeste",
-      "medias": "Celeste"
-     }
+     "goles": null
     },
     {
      "j": 14,
@@ -234,12 +199,7 @@ window.DATOS = {
      "rival": "REAL BETIS BALOMPIE S.A.D.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Verde",
-      "pantalon": "Blanco",
-      "medias": "Verdes"
-     }
+     "goles": null
     },
     {
      "j": 16,
@@ -249,12 +209,7 @@ window.DATOS = {
      "rival": "C.D. ATLÉTICO SAN JUAN",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 17,
@@ -294,12 +249,7 @@ window.DATOS = {
      "rival": "U.D. SOLEA",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Verde",
-      "pantalon": "Rojo",
-      "medias": "Verdes"
-     }
+     "goles": null
     },
     {
      "j": 20,
@@ -324,12 +274,7 @@ window.DATOS = {
      "rival": "CLUB DEPORTIVO GALEONES",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Naranja y negra",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     "goles": null
     },
     {
      "j": 22,
@@ -354,12 +299,7 @@ window.DATOS = {
      "rival": "C.D. SANTIPONCE",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanca",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 24,
@@ -384,12 +324,7 @@ window.DATOS = {
      "rival": "EL RONQUILLO C.F.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Roja",
-      "pantalon": "Negro",
-      "medias": "Negro"
-     }
+     "goles": null
     },
     {
      "j": 26,
@@ -414,12 +349,7 @@ window.DATOS = {
      "rival": "C.D. CASTILBLANCO F.C.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Negro",
-      "medias": "Amarillas"
-     }
+     "goles": null
     },
     {
      "j": 28,
@@ -659,12 +589,7 @@ window.DATOS = {
      "goles": [
       1,
       6
-     ],
-     "equipacion": {
-      "camiseta": "Blanca",
-      "pantalon": "Azul",
-      "medias": "Blancas"
-     }
+     ]
     },
     {
      "j": 2,
@@ -695,12 +620,7 @@ window.DATOS = {
      "goles": [
       0,
       3
-     ],
-     "equipacion": {
-      "camiseta": "Morada y verde",
-      "pantalon": "Morado",
-      "medias": "Moradas"
-     }
+     ]
     },
     {
      "j": 4,
@@ -731,12 +651,7 @@ window.DATOS = {
      "goles": [
       2,
       1
-     ],
-     "equipacion": {
-      "camiseta": "Negra",
-      "pantalon": "Negro",
-      "medias": "Blancas"
-     }
+     ]
     },
     {
      "j": 6,
@@ -776,12 +691,7 @@ window.DATOS = {
      "rival": "C.D. MOSQUITO \"C\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Amarillo",
-      "medias": "Amarillas"
-     }
+     "goles": null
     },
     {
      "j": 9,
@@ -796,12 +706,7 @@ window.DATOS = {
      "rival": "ESPARTINAS C.F. \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul y blanca",
-      "pantalon": "Azul",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 11,
@@ -826,12 +731,7 @@ window.DATOS = {
      "rival": "U.D. CONSOLACION",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Azul",
-      "medias": "Amarillas"
-     }
+     "goles": null
     },
     {
      "j": 13,
@@ -871,12 +771,7 @@ window.DATOS = {
      "rival": "C.D. ISIDRO REGUERA",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul y azul marino",
-      "pantalon": "Azul marino",
-      "medias": "Azul marino"
-     }
+     "goles": null
     },
     {
      "j": 16,
@@ -901,12 +796,7 @@ window.DATOS = {
      "rival": "C.D. TORRE REINA",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Negra y amarilla",
-      "pantalon": "Amarillo",
-      "medias": "Amarillas"
-     }
+     "goles": null
     },
     {
      "j": 18,
@@ -931,12 +821,7 @@ window.DATOS = {
      "rival": "CASTILLEJA C.F.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanca",
-      "pantalon": "Azul",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 20,
@@ -946,12 +831,7 @@ window.DATOS = {
      "rival": "P.D. ROCIERA \"A\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarillas/azul",
-      "pantalon": "Azul",
-      "medias": "Amarillas"
-     }
+     "goles": null
     },
     {
      "j": 21,
@@ -996,12 +876,7 @@ window.DATOS = {
      "rival": "S.D. CLUB RÍO GRANDE",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 25,
@@ -1026,12 +901,7 @@ window.DATOS = {
      "rival": "IBARBURU C.F. \"A\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Roja",
-      "pantalon": "Azul",
-      "medias": "Azul"
-     }
+     "goles": null
     }
    ],
    "tabla": [
@@ -1235,12 +1105,7 @@ window.DATOS = {
      "goles": [
       1,
       4
-     ],
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     ]
     },
     {
      "j": 4,
@@ -1271,12 +1136,7 @@ window.DATOS = {
      "goles": [
       2,
       3
-     ],
-     "equipacion": {
-      "camiseta": "Negra",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     ]
     },
     {
      "j": 6,
@@ -1301,12 +1161,7 @@ window.DATOS = {
      "rival": "A.D. SAN JOSE \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 8,
@@ -1331,12 +1186,7 @@ window.DATOS = {
      "rival": "GUILLENA C.F.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 10,
@@ -1376,12 +1226,7 @@ window.DATOS = {
      "rival": "C.D. VENTAS DE LAS PAJANOSAS",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Negra y blanca",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     "goles": null
     },
     {
      "j": 13,
@@ -1406,12 +1251,7 @@ window.DATOS = {
      "rival": "BRENES BALOMPIE \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Roja",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 15,
@@ -1441,12 +1281,7 @@ window.DATOS = {
      "rival": "CD. ASOC. DVA. NERVION \"C\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 18,
@@ -1471,12 +1306,7 @@ window.DATOS = {
      "rival": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 20,
@@ -1501,12 +1331,7 @@ window.DATOS = {
      "rival": "SEVILLA F.C., S.A.D. \"A\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanca",
-      "pantalon": "Blanco",
-      "medias": "Negras"
-     }
+     "goles": null
     },
     {
      "j": 22,
@@ -1531,12 +1356,7 @@ window.DATOS = {
      "rival": "LORA C.F. \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanca",
-      "pantalon": "Blanco",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 24,
@@ -1561,12 +1381,7 @@ window.DATOS = {
      "rival": "C.D. CASTILBLANCO F.C.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Negro",
-      "medias": "Amarillas"
-     }
+     "goles": null
     },
     {
      "j": 26,
@@ -1576,12 +1391,7 @@ window.DATOS = {
      "rival": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Verde",
-      "pantalon": "Blanco",
-      "medias": "Verdes"
-     }
+     "goles": null
     },
     {
      "j": 27,
@@ -1606,12 +1416,7 @@ window.DATOS = {
      "rival": "ATCO. ALGABEÑO \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanco y rayas celestes",
-      "pantalon": "Celeste",
-      "medias": "Celestes"
-     }
+     "goles": null
     },
     {
      "j": 29,
@@ -1636,12 +1441,7 @@ window.DATOS = {
      "rival": "SAN ROQUE BALOMPIE \"A\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Morada y verde",
-      "pantalon": "Morado",
-      "medias": "Moradas"
-     }
+     "goles": null
     }
    ],
    "tabla": [
@@ -1846,12 +1646,7 @@ window.DATOS = {
      "goles": [
       4,
       5
-     ],
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Blancas"
-     }
+     ]
     },
     {
      "j": 2,
@@ -1879,12 +1674,7 @@ window.DATOS = {
      "rival": "A.D. SAN JOSE \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 4,
@@ -1924,12 +1714,7 @@ window.DATOS = {
      "rival": "BRENES BALOMPIE \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Roja",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 7,
@@ -1954,12 +1739,7 @@ window.DATOS = {
      "rival": "CENTRO HISTORICO AA.VV. \"C\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Verde",
-      "pantalon": "Blanco",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 9,
@@ -1984,12 +1764,7 @@ window.DATOS = {
      "rival": "ALCALA DEL RIO C.F. \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 11,
@@ -2029,12 +1804,7 @@ window.DATOS = {
      "rival": "C.D. CASTILBLANCO F.C.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Negro",
-      "medias": "Amarillas"
-     }
+     "goles": null
     },
     {
      "j": 14,
@@ -2059,12 +1829,7 @@ window.DATOS = {
      "rival": "GUILLENA C.F. \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 16,
@@ -2074,12 +1839,7 @@ window.DATOS = {
      "rival": "C.D. TORO TOCINA LOS ROSALES \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Negra",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     "goles": null
     },
     {
      "j": 17,
@@ -2104,12 +1864,7 @@ window.DATOS = {
      "rival": "U.D. RINCONADA \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul royal / blanco",
-      "pantalon": "Azul royal",
-      "medias": "Azul royal"
-     }
+     "goles": null
     },
     {
      "j": 19,
@@ -2134,12 +1889,7 @@ window.DATOS = {
      "rival": "LORA C.F. \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanca",
-      "pantalon": "Blanco",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 21,
@@ -2164,12 +1914,7 @@ window.DATOS = {
      "rival": "ATCO. ALGABEÑO \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanco y rayas celestes",
-      "pantalon": "Celeste",
-      "medias": "Celestes"
-     }
+     "goles": null
     }
    ],
    "tabla": [
@@ -2356,12 +2101,7 @@ window.DATOS = {
      "goles": [
       5,
       2
-     ],
-     "equipacion": {
-      "camiseta": "Morada y verde",
-      "pantalon": "Morado",
-      "medias": "Moradas"
-     }
+     ]
     },
     {
      "j": 3,
@@ -2389,12 +2129,7 @@ window.DATOS = {
      "rival": "C.D. CASTILBLANCO F.C.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Negro",
-      "medias": "Amarillas"
-     }
+     "goles": null
     },
     {
      "j": 5,
@@ -2419,12 +2154,7 @@ window.DATOS = {
      "rival": "C.D. MONITORES GERENA",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Negra-rayas finas rojas",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     "goles": null
     },
     {
      "j": 7,
@@ -2469,12 +2199,7 @@ window.DATOS = {
      "rival": "ALCALA DEL RIO C.F. \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 11,
@@ -2514,12 +2239,7 @@ window.DATOS = {
      "rival": "ATCO. ALGABEÑO \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanco y rayas celestes",
-      "pantalon": "Celeste",
-      "medias": "Celestes"
-     }
+     "goles": null
     },
     {
      "j": 14,
@@ -2529,12 +2249,7 @@ window.DATOS = {
      "rival": "CAMAS C.F. \"A\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul y blanca rayas",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 15,
@@ -2559,12 +2274,7 @@ window.DATOS = {
      "rival": "C.D. SANTIPONCE \"A\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanca",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 17,
@@ -2589,12 +2299,7 @@ window.DATOS = {
      "rival": "U.D. VILLAVERDE \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 19,
@@ -2619,12 +2324,7 @@ window.DATOS = {
      "rival": "PALOMARES C.F. \"C\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Verde",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     "goles": null
     },
     {
      "j": 21,
@@ -2639,12 +2339,7 @@ window.DATOS = {
      "rival": "LORA C.F. \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanca",
-      "pantalon": "Blanco",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 23,
@@ -2669,12 +2364,7 @@ window.DATOS = {
      "rival": "GUILLENA C.F.",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 25,
@@ -2684,12 +2374,7 @@ window.DATOS = {
      "rival": "C.D. ESFUBASA \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Roja",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     "goles": null
     },
     {
      "j": 26,
@@ -2903,12 +2588,7 @@ window.DATOS = {
      "goles": [
       6,
       2
-     ],
-     "equipacion": {
-      "camiseta": "Rojo-negro",
-      "pantalon": "Negro",
-      "medias": "Rojas"
-     }
+     ]
     },
     {
      "j": 3,
@@ -2936,12 +2616,7 @@ window.DATOS = {
      "rival": "C.D. ALTAIR \"B\"",
      "campo": null,
      "superficie": null,
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 5,
@@ -2966,12 +2641,7 @@ window.DATOS = {
      "rival": "C.D. ALL SPORTS BERMEJALES",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Negro",
-      "medias": "Blancas"
-     }
+     "goles": null
     },
     {
      "j": 7,
@@ -2981,12 +2651,7 @@ window.DATOS = {
      "rival": "CLUB ATLÉTICO CENTRAL \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Negra",
-      "pantalon": "Negro",
-      "medias": "Negras"
-     }
+     "goles": null
     },
     {
      "j": 8,
@@ -3011,12 +2676,7 @@ window.DATOS = {
      "rival": "C.D.ATLÉTICO MACARENO",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarillo fluorescente",
-      "pantalon": "Amarillo fluorescente",
-      "medias": "Amarillo fluorescente"
-     }
+     "goles": null
     },
     {
      "j": 10,
@@ -3041,12 +2701,7 @@ window.DATOS = {
      "rival": "CD. ASOC. DVA. NERVION",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 12,
@@ -3071,12 +2726,7 @@ window.DATOS = {
      "rival": "C.D. EL PILAR \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Azul",
-      "pantalon": "Blanco",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 14,
@@ -3086,12 +2736,7 @@ window.DATOS = {
      "rival": "ANDALUCIA ESTE C.F. \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Verde",
-      "pantalon": "Verde",
-      "medias": "Verde"
-     }
+     "goles": null
     },
     {
      "j": 15,
@@ -3116,12 +2761,7 @@ window.DATOS = {
      "rival": "C.D. COLEGIO CLARET \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla",
-      "pantalon": "Azul",
-      "medias": "Azules"
-     }
+     "goles": null
     },
     {
      "j": 17,
@@ -3146,12 +2786,7 @@ window.DATOS = {
      "rival": "SAN ROQUE BALOMPIE \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Morada y verde",
-      "pantalon": "Morado",
-      "medias": "Moradas"
-     }
+     "goles": null
     },
     {
      "j": 19,
@@ -3191,12 +2826,7 @@ window.DATOS = {
      "rival": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Amarilla y negra",
-      "pantalon": "Negro",
-      "medias": "Amarilla"
-     }
+     "goles": null
     },
     {
      "j": 22,
@@ -3221,12 +2851,7 @@ window.DATOS = {
      "rival": "ATCO. ALGABEÑO \"C\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Blanco y rayas celestes",
-      "pantalon": "Celeste",
-      "medias": "Celestes"
-     }
+     "goles": null
     },
     {
      "j": 24,
@@ -3251,12 +2876,7 @@ window.DATOS = {
      "rival": "C.D. S.P. PINO MONTANO \"B\"",
      "campo": "Aznalcóllar - ALFREDO LIBRERO CAMPO MUNICIPAL (F11-F7)",
      "superficie": "Hierba Artificial",
-     "goles": null,
-     "equipacion": {
-      "camiseta": "Negra con franja central celeste y roja",
-      "pantalon": "Rojo",
-      "medias": "Rojas"
-     }
+     "goles": null
     },
     {
      "j": 26,

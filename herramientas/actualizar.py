@@ -201,7 +201,8 @@ def equipo_rfaf(eq, pool):
             continue
         partidos.append(dict(j=n, fecha=fecha_iso(m['fecha']) or fecha, hora=m['hora'], casa=casa, rival=otro['nombre'],
                              campo=m['campo'], superficie=m['superficie'], goles=m['goles']))
-        equip = equipacion_rfaf(otro.get('cod'))
+        # Solo hace falta de visitante: de local jugamos siempre de azul
+        equip = None if casa else equipacion_rfaf(otro.get('cod'))
         if equip:
             partidos[-1]['equipacion'] = equip
 
