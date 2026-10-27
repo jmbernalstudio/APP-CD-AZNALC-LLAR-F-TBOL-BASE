@@ -211,13 +211,13 @@
   }
 
   /* Traer lo último (peticiones nuevas, avisos, estados) sin tener que cerrar sesión:
-     al volver a la app y cada 30 segundos mientras está abierta. No se repinta si la persona
+     al volver a la app y en cuanto algo cambie (se mira cada 10 segundos). No se repinta si la persona
      está escribiendo, rellenando una petición o con una ventana abierta, ni si nada ha cambiado. */
   let refrescando = false;
   async function refrescar(forzar) {
-    if (refrescando || (!forzar && document.visibilityState !== 'visible') || !S.live) return;
+    if (refrescando || (!forzar && document.visibilityState !== 'visible') || !S.live) return false;
     const ocupado = () => S.tab === 'team' || (S.tab === 'ask' && S.askView !== 'mine' && S.draft && S.draft.step > 1) || $('.modal') || ($('#me-menu') && !$('#me-menu').hidden) || document.activeElement.matches('input, textarea, select');
-    if (ocupado()) return;
+    if (ocupado()) return false;
     refrescando = true;
     try {
       const antes = JSON.stringify([S.requests, S.notices, S.conv]);
@@ -226,12 +226,24 @@
         S.tab = tab; S.sub = sub; if (S.teams[team]) S.team = team;
         render(); scrollTo(0, y);
       }
-    } catch (_) {} finally { refrescando = false; }
+      return true;
+    } catch (_) { return false; } finally { refrescando = false; }
   }
   document.addEventListener('visibilitychange', () => refrescar());
   window.addEventListener('focus', () => refrescar());
   window.addEventListener('online', () => refrescar());
-  setInterval(() => refrescar(), 30000);
+  /* Cada 10 segundos, una comprobación muy ligera (solo números de peticiones, estados y avisos);
+     si algo ha cambiado, se trae todo */
+  let huella = '';
+  setInterval(async () => {
+    if (document.visibilityState !== 'visible' || !S.live) return;
+    try {
+      const [p, a, l] = await Promise.all([sb.from('peticiones').select('id, estado'), sb.from('avisos').select('id'), sb.from('avisos_leidos').select('aviso, perfil')].map(q => Promise.resolve(q).then(ok)));
+      const h = JSON.stringify([p.map(x => x.id + ':' + x.estado).sort(), a.map(x => x.id).sort(), l.length]);
+      /* Si ahora no se puede repintar (está escribiendo, etc.), se reintenta en la siguiente vuelta */
+      if (h === huella || await refrescar()) huella = h;
+    } catch (_) {}
+  }, 10000);
   window.refrescar = refrescar;
 
   window.startServer = async () => {
