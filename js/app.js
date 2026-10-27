@@ -256,17 +256,19 @@ function render(focus) {
     `<li><button type="button" class="${cls || ''}" data-tab="${k}" ${S.tab === k ? 'aria-current="page"' : ''}>${cls === 'plus' ? `<span class="ic">${ic(i)}</span>` : ic(i)}<span>${l}</span>${n ? `<span class="badge" aria-label="${n} pendientes">${n}</span>` : ''}</button></li>`).join('');
   const v = (S.role === 'coach' ? COACH : BOARD)[S.tab]();
   const unread = S.notices.filter(n => !n.read).length;
+  const unseen = S.requests.filter(r => r.st === 0).length;
   $('#top').innerHTML = `
     ${v.back ? `<button type="button" class="back" data-back aria-label="Volver">${ic('back')}</button>` : crestImg('logo')}
     <div class="title"><small>${v.kicker}</small><h1 id="title">${v.title}</h1></div>
-    ${S.role === 'coach' ? `<button type="button" class="iconbtn" data-go="msg" aria-label="Mensajes${unread ? `, ${unread} sin leer` : ''}">${ic('bell')}${unread ? '<span class="dot"></span>' : ''}</button>` : ''}
     <div class="me-wrap"><button type="button" class="me" id="me" aria-haspopup="true" aria-expanded="false" aria-controls="me-menu" aria-label="Tu cuenta: ${esc(myName())}">
       <span class="me-t"><small>${roleName()}</small><b>${esc(myName())}</b></span>${avatar(myPerson(), 'av')}</button>
       <div class="me-menu card" id="me-menu" hidden>${avatar(myPerson(), 'av big')}<b>${esc(myName())}</b><small>${roleName()}</small>
         ${S.live ? `<button type="button" class="btn out block" id="logout">Salir</button>`
           : `<div class="stack" style="width:100%;gap:8px"><small>Demostración · ver como</small>
             <button type="button" class="btn ${S.role === 'coach' ? 'blue' : 'out'} block" data-role="coach">Entrenador</button>
-            <button type="button" class="btn ${S.role === 'board' ? 'blue' : 'out'} block" data-role="board">Junta</button></div>`}</div></div>`;
+            <button type="button" class="btn ${S.role === 'board' ? 'blue' : 'out'} block" data-role="board">Junta</button></div>`}</div></div>
+    ${S.role === 'coach' ? `<button type="button" class="iconbtn" data-go="msg" aria-label="Mensajes${unread ? `, ${unread} sin leer` : ''}">${ic('bell')}${unread ? '<span class="dot"></span>' : ''}</button>`
+      : `<button type="button" class="iconbtn" data-go="home" aria-label="Peticiones${unseen ? `, ${unseen} sin ver` : ''}">${ic('bell')}${unseen ? '<span class="dot"></span>' : ''}</button>`}`;
   bindMe();
   $('#main').className = v.layout || '';
   $('#main').innerHTML = v.body;
@@ -410,13 +412,18 @@ function attendanceHist(team) {
 function attendanceCard(team, id) {
   const { days, pct } = attendanceHist(team);
   const avg = pct.length ? Math.round(pct.reduce((a, b) => a + b) / pct.length) : null;
-  const a = S.attend[`${team} ${today()}`];
   const n = S.teams[team].players.length;
+  // Abajo: el último entreno con lista pasada (hoy si ya la has pasado)
+  const done = Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort();
+  const lastIso = done.length ? done[done.length - 1] : today();
+  const a = S.attend[`${team} ${lastIso}`];
+  const lvl = p => p >= 90 ? 'hi' : p < 70 ? 'lo' : 'mid';
   return card(id, `Asistencia · ${team}`, `
     <div class="bignum">${avg == null ? '–' : avg + '%'}</div><div class="delta">${avg == null ? 'Aún no has pasado lista' : S.live ? `Media de los últimos ${pct.length} entrenos` : '+4% respecto a septiembre'}</div>
-    <div class="bars" role="img" aria-label="Asistencia por entrenamiento: ${pct.join(', ')} por ciento">${pct.map(p => `<span class="${p >= 90 ? 'hi' : p < 70 ? 'lo' : ''}" style="height:${p}%"></span>`).join('')}</div>
+    <div class="bars" role="img" aria-label="Asistencia por entrenamiento: ${pct.join(', ')} por ciento">${pct.map(p => `<span class="${lvl(p)}" style="height:${Math.max(p, 4) * .82}%"><b>${p}%</b></span>`).join('')}</div>
     <div class="bars-x" aria-hidden="true">${days.map(d => `<span>${d}</span>`).join('')}</div>
-    <div class="last">${ic('check')}Hoy<b class="att-today">${a ? a.size : 0} de ${n}</b></div>`, 'dark a-attend', `<span class="tag">${S.live ? 'Últimos entrenos' : 'Octubre'}</span>`);
+    <div class="bars-key"><span><i class="hi"></i>90% o más</span><span><i class="mid"></i>70–89%</span><span><i class="lo"></i>Menos de 70%</span></div>
+    <div class="last">${ic('check')}${lastIso === today() ? 'Hoy' : 'Último entreno · ' + dayLbl(lastIso)}<b>${a ? a.size : 0} de ${n}</b></div>`, 'a-attend', `<span class="tag">${S.live ? 'Últimos entrenos' : 'Octubre'}</span>`);
 }
 function noticeCard(n, cls = '') {
   if (!n) return '';
@@ -604,7 +611,7 @@ const COACH = {
           b.setAttribute('aria-pressed', a.has(i));
           b.querySelector('.pstate').textContent = a.has(i) ? 'Ha venido' : 'Sin marcar';
           $('#cnt').innerHTML = `${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; $('#bar').style.width = pct() + '%';
-          document.querySelectorAll('.att-today').forEach(x => x.textContent = `${a.size} de ${t.players.length}`);
+          const ac = document.querySelector('.a-attend'); if (ac) ac.outerHTML = attendanceCard(S.team, ac.getAttribute('aria-labelledby'));
           save();
           $('#live').textContent = `${t.players.find(p => p.id === i).n}: ${a.has(i) ? 'ha venido' : 'sin marcar'}. ${a.size} de ${t.players.length}.`;
         });
