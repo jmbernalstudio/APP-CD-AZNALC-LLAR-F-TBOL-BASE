@@ -776,3 +776,21 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .sw i { flex: 1; }
 .mx-s { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); }
 @media (max-width: 400px) { .mx-s { gap: 6px; padding: 14px 8px; } .mx-cr { width: 48px; height: 48px; } .mx-m .mx-h { font-size: 1.55rem; } .mx-t b { font-size: .88rem; } }
+
+/* Partidos del grupo: hora o "Final" a la izquierda; local y visitante en dos líneas con sus goles */
+.gr { display: grid; grid-template-columns: 4.6rem minmax(0, 1fr); align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.gr:last-child { border-bottom: 0; }
+@media (min-width: 1080px) { .gr-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; } .gr-list .gr:nth-last-child(2):nth-child(odd) { border-bottom: 0; } }
+.gr.us { background: var(--gold-soft); margin: 0 -10px; padding-left: 10px; padding-right: 10px; border-radius: 14px; border-bottom: 0; }
+.gr-m { display: flex; flex-direction: column; min-width: 0; }
+.gr-m b { font-size: .92rem; font-weight: 700; white-space: nowrap; } .gr-m b.h { color: var(--club); font-size: 1rem; } .gr-m b.tbd { color: var(--muted); font-weight: 600; }
+.gr-m small { color: var(--muted); font-size: .76rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gr-ts { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.gr-t { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.gr-t .mini { flex: none; }
+.gr-t b { flex: 1; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.gr-t.w b { font-weight: 700; }
+.gr-g { flex: none; min-width: 1.6rem; text-align: right; font-weight: 800; font-size: 1.05rem; }
+.gr-rest { margin: 10px 0 0; color: var(--muted); font-size: .88rem; }
+.gm-seg { display: flex; } .gm-seg button { flex: 1 1 auto; white-space: nowrap; }
+@media (max-width: 360px) { .gm-seg button { padding-left: .7rem; padding-right: .7rem; font-size: .9rem; } .gr { grid-template-columns: 3.9rem minmax(0, 1fr); gap: 8px; } }

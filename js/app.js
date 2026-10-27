@@ -645,6 +645,34 @@ function matchRow(e, p) {
   return `<div class="mt ${p.fecha === (nextMatch(e) || {}).fecha ? 'next' : ''}" data-match="${e.id}|${p.j}" role="button" tabindex="0" aria-label="Ver el partido contra ${esc(nice(p.rival))}"><div class="cal-d"><span>J${p.j}</span><b>${toDate(p.fecha).getDate()}</b></div>${crestBadge(e, p.rival)}
     <div class="grow"><b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b><small>${dateLbl(p.fecha)} · ${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></div>${right}</div>`;
 }
+/* Todos los partidos del grupo, jornada a jornada */
+function groupView(e) {
+  const js = e.grupo || [];
+  if (!js.length) return emptyPage('cal', 'Todavía no hay partidos del grupo', 'Se cargan con la próxima actualización de resultados.', 'g');
+  const now = weekOf(TODAY);
+  const cur = js.find(x => x.fecha && weekOf(x.fecha) === now) || [...js].reverse().find(x => x.fecha && x.fecha <= TODAY) || js[0];
+  const jr = js.find(x => x.j === S.gj) || cur;
+  const i = js.indexOf(jr), prev = js[i - 1], next = js[i + 1];
+  const days = jr.partidos.map(p => p.f).filter(Boolean).sort();
+  const wk = weekOf(days[0] || jr.fecha || TODAY);
+  const name = n => US.test(n) ? 'Aznalcóllar' : nice(n);
+  /* Cada partido en dos líneas (local arriba, visitante abajo) para que los nombres quepan en el móvil */
+  const side = (n, g, win) => `<span class="gr-t ${win ? 'w' : ''}">${crestBadge(e, n)}<b title="${esc(name(n))}">${esc(name(n))}</b>${g != null ? `<span class="gr-g">${g}</span>` : ''}</span>`;
+  const row = p => {
+    const g = p.g || [];
+    const when = p.g ? `<b>Final</b>` : `<b class="${p.h ? 'h' : 'tbd'}">${p.h || 'Sin hora'}</b>`;
+    return `<div class="gr ${US.test(p.l) || US.test(p.v) ? 'us' : ''}"><span class="gr-m">${when}<small>${p.f ? dateLbl(p.f) : ''}</small></span>
+      <span class="gr-ts">${side(p.l, g[0], p.g && g[0] > g[1])}${side(p.v, g[1], p.g && g[1] > g[0])}</span></div>`;
+  };
+  const list = [...jr.partidos].sort((a, b) => (a.f || '9').localeCompare(b.f || '9') || (a.h || '99').localeCompare(b.h || '99'));
+  const nav = `<div class="wk-nav card">
+      <button type="button" class="iconbtn" data-gj="${prev ? prev.j : ''}" ${prev ? '' : 'disabled'} aria-label="Jornada anterior">${ic('back')}</button>
+      <div class="wk-t"><small>Jornada ${jr.j}</small><b>${weekLbl(wk, days[0])}</b></div>
+      <button type="button" class="iconbtn" data-gj="${next ? next.j : ''}" ${next ? '' : 'disabled'} aria-label="Jornada siguiente">${ic('chev')}</button>
+      ${jr !== cur ? `<button type="button" class="more wk-now" data-gj="${cur.j}">Volver a la jornada actual</button>` : ''}</div>`;
+  const rest = (jr.descansa || []).length ? `<p class="gr-rest">Descansa: ${jr.descansa.map(n => esc(name(n))).join(', ')}</p>` : '';
+  return `<div class="stack">${nav}${card('h-gr', `Jornada ${jr.j} · ${list.length} partidos`, `<div class="gr-list">${list.map(row).join('')}</div>` + rest, '', `<span class="tag src">${e.fuente}</span>`)}</div>`;
+}
 function tableHTML(e) {
   const gd = r => r.gf != null ? r.gf - r.gc : r.dif;
   return `<div class="tbl" role="table" aria-label="Clasificación"><div class="tr th" role="row"><span role="columnheader">#</span><span role="columnheader">Equipo</span><span role="columnheader" title="Jugados">PJ</span><span role="columnheader" title="Diferencia de goles">DG</span><span role="columnheader">Pts</span></div>
@@ -1042,13 +1070,19 @@ const COACH = {
       ${attendanceCard(S.team, 'h-at2')}</div>`;
     if (sub === 'roster') body = `<div class="stack">${addPlayerCard(S.team)}${rosterCard(S.team)}</div>`;
     const e = EQ[S.team];
-    if (sub === 'games') body = card('h-gm', `Temporada · ${e.partidos.length} jornadas`, e.partidos.map(p => matchRow(e, p)).join(''), '', `<span class="tag src">${e.fuente}</span>`);
+    const gv = S.gmView === 'group' ? 'group' : 'mine';
+    if (sub === 'games') body = `<div class="stack"><div class="seg g-scope gm-seg" role="group" aria-label="Qué partidos ver">
+        <button type="button" data-gmv="mine" aria-pressed="${gv === 'mine'}">Mis partidos</button>
+        <button type="button" data-gmv="group" aria-pressed="${gv === 'group'}">Partidos del grupo</button></div>
+      ${gv === 'group' ? groupView(e) : card('h-gm', `Temporada · ${e.partidos.length} jornadas`, e.partidos.map(p => matchRow(e, p)).join(''), '', `<span class="tag src">${e.fuente}</span>`)}</div>`;
     if (sub === 'table') body = card('h-tb', e.cat, tableHTML(e), '', `<span class="tag src">${e.fuente}</span>`);
     return {
       kicker: `Mi equipo · ${EQ[S.team] ? EQ[S.team].cat : t.cat}`, title: S.team,
       body: head + body,
       bind() {
-        document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; S.attDate = null; render(); });
+        document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; S.attDate = null; S.gj = null; render(); });
+        document.querySelectorAll('[data-gmv]').forEach(b => b.onclick = () => { S.gmView = b.dataset.gmv; S.gj = null; render(); });
+        document.querySelectorAll('[data-gj]').forEach(b => b.onclick = () => { if (b.dataset.gj) { S.gj = +b.dataset.gj; render(); } });
         /* El equipo y el día elegidos siempre a la vista, aunque el selector se deslice */
         document.querySelectorAll('.seg-x [aria-pressed="true"]').forEach(b => { const s = b.parentElement; s.scrollLeft = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2; });
         document.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { S.sub = b.dataset.sub; render(); });
