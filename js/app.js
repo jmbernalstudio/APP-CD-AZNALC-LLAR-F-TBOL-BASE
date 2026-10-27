@@ -245,7 +245,7 @@ function tabsFor() {
     : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Aviso', 'send', 'plus'], ['games', 'Partidos', 'cal'], ['msg', 'Enviados', 'chat']];
 }
 
-function go(tab, sub = null) { S.tab = tab; S.sub = sub; if (tab !== 'ask') S.draft = null; render(true); }
+function go(tab, sub = null) { if (tab === 'ask' && S.tab !== 'ask') S.askView = 'new'; S.tab = tab; S.sub = sub; if (tab !== 'ask') S.draft = null; render(true); }
 
 function render(focus) {
   save();
@@ -531,11 +531,11 @@ const COACH = {
           <span class="kick">${tt ? `Hoy · ${esc(trainLbl(tt))}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>
           <h2 id="h-hero">Semana de partido para el ${S.team}</h2>
           <p>${nm ? `El ${dateLbl(nm.fecha).toLowerCase()} ${nm.casa ? 'recibís al' : 'visitáis al'} ${esc(nice(nm.rival))}. ` : ''}Pasa lista hoy y prepara la convocatoria.</p>
-          <div class="btns"><button type="button" class="btn gold" data-go="team:list">Pasar lista</button><button type="button" class="btn glass" data-go="ask:material">Pedir algo a la junta</button></div>
+          <div class="btns"><button type="button" class="btn gold" data-go="team:list">Pasar lista</button><button type="button" class="btn glass" data-go="ask">Pedir algo a la junta</button></div>
         </section>
         <section class="actions a-actions" aria-label="Acciones rápidas">
           <button type="button" class="act p" data-go="team:list"><span class="ic">${ic('list')}</span>Pasar lista</button>
-          <button type="button" class="act" data-go="ask:material"><span class="ic">${ic('box')}</span>Pedir algo</button>
+          <button type="button" class="act" data-go="ask"><span class="ic">${ic('box')}</span>Pedir algo</button>
           <button type="button" class="act" data-go="ask:roto"><span class="ic">${ic('wrench')}</span>Algo roto</button>
         </section>
         ${agendaCard(S.ag)}
@@ -619,15 +619,27 @@ const COACH = {
     };
   },
   ask() {
+    if (S.sub === 'mine') { S.askView = 'mine'; S.sub = null; }
     const d = S.draft || (S.draft = { step: S.sub ? 2 : 1, kind: S.sub || null, text: '', where: '', urgent: false, photo: null });
+    if (S.sub) S.askView = 'new';
     S.sub = null;
+    const view = S.askView === 'mine' ? 'mine' : 'new';
     const stepper = `<div class="stepper" aria-hidden="true">${[1, 2, 3].map(i => `<span class="${i <= d.step ? 'on' : ''}"></span>`).join('')}</div>
       <p class="step-lbl">Paso ${d.step} de 3 · ${['¿Qué necesitas?', 'Cuéntanos', 'Revisa y envía'][d.step - 1]}</p>`;
-    const back = d.step > 1 && d.step < 4 ? () => { d.step--; render(true); } : null;
+    const back = view === 'new' && d.step > 1 && d.step < 4 ? () => { d.step--; render(true); } : null;
     const mine = S.requests.filter(r => r.by === S.coach);
-    const side = card('h-rqs', 'Mis peticiones', mine.length ? mine.map(r => reqRow(r)).join('') : '<p class="muted" style="margin:0">Aún no has pedido nada. Aquí verás cómo avanza cada petición.</p>');
     const base = { kicker: 'Pedir o avisar', back };
-    const duo = v => ({ ...v, body: `<div class="duo"><div class="stack">${v.body}</div>${side}</div>` });
+    // Selector arriba: hacer una petición o ver las mías, cada cosa a todo el ancho
+    const seg = `<div class="seg g-scope ask-seg" role="group" aria-label="Qué quieres hacer">
+      <button type="button" data-av="new" aria-pressed="${view === 'new'}">${ic('plus')} Hacer una petición</button>
+      <button type="button" data-av="mine" aria-pressed="${view === 'mine'}">${ic('list')} Mis peticiones${mine.length ? ` <span class="seg-n">${mine.length}</span>` : ''}</button></div>`;
+    const bindSeg = () => document.querySelectorAll('[data-av]').forEach(b => b.onclick = () => { S.askView = b.dataset.av; render(true); });
+    const duo = v => ({ ...v, body: `<div class="stack">${seg}${v.body}</div>`, bind() { bindSeg(); v.bind && v.bind(); } });
+    if (view === 'mine') return duo({ ...base,
+      title: 'Mis peticiones',
+      body: mine.length ? `<div class="cards-grid rq-cards">${mine.map(r => `<section class="card">${reqRow(r)}</section>`).join('')}</div>`
+        : emptyPage('box', 'Aún no has pedido nada', 'Aquí verás cómo avanza cada petición.', 'ask-empty', '<button type="button" class="btn blue" data-av="new">' + ic('plus') + ' Hacer una petición</button>')
+    });
     if (d.step === 1) return duo({ ...base,
       title: '¿Qué necesitas?',
       body: `${stepper}<div class="opts">
