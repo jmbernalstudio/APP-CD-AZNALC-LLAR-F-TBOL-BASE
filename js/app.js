@@ -495,7 +495,7 @@ function openMatch(e, p) {
       <div class="wide"><dt>Rival</dt><dd>${esc(rv)}</dd></div>
       <div class="wide"><dt>Campo</dt><dd>${placeOf(p) ? esc(placeOf(p)) : 'Por confirmar'}</dd></div>
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
-    <section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>
+    ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
     ${p.campo ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}`, 'dialog', () => {});
   m.el.classList.add('rqd', 'mx');
   m.el.querySelector('[data-v="0"]').focus();
