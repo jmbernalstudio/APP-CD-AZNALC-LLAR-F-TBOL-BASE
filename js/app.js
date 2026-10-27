@@ -342,6 +342,8 @@ function openRequest(r) {
   const board = S.role === 'board';
   /* Si es nueva y la abre la junta, pasa sola a "Vista" (el entrenador lo ve en su móvil) */
   if (board && r.st === 0) { r.st = 1; render(); API() && API().estado(r.id, 1).catch(() => { r.st = 0; render(); }); }
+  /* La junta puede borrar cualquiera; el entrenador solo retira la suya mientras la junta no la haya abierto */
+  const canDel = board || r.st === 0;
   const m = modal(`<div class="rqd-h"><span class="ic ${kindCls(r.kind)}">${ic(kindIco(r.kind))}</span><div class="grow"><small>${kindName(r.kind)}</small><div class="rq-meta">${stPill(r)}</div></div>
       <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
     <h2 id="mdl-t" class="rqd-t">${esc(r.title)}</h2>
@@ -350,10 +352,22 @@ function openRequest(r) {
     <div id="rqd-ph">${r.foto ? `<a href="${r.foto}" target="_blank" rel="noopener"><img class="rqd-img" src="${r.foto}" alt="Foto adjunta"></a>` : r.conFoto ? '<p class="muted" style="margin:0">Cargando la foto…</p>' : '<p class="muted" style="margin:0">Sin foto adjunta.</p>'}</div>
     ${stepsHTML(r, true)}
     ${board ? `<label class="f" for="rqd-st">Estado<select id="rqd-st">${STATES.map((s, i) => `<option value="${i}" ${i === r.st ? 'selected' : ''}>${s}</option>`).join('')}</select></label>` : ''}
-    <button type="button" class="btn blue block" data-v="0">${ic('check')} Hecho</button>`, 'dialog', () => {});
+    <button type="button" class="btn blue block" data-v="0">${ic('check')} Hecho</button>
+    ${canDel ? `<button type="button" class="btn red block" id="rqd-del">${ic('trash')} ${board ? 'Borrar petición' : 'Retirar petición'}</button>` : ''}`, 'dialog', () => {});
   m.el.classList.add('rqd');
   if (r.conFoto && !r.foto && API()) API().fotoPeticion(r.id).then(f => { r.foto = f; const box = m.el.querySelector('#rqd-ph'); if (box && f) box.innerHTML = `<a href="${f}" target="_blank" rel="noopener"><img class="rqd-img" src="${f}" alt="Foto adjunta"></a>`; })
     .catch(() => { const box = m.el.querySelector('#rqd-ph'); if (box) box.innerHTML = '<p class="muted" style="margin:0">No se ha podido cargar la foto.</p>'; });
+  const del = m.el.querySelector('#rqd-del');
+  if (del) del.onclick = async () => {
+    m.close(false);
+    if (!(await ask(board ? '¿Borrar esta petición?' : '¿Retirar esta petición?', board ? 'Desaparecerá también del móvil del entrenador. No se puede deshacer.' : 'La junta ya no la verá. No se puede deshacer.', board ? 'Sí, borrar' : 'Sí, retirar'))) return;
+    try { API() && await API().borrarPeticion(r.id); } catch (e) {
+      if (e && e.message === 'vista' && !board) { r.st = Math.max(r.st, 1); render(); say('La junta ya la ha visto y no se puede retirar. Si es un error, avisa a la junta.'); }
+      else say('No se ha podido borrar. Revisa la conexión.');
+      return;
+    }
+    S.requests = S.requests.filter(x => x !== r); render(); say(board ? 'Petición borrada.' : 'Petición retirada.');
+  };
   const sel = m.el.querySelector('#rqd-st');
   if (sel) sel.onchange = () => {
     const prev = r.st; r.st = +sel.value; render();
