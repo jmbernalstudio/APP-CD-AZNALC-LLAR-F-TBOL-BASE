@@ -686,9 +686,9 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .cv-place { display: flex; align-items: center; gap: 6px; margin-top: 12px; opacity: .9; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cv-place .i { width: 16px; height: 16px; flex: none; }
 
-/* Pantalla de carga al abrir la app: solo el escudo sobre el fondo de la app */
-.splash { position: fixed; inset: 0; z-index: 1000; background: #F3F5FA; display: grid; place-items: center; transition: opacity .3s ease; }
-.splash img { width: 112px; height: 112px; object-fit: contain; animation: splash-in .45s ease-out both; }
+/* Pantalla de carga al abrir la app: fondo azul y el escudo da una vuelta */
+.splash { position: fixed; inset: 0; z-index: 1000; background: var(--club); display: grid; place-items: center; perspective: 600px; transition: opacity .3s ease; }
+.splash img { width: 112px; height: 112px; object-fit: contain; animation: splash-spin 1.1s ease-in-out both; }
 .splash.out { opacity: 0; pointer-events: none; }
-@keyframes splash-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes splash-spin { 0% { opacity: 0; transform: rotateY(-90deg); } 25% { opacity: 1; } 100% { opacity: 1; transform: rotateY(360deg); } }
 @media (prefers-reduced-motion: reduce) { .splash img { animation: none; } .splash { transition: none; } }
