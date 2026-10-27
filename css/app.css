@@ -650,3 +650,6 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 
 /* Botón sin acción posible todavía (p. ej. campo por confirmar): se ve apagado y no engaña */
 .btn:disabled { opacity: .65; cursor: not-allowed; }
+/* Convocatoria: campo del partido bajo el contador */
+.cv-place { display: flex; align-items: center; gap: 6px; margin-top: 12px; opacity: .9; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cv-place .i { width: 16px; height: 16px; flex: none; }

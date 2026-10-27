@@ -47,6 +47,9 @@
     },
     async foto(perfil, foto) { ok(await sb.from('perfiles').update({ foto }).eq('id', perfil)); },
     async clave(perfil, clave) { ok(await sb.rpc('cambiar_clave', { p_perfil: perfil, p_clave: clave })); },
+    async convocatoria(team, fecha, c) {
+      ok(await sb.from('convocatorias').upsert({ equipo: idEq(team), fecha, jugadores: c.ids, hora: c.hora || '', lugar: c.lugar || '', nota: c.nota || '' }, { onConflict: 'equipo,fecha' }));
+    },
     async nombre(nombre) { ok(await sb.rpc('cambiar_nombre', { p_nombre: nombre })); },
     async equipos(perfil, ids) {
       ok(await sb.from('entrenador_equipo').delete().eq('perfil', perfil).not('equipo', 'in', `(${ids.join(',')})`));
@@ -122,6 +125,10 @@
       const t = S.teams[equipoDe[j.id]];
       if (t) t.players.push({ id: j.id, n: `${j.nombre} ${j.apellidos}`.trim(), dorsal: j.dorsal });
     }
+    /* Convocatorias de los próximos partidos (si la tabla aún no existe, se sigue sin ellas) */
+    S.conv = {};
+    const conv = await sb.from('convocatorias').select('equipo, fecha, jugadores, hora, lugar, nota').gte('fecha', ISO(new Date()));
+    for (const c of conv.data || []) S.conv[`${nombreEq(c.equipo)} ${c.fecha}`] = { ids: (c.jugadores || []).map(Number), hora: c.hora, lugar: c.lugar, nota: c.nota };
     S.attend = {};
     for (const a of asis) {
       const k = `${equipoDe[a.jugador]} ${a.fecha}`;
