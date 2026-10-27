@@ -4,6 +4,7 @@ const I = {
   plus: '<path d="M12 5v14M5 12h14"/>',
   pen: '<path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/>',
   out: '<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>',
+  x: '<path d="M6 6l12 12M18 6L6 18"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
@@ -215,6 +216,19 @@ function readPhoto(file) {
     img.onerror = ko; img.src = url;
   });
 }
+/* Foto de una petición: lado mayor a 1280 px (JPEG) para que suba rápido y se vea bien */
+function readImage(file, max = 1280) {
+  return new Promise((ok, ko) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const k = Math.min(1, max / Math.max(img.width, img.height)), c = document.createElement('canvas');
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); ok(c.toDataURL('image/jpeg', 0.8));
+    };
+    img.onerror = ko; img.src = url;
+  });
+}
 function photoField(foto, nombre) {
   return `<label class="photo" for="fo">${avatar({ foto, nombre: nombre || '?' }, 'av')}<span id="fo-t">${foto ? 'Foto añadida · toca para cambiarla' : 'Añadir foto (opcional)'}</span></label>
     <input type="file" id="fo" accept="image/*" class="sr">`;
@@ -319,9 +333,40 @@ function stepsHTML(r, labels) {
     ${labels ? `<div class="steps-lbl" aria-hidden="true">${STATES.map((s, i) => `<span class="${i <= r.st ? 'on' : ''}">${s}</span>`).join('')}</div>` : ''}</div>`;
 }
 function reqRow(r, ctl = '') {
-  return `<div class="rq"><span class="ic ${kindCls(r.kind)}">${ic(kindIco(r.kind))}</span>
-    <div class="grow"><b title="${esc(r.title)}">${esc(r.title)}</b><div class="rq-meta">${stPill(r)}<small>${S.role === 'board' ? `${r.by} · ${r.team} · ` : ''}${r.when}${r.where ? ' · ' + esc(r.where) : ''}</small></div>${stepsHTML(r, !!ctl)}</div>
+  return `<div class="rq" data-rq="${r.id}"><span class="ic ${kindCls(r.kind)}">${ic(kindIco(r.kind))}</span>
+    <div class="grow"><button type="button" class="rq-open" data-rq-open="${r.id}" title="${esc(r.title)}">${esc(r.title)}</button><div class="rq-meta">${stPill(r)}<small>${r.conFoto ? `<span class="rq-ph" aria-label="Con foto">${ic('camera')}</span>` : ''}${S.role === 'board' ? `${r.by} · ${r.team} · ` : ''}${r.when}${r.where ? ' · ' + esc(r.where) : ''}</small></div>${stepsHTML(r, !!ctl)}</div>
     ${ctl}</div>`;
+}
+/* Tocar una petición abre todo: texto entero, quién, dónde, foto y estado */
+function openRequest(r) {
+  const board = S.role === 'board';
+  /* Si es nueva y la abre la junta, pasa sola a "Vista" (el entrenador lo ve en su móvil) */
+  if (board && r.st === 0) { r.st = 1; render(); API() && API().estado(r.id, 1).catch(() => { r.st = 0; render(); }); }
+  const m = modal(`<div class="rqd-h"><span class="ic ${kindCls(r.kind)}">${ic(kindIco(r.kind))}</span><div class="grow"><small>${kindName(r.kind)}</small><div class="rq-meta">${stPill(r)}</div></div>
+      <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+    <h2 id="mdl-t" class="rqd-t">${esc(r.title)}</h2>
+    <dl class="facts">${board ? `<div><dt>Lo pide</dt><dd>${esc(r.by || '—')}</dd></div>` : ''}<div><dt>Equipo</dt><dd>${esc(r.team || '—')}</dd></div>
+      <div><dt>Cuándo</dt><dd>${esc(r.when)}</dd></div>${r.where ? `<div><dt>Dónde</dt><dd>${esc(r.where)}</dd></div>` : ''}</dl>
+    <div id="rqd-ph">${r.foto ? `<a href="${r.foto}" target="_blank" rel="noopener"><img class="rqd-img" src="${r.foto}" alt="Foto adjunta"></a>` : r.conFoto ? '<p class="muted" style="margin:0">Cargando la foto…</p>' : '<p class="muted" style="margin:0">Sin foto adjunta.</p>'}</div>
+    ${stepsHTML(r, true)}
+    ${board ? `<label class="f" for="rqd-st">Estado<select id="rqd-st">${STATES.map((s, i) => `<option value="${i}" ${i === r.st ? 'selected' : ''}>${s}</option>`).join('')}</select></label>` : ''}
+    <button type="button" class="btn blue block" data-v="0">${ic('check')} Hecho</button>`, 'dialog', () => {});
+  m.el.classList.add('rqd');
+  if (r.conFoto && !r.foto && API()) API().fotoPeticion(r.id).then(f => { r.foto = f; const box = m.el.querySelector('#rqd-ph'); if (box && f) box.innerHTML = `<a href="${f}" target="_blank" rel="noopener"><img class="rqd-img" src="${f}" alt="Foto adjunta"></a>`; })
+    .catch(() => { const box = m.el.querySelector('#rqd-ph'); if (box) box.innerHTML = '<p class="muted" style="margin:0">No se ha podido cargar la foto.</p>'; });
+  const sel = m.el.querySelector('#rqd-st');
+  if (sel) sel.onchange = () => {
+    const prev = r.st; r.st = +sel.value; render();
+    API() && API().estado(r.id, r.st).catch(() => { r.st = prev; render(); say('No se ha podido guardar. Revisa la conexión.'); });
+    say(`“${r.title}” pasa a ${STATES[r.st]}.`);
+  };
+  m.el.querySelector('.iconbtn').focus();
+}
+function bindRequests() {
+  document.querySelectorAll('[data-rq]').forEach(row => row.onclick = e => {
+    if (e.target.closest('.ctl')) return;
+    const r = S.requests.find(x => x.id == row.dataset.rq); if (r) openRequest(r);
+  });
 }
 /* Pantalla sin contenido: tarjeta alta con el mensaje centrado en la parte visible */
 function emptyPage(icon, title, text, cls = '', action = '') {
@@ -707,17 +752,17 @@ const COACH = {
           <span class="hint">${ic('mic')} Con una frase basta. Puedes dictarlo con el micrófono del teclado.</span>
           <textarea id="t" required>${esc(d.text)}</textarea></label>
         ${d.kind === 'roto' ? `<label class="f" for="w">¿Dónde está?
-          <select id="w">${['', 'Campo 1', 'Campo 2', 'Vestuario 1', 'Vestuario 2', 'Vestuario 3', 'Almacén', 'Otro sitio'].map(o => `<option ${d.where === o ? 'selected' : ''} value="${o}">${o || 'Elige un sitio'}</option>`).join('')}</select></label>
+          <select id="w">${['', 'Campo 1', 'Campo 2', 'Vestuario 1', 'Vestuario 2', 'Vestuario 3', 'Almacén', 'Otro sitio'].map(o => `<option ${d.where === o ? 'selected' : ''} value="${o}">${o || 'Elige un sitio'}</option>`).join('')}</select></label>` : ''}
           <label class="photo" for="ph">${d.photo ? `<img src="${d.photo}" alt="Foto adjunta">` : `<span class="ic">${ic('camera')}</span>`}
           <span>${d.photo ? 'Foto añadida · toca para cambiarla' : 'Añadir una foto (opcional)'}</span></label>
-          <input type="file" id="ph" accept="image/*" class="sr">` : ''}
+          <input type="file" id="ph" accept="image/*" class="sr">
         <label class="toggle" for="u"><input type="checkbox" id="u" ${d.urgent ? 'checked' : ''}> <span>Es urgente</span></label>
         <p id="err" class="err" role="alert" hidden>Escribe al menos unas palabras para poder seguir.</p>
         <button class="btn blue block" type="submit">Siguiente</button></form>`,
       bind() {
         const sync = () => { d.text = $('#t').value.trim(); d.urgent = $('#u').checked; if ($('#w')) d.where = $('#w').value; };
         const ph = $('#ph');
-        if (ph) ph.onchange = () => { const f = ph.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { d.photo = r.result; sync(); render(); }; r.readAsDataURL(f); };
+        if (ph) ph.onchange = async () => { const f = ph.files[0]; if (!f) return; try { d.photo = await readImage(f); } catch (_) { say('No se ha podido leer esa foto. Prueba con otra.'); return; } sync(); render(); };
         $('#f').onsubmit = e => { e.preventDefault(); sync(); if (!d.text) { $('#err').hidden = false; $('#t').focus(); return; } d.step = 3; render(true); };
       }
     });
@@ -729,7 +774,7 @@ const COACH = {
         <button type="button" class="btn gold block" id="send">${ic('send')} Enviar a la junta</button></section>`,
       bind() {
         $('#send').onclick = async () => {
-          const r = { id: Date.now(), kind: d.kind, title: d.text, where: d.where, team: S.team, by: S.coach, st: 0, when: 'Ahora', urgent: d.urgent };
+          const r = { id: Date.now(), kind: d.kind, title: d.text, where: d.where, team: S.team, by: S.coach, st: 0, when: 'Ahora', urgent: d.urgent, foto: d.photo || null, conFoto: !!d.photo };
           try { if (API()) r.id = await API().peticion(r); } catch (_) { say('No se ha podido enviar. Revisa la conexión y vuelve a probar.'); return; }
           S.requests.unshift(r);
           d.step = 4; render(true);
@@ -940,6 +985,7 @@ const BOARD = {
 };
 
 function bindGo() {
+  bindRequests();
   document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { const [t, s] = b.dataset.go.split(':'); go(t, s || null); });
   document.querySelectorAll('[data-team-go]').forEach(b => b.onclick = () => { S.team = b.dataset.teamGo; go('team', 'list'); });
   document.querySelectorAll('[data-eq]').forEach(b => b.onclick = () => go('team', 'eq:' + b.dataset.eq));

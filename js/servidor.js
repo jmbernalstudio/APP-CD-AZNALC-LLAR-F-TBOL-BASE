@@ -27,8 +27,13 @@
     async editarJugador(id, n, dorsal) { ok(await sb.from('jugadores').update({ nombre: n, apellidos: '', dorsal }).eq('id', id)); },
     async quitarJugador(id, activo) { ok(await sb.from('jugadores').update({ activo }).eq('id', id)); },
     async peticion(r) {
-      return ok(await sb.from('peticiones').insert({ equipo: idEq(r.team), tipo: r.kind, titulo: r.title, lugar: r.where || '', urgente: r.urgent }).select('id').single()).id;
+      const fila = { equipo: idEq(r.team), tipo: r.kind, titulo: r.title, lugar: r.where || '', urgente: r.urgent };
+      let res = await sb.from('peticiones').insert(r.foto ? { ...fila, foto: r.foto } : fila).select('id').single();
+      /* Si aún no existe la columna "foto", la petición sale igualmente, sin foto */
+      if (res.error && r.foto && /foto/.test(res.error.message || '')) { res = await sb.from('peticiones').insert(fila).select('id').single(); r.conFoto = false; }
+      return ok(res).id;
     },
+    async fotoPeticion(id) { return ok(await sb.from('peticiones').select('foto').eq('id', id).single()).foto; },
     async estado(id, st) { ok(await sb.from('peticiones').update({ estado: st }).eq('id', id)); },
     async aviso(n) { return ok(await sb.from('avisos').insert({ titulo: n.title, texto: n.body }).select('id').single()).id; },
     async borrarAviso(id) { ok(await sb.from('avisos').delete().eq('id', id)); },
@@ -93,7 +98,8 @@
     const [jug, asis, pet, avi, lei, gente] = await Promise.all([
       sb.from('jugadores').select('id, equipo, nombre, apellidos, dorsal').eq('activo', true).order('dorsal', { nullsFirst: false }),
       sb.from('asistencia').select('jugador, fecha').gte('fecha', ISO(desde)),
-      sb.from('peticiones').select('*, perfiles(nombre)').order('creada', { ascending: false }),
+      sb.from('peticiones').select('id, equipo, tipo, titulo, lugar, urgente, estado, creada, con_foto, perfiles(nombre)').order('creada', { ascending: false })
+        .then(r => r.error ? sb.from('peticiones').select('id, equipo, tipo, titulo, lugar, urgente, estado, creada, perfiles(nombre)').order('creada', { ascending: false }) : r),
       sb.from('avisos').select('*').order('creado', { ascending: false }).limit(50),
       sb.from('avisos_leidos').select('aviso, perfil'),
       junta ? sb.from('perfiles').select('id, usuario, nombre, rol, foto').order('nombre') : Promise.resolve({ data: [] })
@@ -121,7 +127,7 @@
       const k = `${equipoDe[a.jugador]} ${a.fecha}`;
       (S.attend[k] = S.attend[k] || new Set()).add(a.jugador);
     }
-    S.requests = pet.map(r => ({ id: r.id, kind: r.tipo, title: r.titulo, where: r.lugar, team: r.equipo ? nombreEq(r.equipo) : '', by: (r.perfiles || {}).nombre || '', st: r.estado, when: cuando(r.creada), urgent: r.urgente }));
+    S.requests = pet.map(r => ({ id: r.id, kind: r.tipo, title: r.titulo, where: r.lugar, team: r.equipo ? nombreEq(r.equipo) : '', by: (r.perfiles || {}).nombre || '', st: r.estado, when: cuando(r.creada), urgent: r.urgente, conFoto: !!r.con_foto }));
     S.people = gente.map(p => ({ ...p, equipos: asig.filter(a => a.perfil === p.id).map(a => a.equipo) }));
     const total = S.people.filter(p => p.rol === 'entrenador').length;
     S.notices = avi.map(n => ({ id: n.id, from: 'Junta directiva', title: n.titulo, body: n.texto,

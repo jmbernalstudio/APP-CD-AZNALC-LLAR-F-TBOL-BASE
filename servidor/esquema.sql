@@ -63,6 +63,9 @@ create table if not exists public.peticiones (
   estado  int not null default 0 check (estado between 0 and 3),  -- Enviada, Vista, En marcha, Resuelta
   creada  timestamptz not null default now()
 );
+-- Foto opcional de la petición (JPEG reducido). con_foto evita descargar la foto al listar.
+alter table public.peticiones add column if not exists foto text;
+alter table public.peticiones add column if not exists con_foto boolean generated always as (foto is not null) stored;
 
 create table if not exists public.avisos (
   id     bigint generated always as identity primary key,
