@@ -607,7 +607,7 @@ function editPlayer(team, p) {
 /* El entrenador elige quién va al próximo partido, la hora y el sitio de quedada, y puede mandarla por WhatsApp */
 const convKey = (team, p) => `${team} ${p.fecha}`;
 function convText(team, p, c, players) {
-  const names = players.filter(x => c.ids.includes(x.id)).map(x => `${x.dorsal ? x.dorsal + '. ' : '• '}${x.n}`);
+  const names = players.filter(x => c.ids.includes(x.id)).map((x, i) => `${i + 1}. ${x.n}`);
   return [`*Convocatoria ${team}*`, `${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${p.casa ? 'Local' : 'Visitante'} vs ${nice(p.rival)}`,
     placeOf(p) ? `Campo: ${placeOf(p)}` : '', c.hora || c.lugar ? `Quedamos${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
     c.nota || '', '', ...names].filter((l, i, a) => l || (i > 0 && a[i - 1])).join('\n');
@@ -663,7 +663,7 @@ async function convPoster(team, p, c, players) {
   list.forEach((q, i) => {
     const y = rowsY + i * ROW;
     if (i % 2 === 0) rr(72, y, W - 144, ROW, 18, BG);
-    text(q.dorsal ? String(q.dorsal) : '–', 140, y + ROW / 2, 800, 34, BLUE, 120);
+    text(String(i + 1), 140, y + ROW / 2, 800, 34, BLUE, 120);
     text(q.n, 240, y + ROW / 2, 500, 34, INK, W - 240 - 96, 'left');
   });
   if (c.nota) text(`Nota: ${c.nota}`, 96, rowsY + list.length * ROW + 30 + 30, 500, 30, MUTED, W - 192, 'left');
