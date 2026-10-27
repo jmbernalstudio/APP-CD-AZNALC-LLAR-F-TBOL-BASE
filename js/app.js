@@ -615,8 +615,8 @@ function convList(players, c) {
 }
 function convText(team, p, c, players) {
   const names = convList(players, c).rows.map(x => `${x.num}. ${x.n}`);
-  return [`*Convocatoria ${team}*`, `${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${p.casa ? 'Local' : 'Visitante'} vs ${nice(p.rival)}`,
-    placeOf(p) ? `Campo: ${placeOf(p)}` : '', c.hora || c.lugar ? `Citación${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
+  return [`*Convocatoria ${team}*`, `${dateLbl(p.fecha)}${p.hora ? ' - ' + p.hora : ''} - ${p.casa ? 'Local' : 'Visitante'} vs ${nice(p.rival)}`,
+    placeOf(p) ? `Campo: ${placeOf(p).replace(/ · /g, ' - ')}` : '', c.hora || c.lugar ? `Citación${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
     c.nota || '', '', ...names].filter((l, i, a) => l || (i > 0 && a[i - 1])).join('\n');
 }
 /* Cartel de la convocatoria: se dibuja en el propio móvil (sin servicios externos) con los escudos y los datos reales */
@@ -647,7 +647,7 @@ async function convPoster(team, p, c, players) {
   rr(48, 170, W - 96, 430, 40, '#FFFFFF');
   x.font = font(700, 30); const pw = Math.min(x.measureText(team).width + 44, 560);
   rr(96, 214, pw, 56, 28, GOLD); text(team, 96 + pw / 2, 243, 700, 30, INK, pw - 44);
-  text(`${dateLbl(p.fecha)} · J${p.j}`, W - 96, 243, 500, 30, MUTED, 380, 'right');
+  text(`${dateLbl(p.fecha)} - J${p.j}`, W - 96, 243, 500, 30, MUTED, 380, 'right');
   const side = (img, name, mine, cx) => {
     if (img) fitImg(img, cx, 375, 150);
     else { x.beginPath(); x.arc(cx, 375, 70, 0, Math.PI * 2); x.fillStyle = '#C8102E'; x.fill(); text(initials(name.replace(/^[A-Z.]+\s/, '').replace(/"/g, '')), cx, 377, 800, 48, '#FFFFFF'); }
@@ -657,10 +657,10 @@ async function convPoster(team, p, c, players) {
   side(...(p.casa ? us : them), 270); side(...(p.casa ? them : us), 810);
   if (p.hora) text(p.hora, W / 2, 385, 800, 76, INK, 240);
   else { text('Hora por', W / 2, 365, 600, 32, MUTED, 220); text('confirmar', W / 2, 403, 600, 32, MUTED, 220); }
-  text(`${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + placeOf(p) : ''}`, W / 2, 558, 500, 30, MUTED);
+  text(`${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' - ' + placeOf(p).replace(/ · /g, ' - ') : ''}`, W / 2, 558, 500, 30, MUTED);
   // Citación
   rr(48, 624, W - 96, 96, 32, BLUE);
-  text(`Citación: ${[c.hora, c.lugar].filter(Boolean).join(' · ')}`, W / 2, 673, 700, 36, '#FFFFFF');
+  text(`Citación: ${[c.hora, c.lugar].filter(Boolean).join(' - ')}`, W / 2, 673, 700, 36, '#FFFFFF');
   // Tabla de convocados
   rr(48, tableY, W - 96, H - tableY - 48, 40, '#FFFFFF');
   text('Convocados', 96, tableY + 60, 800, 40, INK, 500, 'left');
