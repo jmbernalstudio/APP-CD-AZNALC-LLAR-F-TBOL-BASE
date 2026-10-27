@@ -204,8 +204,10 @@ def equipo_rfaf(eq, pool):
     # De una en una: la RFAF guarda en la sesión la última consulta y las peticiones a la vez se mezclan
     resultados = [jornada_rfaf(eq, n) for n, _ in lista]
 
-    partidos, escudos = [], {}
+    partidos, escudos, grupo = [], {}, []
     for (n, fecha), filas in zip(lista, resultados):
+        grupo.append(jornada_grupo(n, fecha, [dict(l=f['local']['nombre'], v=f['visitante']['nombre'], g=f['goles'],
+                                                   f=fecha_iso(f['fecha']) if f['fecha'] else None, h=f['hora']) for f in filas]))
         for f in filas:
             for l in (f['local'], f['visitante']):
                 if l['nombre'] and l['escudo'] and 'escudo_sm_resultados' not in l['escudo'] and l['nombre'] != 'Descansa':
@@ -249,7 +251,17 @@ def equipo_rfaf(eq, pool):
             tabla.append(fila)
         elif 'gf' in fila:
             previa.update(fila)
-    return partidos, tabla, escudos
+    return partidos, tabla, escudos, grupo
+
+
+def jornada_grupo(n, fecha, filas):
+    """Todos los partidos de una jornada del grupo (para 'Partidos del grupo'), sin el equipo que descansa en la lista"""
+    juegan = [f for f in filas if f['l'] and f['v'] and not re.fullmatch(r'Descansa', f['l'], re.I) and not re.fullmatch(r'Descansa', f['v'], re.I)]
+    desc = [f['v'] if re.fullmatch(r'Descansa', f['l'], re.I) else f['l'] for f in filas if f not in juegan and (f['l'] or f['v'])]
+    out = dict(j=n, fecha=fecha, partidos=[{k: v for k, v in f.items() if v is not None} for f in juegan])
+    if desc:
+        out['descansa'] = [d for d in desc if d and not re.fullmatch(r'Descansa', d, re.I)]
+    return out
 
 
 # ---------- Liga Educa ----------
@@ -287,7 +299,7 @@ def equipo_educa(eq, pool):
     primera = bajar(url_educa(eq, 'num_day=1&id_sec=1'))
     total = max([int(x) for x in re.findall(r'>\s*Jornada (\d+)\s*</option>', primera)] or [0])
     paginas = [primera] + list(pool.map(lambda n: bajar(url_educa(eq, f'num_day={n}&id_sec=1')), range(2, total + 1)))
-    partidos, escudos = [], {}
+    partidos, escudos, grupo = [], {}, []
     for n, html in enumerate(paginas, 1):
         filas = filas_educa(html)
         for f in filas:
@@ -295,6 +307,11 @@ def equipo_educa(eq, pool):
             escudos[f['visitante']] = f['clubV']
         mj = re.search(r'Jornada:\s*\d+\s*\((\d{2}/\d{2}/\d{4})\)', BeautifulSoup(html, 'html.parser').get_text())
         fecha_j = fecha_iso(mj[1]) if mj else None
+        todas = []
+        for f in filas:
+            fe, ho, fin = cuando_educa(cal, n, f, fecha_j)
+            todas.append(dict(l=f['local'], v=f['visitante'], g=f['goles'] if fin else None, f=fe, h=ho))
+        grupo.append(jornada_grupo(n, fecha_j, todas))
         m = next((f for f in filas if NOSOTROS.search(f['local']) or NOSOTROS.search(f['visitante'])), None)
         if not m:
             partidos.append(dict(j=n, fecha=fecha_j, descansa=True))
@@ -333,7 +350,24 @@ def equipo_educa(eq, pool):
             tabla.append(dict(pos=v[0], equipo=nom, pts=v[1], j=v[2], g=v[3], e=v[4], p=v[5], dif=v[6]))
     tabla.sort(key=lambda r: r['pos'])
     escudos = {k: f'{EDUCA}t4/images/crests/originals/{v}.jpg' for k, v in escudos.items() if v}
-    return partidos, tabla, escudos
+    return partidos, tabla, escudos, grupo
+
+
+def cuando_educa(cal, n, f, fecha_j):
+    """Día, hora y si ha terminado un partido de la Liga Educa (el día y la hora salen del calendario)"""
+    c = next((x for x in cal if x['jornada'] == n and x['local'] == f['local'] and x['visitante'] == f['visitante']), None)
+    info = ' '.join(c['info']) if c else ''
+    hora = (re.search(r'(\d{1,2}:\d{2})', info) or [None, None])[1]
+    fecha, dia = fecha_j, re.match(r'\D*(\d{1,2})\b', info)
+    if fecha and dia:
+        base = datetime.strptime(fecha, '%Y-%m-%d')
+        for k in range(-3, 7):
+            x = base + timedelta(days=k)
+            if x.day == int(dia[1]):
+                fecha = x.strftime('%Y-%m-%d')
+                break
+    estado = f['info'][0] if f['info'] else ''
+    return fecha, hora, bool(re.search(r'Finalizado', estado + ' ' + info, re.I))
 
 
 # ---------- Escudos ----------
@@ -379,7 +413,7 @@ def main():
                 salida['equipos'].append(previo[eq['id']])
                 continue
             t = time.time()
-            partidos, tabla, escudos = (equipo_rfaf if eq['web'] == 'rfaf' else equipo_educa)(eq, pool)
+            partidos, tabla, escudos, grupo = (equipo_rfaf if eq['web'] == 'rfaf' else equipo_educa)(eq, pool)
             locales = dict(pool.map(bajar_escudo, [(k, v if v.startswith('http') else 'https://www.rfaf.es' + v, eq['web'])
                                                     for k, v in escudos.items()]))
             if len(partidos) != eq['jornadas']:
@@ -398,7 +432,7 @@ def main():
             if fila and fila['j'] != len(jug):
                 avisos.append(f'{eq["nombre"]}: {len(jug)} partidos con resultado y {fila["j"]} jugados en la clasificación')
             salida['equipos'].append(dict(id=eq['id'], nombre=eq['nombre'], cat=eq['cat'], fuente='RFAF' if eq['web'] == 'rfaf' else 'Liga Educa',
-                                          partidos=partidos, tabla=tabla, escudos=locales))
+                                          partidos=partidos, tabla=tabla, escudos=locales, grupo=grupo))
             print(f'{eq["nombre"]}: {sum(1 for p in partidos if not p.get("descansa"))} partidos, '
                   f'{len(tabla)} equipos en la tabla, {sum(1 for v in locales.values() if v)}/{len(locales)} escudos '
                   f'({time.time() - t:.0f}s)', flush=True)

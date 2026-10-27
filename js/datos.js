@@ -1,6 +1,6 @@
 /* Generado por herramientas/actualizar.py desde rfaf.es y educationleague.es. No editar a mano. */
 window.DATOS = {
- "actualizado": "2026-10-27T17:20:58+00:00",
+ "actualizado": "2026-10-27T17:56:58+00:00",
  "equipos": [
   {
    "id": "senior",
@@ -570,7 +570,1546 @@ window.DATOS = {
     "AA.AA. COLSPE": "icons/escudos/rfaf-aa-aa-colspe.png",
     "U.D. LORETO": "icons/escudos/rfaf-u-d-loreto.png",
     "C.D.TORRE REINA": "icons/escudos/rfaf-c-d-torre-reina.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-09-20",
+     "partidos": [
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "C.D. SAN JERONIMO",
+       "g": [
+        5,
+        2
+       ],
+       "f": "2026-09-19",
+       "h": "19:00"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-09-19",
+       "h": "20:00"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "C.D. SANTIPONCE",
+       "g": [
+        1,
+        2
+       ],
+       "f": "2026-09-19",
+       "h": "20:00"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "g": [
+        3,
+        1
+       ],
+       "f": "2026-09-20",
+       "h": "10:00"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "J.D. BORMUJOS",
+       "g": [
+        0,
+        2
+       ],
+       "f": "2026-09-20",
+       "h": "10:30"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "AA.AA. COLSPE",
+       "g": [
+        5,
+        0
+       ],
+       "f": "2026-09-20",
+       "h": "11:30"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "C.D.TORRE REINA",
+       "g": [
+        1,
+        0
+       ],
+       "f": "2026-09-20",
+       "h": "19:30"
+      }
+     ],
+     "descansa": [
+      "U.D. SOLEA"
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-09-27",
+     "partidos": [
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "C.D. UNIÓN GERENA",
+       "g": [
+        4,
+        0
+       ],
+       "f": "2026-09-26",
+       "h": "20:00"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "U.D. LORETO",
+       "g": [
+        4,
+        4
+       ],
+       "f": "2026-09-27",
+       "h": "10:00"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "g": [
+        3,
+        2
+       ],
+       "f": "2026-09-27",
+       "h": "11:00"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "EL RONQUILLO C.F.",
+       "g": [
+        2,
+        0
+       ],
+       "f": "2026-09-27",
+       "h": "11:00"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "g": [
+        5,
+        0
+       ],
+       "f": "2026-09-27",
+       "h": "11:41"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "GUILLENA C.F.",
+       "g": [
+        1,
+        3
+       ],
+       "f": "2026-09-27",
+       "h": "19:00"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "g": [
+        6,
+        3
+       ],
+       "f": "2026-09-27",
+       "h": "19:30"
+      }
+     ],
+     "descansa": [
+      "C.D.TORRE REINA"
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-10-04",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "J.D. BORMUJOS",
+       "g": [
+        1,
+        1
+       ],
+       "f": "2026-10-02",
+       "h": "20:30"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. SANTIPONCE",
+       "g": [
+        1,
+        3
+       ],
+       "f": "2026-10-03",
+       "h": "20:00"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "C.D. SAN JERONIMO",
+       "g": [
+        2,
+        2
+       ],
+       "f": "2026-10-03",
+       "h": "20:30"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "AA.AA. COLSPE",
+       "g": [
+        4,
+        2
+       ],
+       "f": "2026-10-03",
+       "h": "20:30"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "U.D. SOLEA",
+       "g": [
+        0,
+        6
+       ],
+       "f": "2026-10-04",
+       "h": "10:00"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "C.D.TORRE REINA",
+       "g": [
+        2,
+        2
+       ],
+       "f": "2026-10-04",
+       "h": "11:30"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "EL RONQUILLO C.F.",
+       "g": [
+        5,
+        0
+       ],
+       "f": "2026-10-04",
+       "h": "11:30"
+      }
+     ],
+     "descansa": [
+      "CLUB DEPORTIVO GALEONES"
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-10-11",
+     "partidos": [
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "g": [
+        0,
+        2
+       ],
+       "f": "2026-10-10",
+       "h": "19:00"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "C.D. UNIÓN GERENA",
+       "g": [
+        2,
+        10
+       ],
+       "f": "2026-10-10",
+       "h": "19:00"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-11",
+       "h": "11:20"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "g": [
+        5,
+        2
+       ],
+       "f": "2026-10-11",
+       "h": "11:30"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "U.D. LORETO",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-11",
+       "h": "12:00"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "g": [
+        1,
+        0
+       ],
+       "f": "2026-10-11",
+       "h": "12:00"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "GUILLENA C.F.",
+       "g": [
+        1,
+        1
+       ],
+       "f": "2026-10-11",
+       "h": "13:30"
+      }
+     ],
+     "descansa": [
+      "C.D. SAN JERONIMO"
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-10-18",
+     "partidos": [
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "C.D. SAN JERONIMO",
+       "g": [
+        2,
+        3
+       ],
+       "f": "2026-10-18",
+       "h": "11:00"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "U.D. SOLEA",
+       "g": [
+        0,
+        6
+       ],
+       "f": "2026-10-18",
+       "h": "11:30"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. UNIÓN GERENA",
+       "g": [
+        2,
+        0
+       ],
+       "f": "2026-10-18",
+       "h": "11:30"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-18",
+       "h": "18:00"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "EL RONQUILLO C.F.",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-18",
+       "h": "18:00"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "AA.AA. COLSPE",
+       "g": [
+        3,
+        2
+       ],
+       "f": "2026-10-18",
+       "h": "18:15"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D.TORRE REINA",
+       "g": [
+        2,
+        0
+       ],
+       "f": "2026-10-18",
+       "h": "19:00"
+      }
+     ],
+     "descansa": [
+      "C.D. SANTIPONCE"
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-10-25",
+     "partidos": [
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "g": [
+        3,
+        4
+       ],
+       "f": "2026-10-24",
+       "h": "19:00"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "U.D. LORETO",
+       "g": [
+        1,
+        3
+       ],
+       "f": "2026-10-24",
+       "h": "19:00"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "g": [
+        1,
+        0
+       ],
+       "f": "2026-10-25",
+       "h": "10:00"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "GUILLENA C.F.",
+       "g": [
+        3,
+        1
+       ],
+       "f": "2026-10-25",
+       "h": "11:20"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "J.D. BORMUJOS",
+       "g": [
+        0,
+        1
+       ],
+       "f": "2026-10-25",
+       "h": "11:30"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-25",
+       "h": "12:00"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "g": [
+        8,
+        0
+       ],
+       "f": "2026-10-25",
+       "h": "12:00"
+      }
+     ],
+     "descansa": [
+      "AA.AA. COLSPE"
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-11-01",
+     "partidos": [
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2026-10-30",
+       "h": "20:30"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2026-10-31",
+       "h": "20:00"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "C.D.TORRE REINA",
+       "f": "2026-11-01",
+       "h": "11:20"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "AA.AA. COLSPE",
+       "f": "2026-11-01",
+       "h": "11:30"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-01",
+       "h": "11:30"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "C.D. SANTIPONCE",
+       "f": "2026-11-01",
+       "h": "18:00"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2026-11-30",
+       "h": "21:00"
+      }
+     ],
+     "descansa": [
+      "EL RONQUILLO C.F."
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-11-08",
+     "partidos": [
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "GUILLENA C.F.",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "U.D. SOLEA",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "J.D. BORMUJOS",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "U.D. LORETO",
+       "f": "2026-11-08"
+      }
+     ],
+     "descansa": [
+      "C.D. UNIÓN GERENA"
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2026-11-15",
+     "partidos": [
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "C.D. SANTIPONCE",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "AA.AA. COLSPE",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "U.D. LORETO",
+       "f": "2026-11-15"
+      }
+     ],
+     "descansa": [
+      "C.D. CASTILBLANCO F.C."
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2026-11-22",
+     "partidos": [
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "GUILLENA C.F.",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "C.D.TORRE REINA",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "U.D. SOLEA",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "J.D. BORMUJOS",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2026-11-22"
+      }
+     ],
+     "descansa": [
+      "U.D. LORETO"
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2026-11-29",
+     "partidos": [
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "C.D. SANTIPONCE",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "AA.AA. COLSPE",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "U.D. LORETO",
+       "f": "2026-11-29"
+      }
+     ],
+     "descansa": [
+      "GUILLENA C.F."
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2026-12-06",
+     "partidos": [
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "GUILLENA C.F.",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "C.D.TORRE REINA",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "U.D. SOLEA",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "J.D. BORMUJOS",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2026-12-06"
+      }
+     ],
+     "descansa": [
+      "REAL BETIS BALOMPIE S.A.D."
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2026-12-13",
+     "partidos": [
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "C.D. SANTIPONCE",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "AA.AA. COLSPE",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "U.D. LORETO",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2026-12-13"
+      }
+     ],
+     "descansa": [
+      "C.D. ATLÉTICO SAN JUAN"
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2026-12-20",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. SANTIPONCE",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "C.D.TORRE REINA",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "U.D. SOLEA",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "J.D. BORMUJOS",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2026-12-20"
+      }
+     ],
+     "descansa": [
+      "C.D. AZNALCOLLAR FUTBOL BASE"
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-01-10",
+     "partidos": [
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "AA.AA. COLSPE",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "U.D. LORETO",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "GUILLENA C.F.",
+       "f": "2027-01-10"
+      }
+     ],
+     "descansa": [
+      "J.D. BORMUJOS"
+     ]
+    },
+    {
+     "j": 16,
+     "fecha": "2027-01-17",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "U.D. LORETO",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "GUILLENA C.F.",
+       "f": "2027-01-17"
+      }
+     ],
+     "descansa": [
+      "U.D. SOLEA"
+     ]
+    },
+    {
+     "j": 17,
+     "fecha": "2027-01-24",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "J.D. BORMUJOS",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "U.D. SOLEA",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "C.D. SANTIPONCE",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "AA.AA. COLSPE",
+       "f": "2027-01-24"
+      }
+     ],
+     "descansa": [
+      "C.D.TORRE REINA"
+     ]
+    },
+    {
+     "j": 18,
+     "fecha": "2027-01-31",
+     "partidos": [
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "U.D. LORETO",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "GUILLENA C.F.",
+       "f": "2027-01-31"
+      }
+     ],
+     "descansa": [
+      "CLUB DEPORTIVO GALEONES"
+     ]
+    },
+    {
+     "j": 19,
+     "fecha": "2027-02-07",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "J.D. BORMUJOS",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "U.D. SOLEA",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "C.D.TORRE REINA",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "C.D. SANTIPONCE",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "AA.AA. COLSPE",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2027-02-07"
+      }
+     ],
+     "descansa": [
+      "C.D. SAN JERONIMO"
+     ]
+    },
+    {
+     "j": 20,
+     "fecha": "2027-02-14",
+     "partidos": [
+      {
+       "l": "U.D. SOLEA",
+       "v": "J.D. BORMUJOS",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "U.D. LORETO",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "GUILLENA C.F.",
+       "f": "2027-02-14"
+      }
+     ],
+     "descansa": [
+      "C.D. SANTIPONCE"
+     ]
+    },
+    {
+     "j": 21,
+     "fecha": "2027-02-21",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "U.D. SOLEA",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "C.D.TORRE REINA",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "C.D. SANTIPONCE",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2027-02-21"
+      }
+     ],
+     "descansa": [
+      "AA.AA. COLSPE"
+     ]
+    },
+    {
+     "j": 22,
+     "fecha": "2027-02-28",
+     "partidos": [
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "U.D. SOLEA",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "J.D. BORMUJOS",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "U.D. LORETO",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "GUILLENA C.F.",
+       "f": "2027-02-28"
+      }
+     ],
+     "descansa": [
+      "EL RONQUILLO C.F."
+     ]
+    },
+    {
+     "j": 23,
+     "fecha": "2027-03-07",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D.TORRE REINA",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. SANTIPONCE",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "AA.AA. COLSPE",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-03-07"
+      }
+     ],
+     "descansa": [
+      "C.D. UNIÓN GERENA"
+     ]
+    },
+    {
+     "j": 24,
+     "fecha": "2027-03-14",
+     "partidos": [
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "C.D.TORRE REINA",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "U.D. SOLEA",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "J.D. BORMUJOS",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "GUILLENA C.F.",
+       "f": "2027-03-14"
+      }
+     ],
+     "descansa": [
+      "C.D. CASTILBLANCO F.C."
+     ]
+    },
+    {
+     "j": 25,
+     "fecha": "2027-03-21",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2027-03-21"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2027-03-21"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "C.D. SANTIPONCE",
+       "f": "2027-03-21"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "AA.AA. COLSPE",
+       "f": "2027-03-21"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2027-03-21"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2027-03-21"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-03-21"
+      }
+     ],
+     "descansa": [
+      "U.D. LORETO"
+     ]
+    },
+    {
+     "j": 26,
+     "fecha": "2027-04-04",
+     "partidos": [
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "C.D.TORRE REINA",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "U.D. SOLEA",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "J.D. BORMUJOS",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2027-04-04"
+      }
+     ],
+     "descansa": [
+      "GUILLENA C.F."
+     ]
+    },
+    {
+     "j": 27,
+     "fecha": "2027-04-11",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "C.D. SANTIPONCE",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "AA.AA. COLSPE",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "U.D. LORETO",
+       "f": "2027-04-11"
+      }
+     ],
+     "descansa": [
+      "REAL BETIS BALOMPIE S.A.D."
+     ]
+    },
+    {
+     "j": 28,
+     "fecha": "2027-04-25",
+     "partidos": [
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "C.D.TORRE REINA",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "U.D. SOLEA",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "J.D. BORMUJOS",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "GUILLENA C.F.",
+       "f": "2027-04-25"
+      }
+     ],
+     "descansa": [
+      "C.D. ATLÉTICO SAN JUAN"
+     ]
+    },
+    {
+     "j": 29,
+     "fecha": "2027-05-02",
+     "partidos": [
+      {
+       "l": "C.D. SANTIPONCE",
+       "v": "GUILLENA C.F.",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. SAN JERONIMO",
+       "v": "AA.AA. COLSPE",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "CLUB DEPORTIVO GALEONES",
+       "v": "EL RONQUILLO C.F.",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D.TORRE REINA",
+       "v": "C.D. UNIÓN GERENA",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "U.D. SOLEA",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "J.D. BORMUJOS",
+       "v": "U.D. LORETO",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. ATLÉTICO SAN JUAN",
+       "v": "REAL BETIS BALOMPIE S.A.D.",
+       "f": "2027-05-02"
+      }
+     ],
+     "descansa": [
+      "C.D. AZNALCOLLAR FUTBOL BASE"
+     ]
+    },
+    {
+     "j": 30,
+     "fecha": "2027-05-09",
+     "partidos": [
+      {
+       "l": "AA.AA. COLSPE",
+       "v": "C.D. SANTIPONCE",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "EL RONQUILLO C.F.",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. UNIÓN GERENA",
+       "v": "CLUB DEPORTIVO GALEONES",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D.TORRE REINA",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "U.D. LORETO",
+       "v": "U.D. SOLEA",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "REAL BETIS BALOMPIE S.A.D.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. ATLÉTICO SAN JUAN",
+       "f": "2027-05-09"
+      }
+     ],
+     "descansa": [
+      "J.D. BORMUJOS"
+     ]
+    }
+   ]
   },
   {
    "id": "juvenil",
@@ -1063,7 +2602,1179 @@ window.DATOS = {
     "S.D. CLUB RÍO GRANDE": "icons/escudos/rfaf-s-d-club-rio-grande.png",
     "CASTILLEJA C.F.": "icons/escudos/rfaf-castilleja-c-f.png",
     "C.D. ISIDRO REGUERA": "icons/escudos/rfaf-c-d-isidro-reguera.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-09-27",
+     "partidos": [
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "IBARBURU C.F. \"A\"",
+       "g": [
+        0,
+        2
+       ],
+       "f": "2026-09-26",
+       "h": "18:00"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "g": [
+        1,
+        4
+       ],
+       "f": "2026-09-26",
+       "h": "20:00"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "g": [
+        1,
+        6
+       ],
+       "f": "2026-09-27",
+       "h": "11:30"
+      },
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "C.D. TORRE REINA",
+       "g": [
+        4,
+        1
+       ],
+       "f": "2026-09-27",
+       "h": "11:45"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "g": [
+        6,
+        3
+       ],
+       "f": "2026-09-27",
+       "h": "19:00"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "C.D. ISIDRO REGUERA",
+       "g": [
+        1,
+        2
+       ],
+       "f": "2026-09-27",
+       "h": "20:00"
+      }
+     ],
+     "descansa": [
+      "U.D. CONSOLACION"
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-04",
+     "partidos": [
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "J.D. BORMUJOS \"B\"",
+       "g": [
+        3,
+        0
+       ],
+       "f": "2026-10-03",
+       "h": "19:30"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "CASTILLEJA C.F.",
+       "g": [
+        4,
+        1
+       ],
+       "f": "2026-10-04",
+       "h": "11:00"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "g": [
+        1,
+        8
+       ],
+       "f": "2026-10-04",
+       "h": "12:00"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "P.D. ROCIERA \"A\"",
+       "g": [
+        1,
+        1
+       ],
+       "f": "2026-10-04",
+       "h": "18:00"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "C.D. MOSQUITO \"C\"",
+       "g": [
+        11,
+        0
+       ],
+       "f": "2026-10-04",
+       "h": "19:00"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "g": [
+        2,
+        0
+       ],
+       "f": "2026-10-04",
+       "h": "20:00"
+      }
+     ],
+     "descansa": [
+      "IBARBURU C.F. \"A\""
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-10-11",
+     "partidos": [
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "J.D. BORMUJOS \"B\"",
+       "g": [
+        7,
+        0
+       ],
+       "f": "2026-10-10",
+       "h": "17:30"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "IBARBURU C.F. \"A\"",
+       "g": [
+        0,
+        5
+       ],
+       "f": "2026-10-10",
+       "h": "20:00"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "C.D. TORRE REINA",
+       "g": [
+        2,
+        2
+       ],
+       "f": "2026-10-10",
+       "h": "20:00"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "U.D. CONSOLACION",
+       "g": [
+        8,
+        0
+       ],
+       "f": "2026-10-11",
+       "h": "10:00"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "C.D. ISIDRO REGUERA",
+       "g": [
+        3,
+        3
+       ],
+       "f": "2026-10-11",
+       "h": "17:00"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "g": [
+        0,
+        3
+       ],
+       "f": "2026-10-12",
+       "h": "17:30"
+      }
+     ],
+     "descansa": [
+      "U.D. MAIRENA DEL ALJARAFE \"B\""
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-10-18",
+     "partidos": [
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "g": [
+        3,
+        0
+       ],
+       "f": "2026-10-17",
+       "h": "17:30"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "P.D. ROCIERA \"A\"",
+       "g": [
+        0,
+        15
+       ],
+       "f": "2026-10-17",
+       "h": "19:00"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "CASTILLEJA C.F.",
+       "g": [
+        4,
+        1
+       ],
+       "f": "2026-10-17",
+       "h": "20:00"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "g": [
+        5,
+        3
+       ],
+       "f": "2026-10-18",
+       "h": "18:00"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "g": [
+        9,
+        3
+       ],
+       "f": "2026-10-18",
+       "h": "19:00"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "C.D. MOSQUITO \"C\"",
+       "g": [
+        3,
+        1
+       ],
+       "f": "2026-10-18",
+       "h": "20:00"
+      }
+     ],
+     "descansa": [
+      "C.D. ISIDRO REGUERA"
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-10-25",
+     "partidos": [
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "CASTILLEJA C.F.",
+       "g": [
+        5,
+        0
+       ],
+       "f": "2026-10-24",
+       "h": "17:30"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "IBARBURU C.F. \"A\"",
+       "g": [
+        1,
+        10
+       ],
+       "f": "2026-10-24",
+       "h": "18:30"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "C.D. ISIDRO REGUERA",
+       "g": [
+        2,
+        3
+       ],
+       "f": "2026-10-24",
+       "h": "19:00"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "C.D. TORRE REINA",
+       "g": [
+        1,
+        6
+       ],
+       "f": "2026-10-25",
+       "h": "10:00"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "g": [
+        0,
+        1
+       ],
+       "f": "2026-10-25",
+       "h": "17:00"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "J.D. BORMUJOS \"B\"",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-25",
+       "h": "17:00"
+      }
+     ],
+     "descansa": [
+      "SAN ROQUE BALOMPIE \"A\""
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-11-01",
+     "partidos": [
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2026-10-31",
+       "h": "17:30"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2026-10-31",
+       "h": "17:30"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2026-10-31",
+       "h": "20:00"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "U.D. CONSOLACION",
+       "f": "2026-11-01",
+       "h": "12:00"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2026-11-01",
+       "h": "19:00"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2026-11-02",
+       "h": "11:00"
+      }
+     ],
+     "descansa": [
+      "C.D. TORRE REINA"
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-11-08",
+     "partidos": [
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "C.D. TORRE REINA",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "CASTILLEJA C.F.",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2026-11-08"
+      }
+     ],
+     "descansa": [
+      "J.D. BORMUJOS \"B\""
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-11-15",
+     "partidos": [
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "U.D. CONSOLACION",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2026-11-15"
+      }
+     ],
+     "descansa": [
+      "CASTILLEJA C.F."
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2026-11-22",
+     "partidos": [
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "C.D. TORRE REINA",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "CASTILLEJA C.F.",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2026-11-22"
+      }
+     ],
+     "descansa": [
+      "C.D. AZNALCÓLLAR FÚTBOL BASE"
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2026-11-29",
+     "partidos": [
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "U.D. CONSOLACION",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2026-11-29"
+      }
+     ],
+     "descansa": [
+      "C.D. MOSQUITO \"C\""
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2026-12-06",
+     "partidos": [
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "C.D. TORRE REINA",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "CASTILLEJA C.F.",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2026-12-06"
+      }
+     ],
+     "descansa": [
+      "P.D. ROCIERA \"A\""
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2026-12-13",
+     "partidos": [
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "U.D. CONSOLACION",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2026-12-13"
+      }
+     ],
+     "descansa": [
+      "ESPARTINAS C.F. \"B\""
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2026-12-20",
+     "partidos": [
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "C.D. TORRE REINA",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "CASTILLEJA C.F.",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2026-12-20"
+      }
+     ],
+     "descansa": [
+      "S.D. CLUB RÍO GRANDE"
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-01-10",
+     "partidos": [
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "CASTILLEJA C.F.",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2027-01-10"
+      }
+     ],
+     "descansa": [
+      "U.D. CONSOLACION"
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-01-17",
+     "partidos": [
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "U.D. CONSOLACION",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "C.D. TORRE REINA",
+       "f": "2027-01-17"
+      }
+     ],
+     "descansa": [
+      "IBARBURU C.F. \"A\""
+     ]
+    },
+    {
+     "j": 16,
+     "fecha": "2027-01-24",
+     "partidos": [
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "CASTILLEJA C.F.",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2027-01-24"
+      }
+     ],
+     "descansa": [
+      "U.D. MAIRENA DEL ALJARAFE \"B\""
+     ]
+    },
+    {
+     "j": 17,
+     "fecha": "2027-02-07",
+     "partidos": [
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "U.D. CONSOLACION",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "C.D. TORRE REINA",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2027-02-07"
+      }
+     ],
+     "descansa": [
+      "C.D. ISIDRO REGUERA"
+     ]
+    },
+    {
+     "j": 18,
+     "fecha": "2027-02-14",
+     "partidos": [
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "U.D. CONSOLACION",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2027-02-14"
+      }
+     ],
+     "descansa": [
+      "SAN ROQUE BALOMPIE \"A\""
+     ]
+    },
+    {
+     "j": 19,
+     "fecha": "2027-02-21",
+     "partidos": [
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "CASTILLEJA C.F.",
+       "f": "2027-02-21"
+      }
+     ],
+     "descansa": [
+      "C.D. TORRE REINA"
+     ]
+    },
+    {
+     "j": 20,
+     "fecha": "2027-03-07",
+     "partidos": [
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "U.D. CONSOLACION",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2027-03-07"
+      }
+     ],
+     "descansa": [
+      "J.D. BORMUJOS \"B\""
+     ]
+    },
+    {
+     "j": 21,
+     "fecha": "2027-03-14",
+     "partidos": [
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "C.D. TORRE REINA",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2027-03-14"
+      }
+     ],
+     "descansa": [
+      "CASTILLEJA C.F."
+     ]
+    },
+    {
+     "j": 22,
+     "fecha": "2027-04-04",
+     "partidos": [
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "U.D. CONSOLACION",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2027-04-04"
+      }
+     ],
+     "descansa": [
+      "C.D. AZNALCÓLLAR FÚTBOL BASE"
+     ]
+    },
+    {
+     "j": 23,
+     "fecha": "2027-04-11",
+     "partidos": [
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "C.D. TORRE REINA",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "CASTILLEJA C.F.",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "ESPARTINAS C.F. \"B\"",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2027-04-11"
+      }
+     ],
+     "descansa": [
+      "C.D. MOSQUITO \"C\""
+     ]
+    },
+    {
+     "j": 24,
+     "fecha": "2027-04-25",
+     "partidos": [
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "U.D. CONSOLACION",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "S.D. CLUB RÍO GRANDE",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2027-04-25"
+      }
+     ],
+     "descansa": [
+      "P.D. ROCIERA \"A\""
+     ]
+    },
+    {
+     "j": 25,
+     "fecha": "2027-05-02",
+     "partidos": [
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "P.D. ROCIERA \"A\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. ISIDRO REGUERA",
+       "v": "C.D. TORRE REINA",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "v": "J.D. BORMUJOS \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "IBARBURU C.F. \"A\"",
+       "v": "CASTILLEJA C.F.",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "U.D. CONSOLACION",
+       "v": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "S.D. CLUB RÍO GRANDE",
+       "v": "C.D. MOSQUITO \"C\"",
+       "f": "2027-05-02"
+      }
+     ],
+     "descansa": [
+      "ESPARTINAS C.F. \"B\""
+     ]
+    },
+    {
+     "j": 26,
+     "fecha": "2027-05-09",
+     "partidos": [
+      {
+       "l": "C.D. TORRE REINA",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "J.D. BORMUJOS \"B\"",
+       "v": "C.D. ISIDRO REGUERA",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "CASTILLEJA C.F.",
+       "v": "U.D. MAIRENA DEL ALJARAFE \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. AZNALCÓLLAR FÚTBOL BASE",
+       "v": "IBARBURU C.F. \"A\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. MOSQUITO \"C\"",
+       "v": "U.D. CONSOLACION",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "P.D. ROCIERA \"A\"",
+       "v": "ESPARTINAS C.F. \"B\"",
+       "f": "2027-05-09"
+      }
+     ],
+     "descansa": [
+      "S.D. CLUB RÍO GRANDE"
+     ]
+    }
+   ]
   },
   {
    "id": "infantil",
@@ -1627,7 +4338,1511 @@ window.DATOS = {
     "C.D. AZNALCOLLAR FUTBOL BASE": "icons/escudos/rfaf-c-d-aznalcollar-futbol-base.png",
     "A.D. SAN JOSE \"B\"": "icons/escudos/rfaf-a-d-san-jose-b.png",
     "C.D. TORO TOCINA LOS ROSALES \"B\"": "icons/escudos/rfaf-c-d-toro-tocina-los-rosales-b.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-09-27",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "g": [
+        0,
+        8
+       ],
+       "f": "2026-09-26",
+       "h": "10:00"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "g": [
+        11,
+        0
+       ],
+       "f": "2026-09-26",
+       "h": "10:00"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "g": [
+        7,
+        2
+       ],
+       "f": "2026-09-26",
+       "h": "10:30"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "g": [
+        1,
+        3
+       ],
+       "f": "2026-09-26",
+       "h": "12:00"
+      },
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "g": [
+        3,
+        1
+       ],
+       "f": "2026-09-26",
+       "h": "18:00"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "g": [
+        1,
+        3
+       ],
+       "f": "2026-09-26",
+       "h": "19:00"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "g": [
+        3,
+        2
+       ],
+       "f": "2026-09-27",
+       "h": "10:00"
+      }
+     ],
+     "descansa": [
+      "C.D. AZNALCOLLAR FUTBOL BASE"
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-04",
+     "partidos": [
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "g": [
+        2,
+        0
+       ],
+       "f": "2026-10-03",
+       "h": "10:00"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "g": [
+        4,
+        1
+       ],
+       "f": "2026-10-03",
+       "h": "12:00"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "g": [
+        0,
+        6
+       ],
+       "f": "2026-10-03",
+       "h": "12:00"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "GUILLENA C.F.",
+       "g": [
+        8,
+        1
+       ],
+       "f": "2026-10-03",
+       "h": "18:00"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "g": [
+        1,
+        1
+       ],
+       "f": "2026-10-04",
+       "h": "10:00"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "g": [
+        7,
+        0
+       ],
+       "f": "2026-10-04",
+       "h": "17:55"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "g": [
+        0,
+        15
+       ],
+       "f": "2026-10-04",
+       "h": "18:00"
+      }
+     ],
+     "descansa": [
+      "C.D. VENTAS DE LAS PAJANOSAS"
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-10-11",
+     "partidos": [
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "g": [
+        5,
+        0
+       ],
+       "f": "2026-10-10",
+       "h": "10:00"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "g": [
+        1,
+        4
+       ],
+       "f": "2026-10-10",
+       "h": "11:00"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "g": [
+        3,
+        3
+       ],
+       "f": "2026-10-10",
+       "h": "11:00"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "g": [
+        2,
+        10
+       ],
+       "f": "2026-10-10",
+       "h": "13:00"
+      },
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "A.D. SAN JOSE \"B\"",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-10",
+       "h": "18:00"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "g": [
+        4,
+        0
+       ],
+       "f": "2026-10-10",
+       "h": "19:30"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "g": [
+        0,
+        15
+       ],
+       "f": "2026-10-15",
+       "h": "19:00"
+      }
+     ],
+     "descansa": [
+      "ATCO. ALGABEÑO \"B\""
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-10-18",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "g": [
+        3,
+        1
+       ],
+       "f": "2026-10-17",
+       "h": "09:45"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "g": [
+        1,
+        4
+       ],
+       "f": "2026-10-17",
+       "h": "12:00"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "g": [
+        5,
+        4
+       ],
+       "f": "2026-10-17",
+       "h": "12:45"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "g": [
+        3,
+        3
+       ],
+       "f": "2026-10-17",
+       "h": "19:00"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "GUILLENA C.F.",
+       "g": [
+        9,
+        0
+       ],
+       "f": "2026-10-18",
+       "h": "10:00"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "g": [
+        1,
+        5
+       ],
+       "f": "2026-10-18",
+       "h": "14:00"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "g": [
+        2,
+        3
+       ],
+       "f": "2026-10-18",
+       "h": "18:05"
+      }
+     ],
+     "descansa": [
+      "BRENES BALOMPIE \"B\""
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-10-25",
+     "partidos": [
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "g": [
+        10,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "19:30"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "g": [
+        2,
+        9
+       ],
+       "f": "2026-10-24",
+       "h": "10:00"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "A.D. SAN JOSE \"B\"",
+       "g": [
+        0,
+        13
+       ],
+       "f": "2026-10-24",
+       "h": "11:00"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "g": [
+        2,
+        3
+       ],
+       "f": "2026-10-24",
+       "h": "13:00"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "g": [
+        0,
+        8
+       ],
+       "f": "2026-10-24",
+       "h": "14:30"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "g": [
+        0,
+        1
+       ],
+       "f": "2026-10-24",
+       "h": "18:00"
+      },
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "LORA C.F. \"B\"",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-24",
+       "h": "19:00"
+      }
+     ],
+     "descansa": [
+      "SAN ROQUE BALOMPIE \"A\""
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-11-01",
+     "partidos": [
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2026-10-31",
+       "h": "10:45"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2026-10-31",
+       "h": "12:00"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2026-10-31",
+       "h": "13:00"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-11-01",
+       "h": "10:00"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-11-01",
+       "h": "10:00"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2026-11-01",
+       "h": "16:00"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-01",
+       "h": "17:00"
+      }
+     ],
+     "descansa": [
+      "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE"
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-11-08",
+     "partidos": [
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "GUILLENA C.F.",
+       "f": "2026-11-08"
+      }
+     ],
+     "descansa": [
+      "CD. ASOC. DVA. NERVION \"C\""
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-11-15",
+     "partidos": [
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-15"
+      }
+     ],
+     "descansa": [
+      "ALCALA DEL RIO C.F. \"B\""
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2026-11-22",
+     "partidos": [
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "GUILLENA C.F.",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-22"
+      }
+     ],
+     "descansa": [
+      "CLUB DEPORTIVO ODUCIAROSAL \"B\""
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2026-11-29",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-11-29"
+      }
+     ],
+     "descansa": [
+      "C.D. TORO TOCINA LOS ROSALES \"B\""
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2026-12-06",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-12-06"
+      }
+     ],
+     "descansa": [
+      "SEVILLA F.C., S.A.D. \"A\""
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2026-12-13",
+     "partidos": [
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2026-12-13"
+      }
+     ],
+     "descansa": [
+      "A.D. SAN JOSE \"B\""
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2026-12-20",
+     "partidos": [
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "GUILLENA C.F.",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2026-12-20"
+      }
+     ],
+     "descansa": [
+      "LORA C.F. \"B\""
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-01-10",
+     "partidos": [
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-01-10"
+      }
+     ],
+     "descansa": [
+      "GUILLENA C.F."
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-01-17",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-01-17"
+      }
+     ],
+     "descansa": [
+      "C.D. CASTILBLANCO F.C."
+     ]
+    },
+    {
+     "j": 16,
+     "fecha": "2027-01-24",
+     "partidos": [
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-01-24"
+      }
+     ],
+     "descansa": [
+      "C.D. AZNALCOLLAR FUTBOL BASE"
+     ]
+    },
+    {
+     "j": 17,
+     "fecha": "2027-01-31",
+     "partidos": [
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-01-31"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2027-01-31"
+      }
+     ],
+     "descansa": [
+      "C.D. VENTAS DE LAS PAJANOSAS"
+     ]
+    },
+    {
+     "j": 18,
+     "fecha": "2027-02-07",
+     "partidos": [
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-02-07"
+      }
+     ],
+     "descansa": [
+      "ATCO. ALGABEÑO \"B\""
+     ]
+    },
+    {
+     "j": 19,
+     "fecha": "2027-02-14",
+     "partidos": [
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-02-14"
+      }
+     ],
+     "descansa": [
+      "BRENES BALOMPIE \"B\""
+     ]
+    },
+    {
+     "j": 20,
+     "fecha": "2027-02-21",
+     "partidos": [
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-02-21"
+      }
+     ],
+     "descansa": [
+      "SAN ROQUE BALOMPIE \"A\""
+     ]
+    },
+    {
+     "j": 21,
+     "fecha": "2027-02-28",
+     "partidos": [
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-02-28"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-02-28"
+      }
+     ],
+     "descansa": [
+      "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE"
+     ]
+    },
+    {
+     "j": 22,
+     "fecha": "2027-03-07",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-03-07"
+      }
+     ],
+     "descansa": [
+      "CD. ASOC. DVA. NERVION \"C\""
+     ]
+    },
+    {
+     "j": 23,
+     "fecha": "2027-03-14",
+     "partidos": [
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "GUILLENA C.F.",
+       "f": "2027-03-14"
+      }
+     ],
+     "descansa": [
+      "ALCALA DEL RIO C.F. \"B\""
+     ]
+    },
+    {
+     "j": 24,
+     "fecha": "2027-04-04",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-04-04"
+      }
+     ],
+     "descansa": [
+      "CLUB DEPORTIVO ODUCIAROSAL \"B\""
+     ]
+    },
+    {
+     "j": 25,
+     "fecha": "2027-04-11",
+     "partidos": [
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "GUILLENA C.F.",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-04-11"
+      }
+     ],
+     "descansa": [
+      "C.D. TORO TOCINA LOS ROSALES \"B\""
+     ]
+    },
+    {
+     "j": 26,
+     "fecha": "2027-04-25",
+     "partidos": [
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-04-25"
+      }
+     ],
+     "descansa": [
+      "SEVILLA F.C., S.A.D. \"A\""
+     ]
+    },
+    {
+     "j": 27,
+     "fecha": "2027-05-02",
+     "partidos": [
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-05-02"
+      }
+     ],
+     "descansa": [
+      "A.D. SAN JOSE \"B\""
+     ]
+    },
+    {
+     "j": 28,
+     "fecha": "2027-05-09",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-05-09"
+      }
+     ],
+     "descansa": [
+      "LORA C.F. \"B\""
+     ]
+    },
+    {
+     "j": 29,
+     "fecha": "2027-05-16",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "v": "SEVILLA F.C., S.A.D. \"A\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION \"C\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"A\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. VENTAS DE LAS PAJANOSAS",
+       "f": "2027-05-16"
+      }
+     ],
+     "descansa": [
+      "GUILLENA C.F."
+     ]
+    },
+    {
+     "j": 30,
+     "fecha": "2027-05-23",
+     "partidos": [
+      {
+       "l": "SEVILLA F.C., S.A.D. \"A\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "CLUB DEPORTIVO ODUCIAROSAL \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "CD. ASOC. DVA. NERVION \"C\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "SAN ROQUE BALOMPIE \"A\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "C.D. VENTAS DE LAS PAJANOSAS",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "SECCION DEPORTIVA FUNDACION REAL BETIS BALOMPIE",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-05-23"
+      }
+     ],
+     "descansa": [
+      "C.D. CASTILBLANCO F.C."
+     ]
+    }
+   ]
   },
   {
    "id": "alevin2",
@@ -2064,7 +6279,867 @@ window.DATOS = {
     "U.D. VILLAVERDE \"B\"": "icons/escudos/rfaf-u-d-villaverde-b.png",
     "C.D. TORO TOCINA LOS ROSALES \"B\"": "icons/escudos/rfaf-c-d-toro-tocina-los-rosales-b.png",
     "A.D. SAN JOSE \"B\"": "icons/escudos/rfaf-a-d-san-jose-b.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-10-18",
+     "partidos": [
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "g": [
+        1,
+        8
+       ],
+       "f": "2026-10-15",
+       "h": "17:00"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "LORA C.F. \"B\"",
+       "g": [
+        2,
+        2
+       ],
+       "f": "2026-10-16",
+       "h": "17:45"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "g": [
+        0,
+        8
+       ],
+       "f": "2026-10-16",
+       "h": "19:00"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "g": [
+        1,
+        4
+       ],
+       "f": "2026-10-17",
+       "h": "11:00"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "g": [
+        4,
+        5
+       ],
+       "f": "2026-10-17",
+       "h": "11:30"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "g": [
+        4,
+        1
+       ],
+       "f": "2026-10-17",
+       "h": "12:30"
+      }
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-25",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "g": [
+        3,
+        2
+       ],
+       "f": "2026-10-23",
+       "h": "17:30"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "g": [
+        3,
+        2
+       ],
+       "f": "2026-10-23",
+       "h": "18:30"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "g": [
+        0,
+        10
+       ],
+       "f": "2026-10-23",
+       "h": "19:00"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "g": [
+        8,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "19:00"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "g": [
+        3,
+        1
+       ],
+       "f": "2026-10-24",
+       "h": "13:00"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "g": [
+        10,
+        1
+       ],
+       "f": "2026-10-24",
+       "h": "17:00"
+      }
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-11-01",
+     "partidos": [
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-10-28",
+       "h": "18:30"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2026-10-30",
+       "h": "17:30"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-10-30",
+       "h": "19:00"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2026-10-30",
+       "h": "19:30"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-10-31",
+       "h": "11:30"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-10-31",
+       "h": "13:00"
+      }
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-11-08",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-11-08"
+      }
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-11-15",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-11-15"
+      }
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-11-22",
+     "partidos": [
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2026-11-22"
+      }
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-11-29",
+     "partidos": [
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2026-11-29"
+      }
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-12-06",
+     "partidos": [
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2026-12-06"
+      }
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2026-12-13",
+     "partidos": [
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2026-12-13"
+      }
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2026-12-20",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2026-12-20"
+      }
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2027-01-10",
+     "partidos": [
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-01-10"
+      }
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2027-01-17",
+     "partidos": [
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-01-17"
+      }
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2027-01-24",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-01-24"
+      }
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-02-07",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-02-07"
+      }
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-02-14",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2027-02-14"
+      }
+     ]
+    },
+    {
+     "j": 16,
+     "fecha": "2027-02-21",
+     "partidos": [
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-02-21"
+      }
+     ]
+    },
+    {
+     "j": 17,
+     "fecha": "2027-03-07",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-03-07"
+      }
+     ]
+    },
+    {
+     "j": 18,
+     "fecha": "2027-03-14",
+     "partidos": [
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-03-14"
+      }
+     ]
+    },
+    {
+     "j": 19,
+     "fecha": "2027-04-04",
+     "partidos": [
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-04-04"
+      }
+     ]
+    },
+    {
+     "j": 20,
+     "fecha": "2027-04-11",
+     "partidos": [
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-04-11"
+      }
+     ]
+    },
+    {
+     "j": 21,
+     "fecha": "2027-04-25",
+     "partidos": [
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "A.D. SAN JOSE \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "GUILLENA C.F. \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "BRENES BALOMPIE \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "CENTRO HISTORICO AA.VV. \"C\"",
+       "v": "U.D. RINCONADA \"B\"",
+       "f": "2027-04-25"
+      }
+     ]
+    },
+    {
+     "j": 22,
+     "fecha": "2027-05-02",
+     "partidos": [
+      {
+       "l": "A.D. SAN JOSE \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "GUILLENA C.F. \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "U.D. RINCONADA \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. TORO TOCINA LOS ROSALES \"B\"",
+       "v": "CENTRO HISTORICO AA.VV. \"C\"",
+       "f": "2027-05-02"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "benjamin2",
@@ -2551,7 +7626,1119 @@ window.DATOS = {
     "SAN ROQUE BALOMPIE \"D\"": "icons/escudos/rfaf-san-roque-balompie-d.png",
     "GUILLENA C.F.": "icons/escudos/rfaf-guillena-c-f.png",
     "U.D. VILLAVERDE \"B\"": "icons/escudos/rfaf-u-d-villaverde-b.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-10-11",
+     "partidos": [
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "g": [
+        3,
+        0
+       ],
+       "f": "2026-10-09",
+       "h": "17:30"
+      },
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "g": [
+        5,
+        3
+       ],
+       "f": "2026-10-09",
+       "h": "17:45"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "LORA C.F. \"B\"",
+       "g": [
+        6,
+        0
+       ],
+       "f": "2026-10-09",
+       "h": "18:30"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "g": [
+        5,
+        0
+       ],
+       "f": "2026-10-09",
+       "h": "19:00"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "PALOMARES C.F. \"C\"",
+       "g": [
+        10,
+        0
+       ],
+       "f": "2026-10-09",
+       "h": "19:30"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "GUILLENA C.F.",
+       "g": [
+        11,
+        1
+       ],
+       "f": "2026-10-10",
+       "h": "13:00"
+      }
+     ],
+     "descansa": [
+      "U.D. VILLAVERDE \"B\""
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-18",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "g": [
+        1,
+        5
+       ],
+       "f": "2026-10-16",
+       "h": "17:00"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "g": [
+        5,
+        2
+       ],
+       "f": "2026-10-16",
+       "h": "18:40"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "CAMAS C.F. \"A\"",
+       "g": [
+        2,
+        2
+       ],
+       "f": "2026-10-16",
+       "h": "18:45"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "g": [
+        1,
+        11
+       ],
+       "f": "2026-10-17",
+       "h": "11:30"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "g": [
+        0,
+        7
+       ],
+       "f": "2026-10-17",
+       "h": "12:00"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "g": [
+        1,
+        2
+       ],
+       "f": "2026-10-17",
+       "h": "17:45"
+      }
+     ],
+     "descansa": [
+      "C.D. MONITORES GERENA"
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-10-25",
+     "partidos": [
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "g": [
+        1,
+        4
+       ],
+       "f": "2026-10-23",
+       "h": "17:30"
+      },
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "CAMAS C.F. \"A\"",
+       "g": [
+        5,
+        2
+       ],
+       "f": "2026-10-23",
+       "h": "17:30"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "LORA C.F. \"B\"",
+       "g": [
+        7,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "19:00"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "GUILLENA C.F.",
+       "g": [
+        10,
+        0
+       ],
+       "f": "2026-10-24",
+       "h": "11:00"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "g": [
+        4,
+        1
+       ],
+       "f": "2026-10-24",
+       "h": "11:00"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "g": [
+        3,
+        2
+       ],
+       "f": "2026-10-24",
+       "h": "13:00"
+      }
+     ],
+     "descansa": [
+      "PALOMARES C.F. \"C\""
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-11-01",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2026-10-30",
+       "h": "17:30"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2026-10-30",
+       "h": "18:00"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-10-30",
+       "h": "18:30"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2026-10-30",
+       "h": "19:00"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2026-10-30",
+       "h": "19:00"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-10-31",
+       "h": "12:15"
+      }
+     ],
+     "descansa": [
+      "C.D. ESFUBASA \"B\""
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-11-08",
+     "partidos": [
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "GUILLENA C.F.",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2026-11-08"
+      }
+     ],
+     "descansa": [
+      "LORA C.F. \"B\""
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-11-15",
+     "partidos": [
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2026-11-15"
+      }
+     ],
+     "descansa": [
+      "ALCALA DEL RIO C.F. \"B\""
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-11-22",
+     "partidos": [
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2026-11-22"
+      }
+     ],
+     "descansa": [
+      "GUILLENA C.F."
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-11-29",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-29"
+      }
+     ],
+     "descansa": [
+      "C.D. AZNALCOLLAR FUTBOL BASE \"A\""
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2026-12-06",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-12-06"
+      }
+     ],
+     "descansa": [
+      "ATCO. ALGABEÑO \"B\""
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2026-12-13",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-12-13"
+      }
+     ],
+     "descansa": [
+      "CAMAS C.F. \"A\""
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2026-12-20",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2026-12-20"
+      }
+     ],
+     "descansa": [
+      "SAN ROQUE BALOMPIE \"D\""
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2027-01-10",
+     "partidos": [
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2027-01-10"
+      }
+     ],
+     "descansa": [
+      "C.D. SANTIPONCE \"A\""
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2027-01-17",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2027-01-17"
+      }
+     ],
+     "descansa": [
+      "C.D. CASTILBLANCO F.C."
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-01-24",
+     "partidos": [
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2027-01-24"
+      }
+     ],
+     "descansa": [
+      "U.D. VILLAVERDE \"B\""
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-02-07",
+     "partidos": [
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-02-07"
+      }
+     ],
+     "descansa": [
+      "C.D. MONITORES GERENA"
+     ]
+    },
+    {
+     "j": 16,
+     "fecha": "2027-02-14",
+     "partidos": [
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2027-02-14"
+      }
+     ],
+     "descansa": [
+      "PALOMARES C.F. \"C\""
+     ]
+    },
+    {
+     "j": 17,
+     "fecha": "2027-02-21",
+     "partidos": [
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2027-02-21"
+      }
+     ],
+     "descansa": [
+      "C.D. ESFUBASA \"B\""
+     ]
+    },
+    {
+     "j": 18,
+     "fecha": "2027-03-07",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2027-03-07"
+      }
+     ],
+     "descansa": [
+      "LORA C.F. \"B\""
+     ]
+    },
+    {
+     "j": 19,
+     "fecha": "2027-03-14",
+     "partidos": [
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2027-03-14"
+      }
+     ],
+     "descansa": [
+      "ALCALA DEL RIO C.F. \"B\""
+     ]
+    },
+    {
+     "j": 20,
+     "fecha": "2027-04-04",
+     "partidos": [
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2027-04-04"
+      }
+     ],
+     "descansa": [
+      "GUILLENA C.F."
+     ]
+    },
+    {
+     "j": 21,
+     "fecha": "2027-04-11",
+     "partidos": [
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2027-04-11"
+      }
+     ],
+     "descansa": [
+      "C.D. AZNALCOLLAR FUTBOL BASE \"A\""
+     ]
+    },
+    {
+     "j": 22,
+     "fecha": "2027-04-25",
+     "partidos": [
+      {
+       "l": "GUILLENA C.F.",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2027-04-25"
+      }
+     ],
+     "descansa": [
+      "ATCO. ALGABEÑO \"B\""
+     ]
+    },
+    {
+     "j": 23,
+     "fecha": "2027-05-02",
+     "partidos": [
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "C.D. SANTIPONCE \"A\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-05-02"
+      }
+     ],
+     "descansa": [
+      "CAMAS C.F. \"A\""
+     ]
+    },
+    {
+     "j": 24,
+     "fecha": "2027-05-09",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. CASTILBLANCO F.C.",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2027-05-09"
+      }
+     ],
+     "descansa": [
+      "SAN ROQUE BALOMPIE \"D\""
+     ]
+    },
+    {
+     "j": 25,
+     "fecha": "2027-05-16",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "v": "C.D. ESFUBASA \"B\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "GUILLENA C.F.",
+       "v": "ATCO. ALGABEÑO \"B\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "ALCALA DEL RIO C.F. \"B\"",
+       "v": "CAMAS C.F. \"A\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "LORA C.F. \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"D\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "PALOMARES C.F. \"C\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "C.D. MONITORES GERENA",
+       "v": "U.D. VILLAVERDE \"B\"",
+       "f": "2027-05-16"
+      }
+     ],
+     "descansa": [
+      "C.D. SANTIPONCE \"A\""
+     ]
+    },
+    {
+     "j": 26,
+     "fecha": "2027-05-23",
+     "partidos": [
+      {
+       "l": "ATCO. ALGABEÑO \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"A\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "CAMAS C.F. \"A\"",
+       "v": "GUILLENA C.F.",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"D\"",
+       "v": "ALCALA DEL RIO C.F. \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "C.D. SANTIPONCE \"A\"",
+       "v": "LORA C.F. \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "U.D. VILLAVERDE \"B\"",
+       "v": "PALOMARES C.F. \"C\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "C.D. ESFUBASA \"B\"",
+       "v": "C.D. MONITORES GERENA",
+       "f": "2027-05-23"
+      }
+     ],
+     "descansa": [
+      "C.D. CASTILBLANCO F.C."
+     ]
+    }
+   ]
   },
   {
    "id": "benjamin1",
@@ -3065,7 +9252,1145 @@ window.DATOS = {
     "C.D.ATLÉTICO MACARENO": "icons/escudos/rfaf-c-d-atletico-macareno.png",
     "C.D. COLEGIO CLARET \"B\"": "icons/escudos/rfaf-c-d-colegio-claret-b.png",
     "C.D. ALTAIR \"B\"": "icons/escudos/rfaf-c-d-altair-b.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-10-11",
+     "partidos": [
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "g": [
+        3,
+        11
+       ],
+       "f": "2026-10-09",
+       "h": "17:30"
+      },
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "g": [
+        4,
+        4
+       ],
+       "f": "2026-10-09",
+       "h": "17:30"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "g": [
+        4,
+        1
+       ],
+       "f": "2026-10-09",
+       "h": "18:00"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "g": [
+        2,
+        2
+       ],
+       "f": "2026-10-10",
+       "h": "11:10"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "g": [
+        4,
+        3
+       ],
+       "f": "2026-10-10",
+       "h": "13:00"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "g": [
+        6,
+        0
+       ],
+       "f": "2026-10-10",
+       "h": "16:30"
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      }
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-18",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "g": [
+        6,
+        2
+       ],
+       "f": "2026-10-16",
+       "h": "17:30"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "17:30"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "g": [
+        10,
+        0
+       ],
+       "f": "2026-10-16",
+       "h": "18:45"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "g": [
+        0,
+        10
+       ],
+       "f": "2026-10-17",
+       "h": "11:30"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "g": [
+        1,
+        2
+       ],
+       "f": "2026-10-18",
+       "h": "10:15"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "g": [
+        1,
+        2
+       ],
+       "f": "2026-10-18",
+       "h": "10:15"
+      }
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-10-25",
+     "partidos": [
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "g": [
+        1,
+        11
+       ],
+       "f": "2026-10-24",
+       "h": "10:30"
+      },
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "CD. ASOC. DVA. NERVION",
+       "g": [
+        9,
+        2
+       ],
+       "f": "2026-10-24",
+       "h": "11:00"
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "g": [
+        8,
+        4
+       ],
+       "f": "2026-10-24",
+       "h": "12:30"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "g": [
+        10,
+        0
+       ],
+       "f": "2026-10-24",
+       "h": "12:40"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "g": [
+        2,
+        0
+       ],
+       "f": "2026-10-24",
+       "h": "13:00"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\""
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "g": [
+        5,
+        5
+       ],
+       "f": "2026-10-25",
+       "h": "12:45"
+      }
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-11-01",
+     "partidos": [
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2026-10-30",
+       "h": "17:45"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2026-10-30",
+       "h": "18:45"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2026-10-31",
+       "h": "10:00"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2026-10-31",
+       "h": "10:15"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2026-10-31",
+       "h": "11:00"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2026-10-31",
+       "h": "11:00"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      }
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-11-08",
+     "partidos": [
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2026-11-08"
+      },
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2026-11-08"
+      }
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-11-15",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2026-11-15"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2026-11-15"
+      }
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-11-22",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO"
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2026-11-22"
+      },
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2026-11-22"
+      }
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-11-29",
+     "partidos": [
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2026-11-29"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2026-11-29"
+      }
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2026-12-06",
+     "partidos": [
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "CD. ASOC. DVA. NERVION"
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2026-12-06"
+      },
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2026-12-06"
+      }
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2026-12-13",
+     "partidos": [
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2026-12-13"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2026-12-13"
+      }
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2026-12-20",
+     "partidos": [
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "C.D. EL PILAR \"B\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2026-12-20"
+      },
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2026-12-20"
+      }
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2027-01-10",
+     "partidos": [
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2027-01-10"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2027-01-10"
+      }
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2027-01-17",
+     "partidos": [
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2027-01-17"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2027-01-17"
+      }
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-01-24",
+     "partidos": [
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\""
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2027-01-24"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2027-01-24"
+      }
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-02-07",
+     "partidos": [
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2027-02-07"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2027-02-07"
+      }
+     ]
+    },
+    {
+     "j": 16,
+     "fecha": "2027-02-14",
+     "partidos": [
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2027-02-14"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2027-02-14"
+      }
+     ]
+    },
+    {
+     "j": 17,
+     "fecha": "2027-02-21",
+     "partidos": [
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2027-02-21"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2027-02-21"
+      }
+     ]
+    },
+    {
+     "j": 18,
+     "fecha": "2027-03-07",
+     "partidos": [
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2027-03-07"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2027-03-07"
+      }
+     ]
+    },
+    {
+     "j": 19,
+     "fecha": "2027-03-14",
+     "partidos": [
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2027-03-14"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2027-03-14"
+      }
+     ]
+    },
+    {
+     "j": 20,
+     "fecha": "2027-04-04",
+     "partidos": [
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2027-04-04"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2027-04-04"
+      }
+     ]
+    },
+    {
+     "j": 21,
+     "fecha": "2027-04-11",
+     "partidos": [
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2027-04-11"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2027-04-11"
+      }
+     ]
+    },
+    {
+     "j": 22,
+     "fecha": "2027-04-25",
+     "partidos": [
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2027-04-25"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2027-04-25"
+      }
+     ]
+    },
+    {
+     "j": 23,
+     "fecha": "2027-05-02",
+     "partidos": [
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2027-05-02"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\"",
+       "f": "2027-05-02"
+      }
+     ]
+    },
+    {
+     "j": 24,
+     "fecha": "2027-05-09",
+     "partidos": [
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2027-05-09"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2027-05-09"
+      }
+     ]
+    },
+    {
+     "j": 25,
+     "fecha": "2027-05-16",
+     "partidos": [
+      {
+       "l": "C.D.ATLÉTICO MACARENO",
+       "v": "C.D. ALL SPORTS BERMEJALES",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "v": "ATCO. ALGABEÑO \"C\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "v": "CD. ASOC. DVA. NERVION",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "v": "C.D. S.P. PINO MONTANO \"B\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "SAN ROQUE BALOMPIE \"B\"",
+       "v": "C.D. EL PILAR \"B\"",
+       "f": "2027-05-16"
+      },
+      {
+       "l": "C.D. ALTAIR \"B\"",
+       "v": "ANDALUCIA ESTE C.F. \"B\""
+      },
+      {
+       "l": "C.D. COLEGIO CLARET \"B\"",
+       "v": "C.D. ATLETICO SUMI \"B\"",
+       "f": "2027-05-16"
+      }
+     ]
+    },
+    {
+     "j": 26,
+     "fecha": "2027-05-23",
+     "partidos": [
+      {
+       "l": "ATCO. ALGABEÑO \"C\"",
+       "v": "C.D.ATLÉTICO MACARENO",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "CD. ASOC. DVA. NERVION",
+       "v": "C.F. POLIDEPORTIVO ALCOSA \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "C.D. S.P. PINO MONTANO \"B\"",
+       "v": "CLUB ATLÉTICO CENTRAL \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "C.D. EL PILAR \"B\"",
+       "v": "C.D. AZNALCOLLAR FUTBOL BASE \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "ANDALUCIA ESTE C.F. \"B\"",
+       "v": "SAN ROQUE BALOMPIE \"B\"",
+       "f": "2027-05-23"
+      },
+      {
+       "l": "C.D. ATLETICO SUMI \"B\"",
+       "v": "C.D. ALTAIR \"B\""
+      },
+      {
+       "l": "C.D. ALL SPORTS BERMEJALES",
+       "v": "C.D. COLEGIO CLARET \"B\"",
+       "f": "2027-05-23"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "cadete",
@@ -3436,7 +10761,595 @@ window.DATOS = {
     "CD Atco. San Martín": "icons/escudos/educa-cd-atco-san-martin.png",
     "CA Aznalcázar": "icons/escudos/educa-ca-aznalcazar.png",
     "CD Toro Tocina Los Rosales (Fem)": "icons/escudos/educa-cd-toro-tocina-los-rosales-fem.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-10-16",
+     "partidos": [
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "JD Gines",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "17:15"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CD Aznalcóllar FB",
+       "g": [
+        2,
+        5
+       ],
+       "f": "2026-10-16",
+       "h": "18:00"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "CD Atco. San Martín",
+       "g": [
+        8,
+        5
+       ],
+       "f": "2026-10-16",
+       "h": "11:10"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "g": [
+        5,
+        0
+       ],
+       "f": "2026-10-16",
+       "h": "12:00"
+      }
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-23",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "17:30"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "RCD Nueva Sevilla",
+       "g": [
+        5,
+        0
+       ],
+       "f": "2026-10-23",
+       "h": "11:00"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "Club Náutico Sevilla",
+       "g": [
+        3,
+        5
+       ],
+       "f": "2026-10-23",
+       "h": "16:15"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "CA Aznalcázar",
+       "f": "2026-10-23",
+       "h": "18:30"
+      }
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-10-30",
+     "partidos": [
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "CF Comarca los Alcores",
+       "f": "2026-10-30",
+       "h": "17:30"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "JD Gines",
+       "f": "2026-10-30",
+       "h": "19:00"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "CD Atco. San Martín",
+       "f": "2026-10-30",
+       "h": "19:00"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "Club Náutico Sevilla",
+       "f": "2026-10-30",
+       "h": "19:00"
+      }
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-11-06",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "CD Atco. San Martín",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "RCD Nueva Sevilla",
+       "f": "2026-11-06"
+      }
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-11-13",
+     "partidos": [
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "JD Gines",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "Club Náutico Sevilla",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CA Aznalcázar",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "RCD Nueva Sevilla",
+       "f": "2026-11-13"
+      }
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-11-20",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "Club Náutico Sevilla",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "CF Comarca los Alcores",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "CD Atco. San Martín",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-11-20"
+      }
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-11-27",
+     "partidos": [
+      {
+       "l": "CA Aznalcázar",
+       "v": "JD Gines",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "RCD Nueva Sevilla",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-11-27"
+      }
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-12-11",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "RCD Nueva Sevilla",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "CA Aznalcázar",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Club Náutico Sevilla",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "CF Comarca los Alcores",
+       "f": "2026-12-11"
+      }
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2026-12-18",
+     "partidos": [
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "JD Gines",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "CD Atco. San Martín",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CF Comarca los Alcores",
+       "f": "2026-12-18"
+      }
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2027-01-08",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CA Aznalcázar",
+       "f": "2027-01-08"
+      }
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2027-01-15",
+     "partidos": [
+      {
+       "l": "CD Atco. San Martín",
+       "v": "JD Gines",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CF Comarca los Alcores",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "CA Aznalcázar",
+       "f": "2027-01-15"
+      }
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2027-01-29",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "CF Comarca los Alcores",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CD Atco. San Martín",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2027-01-29"
+      }
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2027-02-12",
+     "partidos": [
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "JD Gines",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "CA Aznalcázar",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2027-02-12"
+      }
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-03-05",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "CA Aznalcázar",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "CF Comarca los Alcores",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CD Atco. San Martín",
+       "f": "2027-03-05"
+      }
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-03-12",
+     "partidos": [
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "JD Gines",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "CD Atco. San Martín",
+       "f": "2027-03-12"
+      }
+     ]
+    },
+    {
+     "j": 16,
+     "fecha": "2027-03-19",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "CA Aznalcázar",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-03-19"
+      }
+     ]
+    },
+    {
+     "j": 17,
+     "fecha": "2027-04-02",
+     "partidos": [
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "JD Gines",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "CD Atco. San Martín",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "CF Comarca los Alcores",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-04-02"
+      }
+     ]
+    },
+    {
+     "j": 18,
+     "fecha": "2027-04-09",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "CD Atco. San Martín",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-04-09"
+      }
+     ]
+    },
+    {
+     "j": 19,
+     "fecha": "2027-04-23",
+     "partidos": [
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "JD Gines",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CA Aznalcázar",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-04-23"
+      }
+     ]
+    },
+    {
+     "j": 20,
+     "fecha": "2027-04-30",
+     "partidos": [
+      {
+       "l": "JD Gines",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "CA Aznalcázar",
+       "v": "CF Comarca los Alcores",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "CD Atco. San Martín",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "CD Toro Tocina Los Rosales (Fem)",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-04-30"
+      }
+     ]
+    },
+    {
+     "j": 21,
+     "fecha": "2027-05-07",
+     "partidos": [
+      {
+       "l": "CA Aznalcázar",
+       "v": "JD Gines",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "CF Comarca los Alcores",
+       "v": "CD Toro Tocina Los Rosales (Fem)",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "CD Atco. San Martín",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-05-07"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "alevin1",
@@ -3940,7 +11853,1296 @@ window.DATOS = {
     "EF Rio Grande": "icons/escudos/educa-ef-rio-grande.png",
     "CD Mairena": "icons/escudos/educa-cd-mairena.png",
     "EDM Bormujos": "icons/escudos/educa-edm-bormujos.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-10-16",
+     "partidos": [
+      {
+       "l": "CD Híspalis",
+       "v": "CD Isidro Reguera",
+       "g": [
+        6,
+        4
+       ],
+       "f": "2026-10-16",
+       "h": "17:30"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "CD Aznalcóllar FB",
+       "g": [
+        3,
+        3
+       ],
+       "f": "2026-10-16",
+       "h": "18:10"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "Camino Viejo CF",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "18:15"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "Real Betis Academy \"Abde\"",
+       "g": [
+        3,
+        2
+       ],
+       "f": "2026-10-16",
+       "h": "18:15"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "CD Estrella Aljarafe",
+       "g": [
+        2,
+        5
+       ],
+       "f": "2026-10-16",
+       "h": "18:40"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "FBJD Puebla",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "19:15"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "Espartinas CF",
+       "g": [
+        2,
+        7
+       ],
+       "f": "2026-10-16",
+       "h": "10:00"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "CD Atco. Maribañez",
+       "g": [
+        2,
+        7
+       ],
+       "f": "2026-10-16",
+       "h": "11:30"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "CF Comarca los Alcores \"A\"",
+       "g": [
+        4,
+        2
+       ],
+       "f": "2026-10-16",
+       "h": "13:00"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "CD Mairena",
+       "g": [
+        3,
+        6
+       ],
+       "f": "2026-10-16",
+       "h": "13:45"
+      }
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-23",
+     "partidos": [
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "CD Isidro Reguera",
+       "g": [
+        5,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "19:00"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "EF Ayto. Gines",
+       "g": [
+        3,
+        6
+       ],
+       "f": "2026-10-23",
+       "h": "17:00"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "EEMM Villamanrique",
+       "g": [
+        1,
+        6
+       ],
+       "f": "2026-10-23",
+       "h": "18:15"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "CD Tor del Rey de Pilas",
+       "g": [
+        4,
+        0
+       ],
+       "f": "2026-10-23",
+       "h": "18:15"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "Real Betis Academy \"Antony\"",
+       "g": [
+        8,
+        3
+       ],
+       "f": "2026-10-23",
+       "h": "18:20"
+      },
+      {
+       "l": "EDM Bormujos",
+       "v": "CD Híspalis",
+       "g": [
+        3,
+        7
+       ],
+       "f": "2026-10-23",
+       "h": "18:30"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "EF Rio Grande",
+       "g": [
+        2,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "18:35"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "UD Mairena del Aljarafe",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "19:30"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "g": [
+        1,
+        2
+       ],
+       "f": "2026-10-23",
+       "h": "10:00"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "CD Dani Triana Ar-Rabad",
+       "g": [
+        7,
+        2
+       ],
+       "f": "2026-10-23",
+       "h": "10:00"
+      }
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-10-30",
+     "partidos": [
+      {
+       "l": "CD Mairena",
+       "v": "EDM Bormujos",
+       "f": "2026-10-30",
+       "h": "17:15"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2026-10-30",
+       "h": "17:30"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2026-10-30",
+       "h": "17:00"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "CD Atco. Maribañez",
+       "f": "2026-10-30",
+       "h": "17:30"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "Espartinas CF",
+       "f": "2026-10-30",
+       "h": "18:00"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2026-10-30",
+       "h": "19:00"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "EF Ayto. Gines",
+       "f": "2026-10-30",
+       "h": "10:00"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "CD Estrella Aljarafe",
+       "f": "2026-10-30",
+       "h": "11:15"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "Camino Viejo CF",
+       "f": "2026-10-30",
+       "h": "11:30"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2026-10-30",
+       "h": "13:45"
+      }
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-11-06",
+     "partidos": [
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "CD Híspalis",
+       "f": "2026-11-06",
+       "h": "19:00"
+      },
+      {
+       "l": "EDM Bormujos",
+       "v": "CD Atco. Maribañez",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CD Mairena",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "CD Isidro Reguera",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "EF Rio Grande",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "EEMM Villamanrique",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2026-11-06"
+      }
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-11-13",
+     "partidos": [
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "EDM Bormujos",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "CD Estrella Aljarafe",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "Camino Viejo CF",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "FBJD Puebla",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "EEMM Villamanrique",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2026-11-13"
+      }
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-11-20",
+     "partidos": [
+      {
+       "l": "EDM Bormujos",
+       "v": "CD Estrella Aljarafe",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "CD Atco. Maribañez",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "CD Mairena",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "CD Híspalis",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "CD Isidro Reguera",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "EF Rio Grande",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "EEMM Villamanrique",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2026-11-20"
+      }
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-11-27",
+     "partidos": [
+      {
+       "l": "Camino Viejo CF",
+       "v": "EDM Bormujos",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "FBJD Puebla",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Espartinas CF",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2026-11-27"
+      }
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-12-11",
+     "partidos": [
+      {
+       "l": "EDM Bormujos",
+       "v": "FBJD Puebla",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "Camino Viejo CF",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "CD Estrella Aljarafe",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "CD Atco. Maribañez",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "CD Mairena",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "CD Híspalis",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "CD Isidro Reguera",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "EF Rio Grande",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "EEMM Villamanrique",
+       "f": "2026-12-11"
+      }
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2026-12-18",
+     "partidos": [
+      {
+       "l": "Espartinas CF",
+       "v": "EDM Bormujos",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "EF Ayto. Gines",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "EEMM Villamanrique",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2026-12-18"
+      }
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2027-01-08",
+     "partidos": [
+      {
+       "l": "EDM Bormujos",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "Espartinas CF",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "FBJD Puebla",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "Camino Viejo CF",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "CD Estrella Aljarafe",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "CD Atco. Maribañez",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "CD Mairena",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "CD Híspalis",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "CD Isidro Reguera",
+       "f": "2027-01-08"
+      }
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2027-01-15",
+     "partidos": [
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "EDM Bormujos",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "EF Ayto. Gines",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "EEMM Villamanrique",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "EF Rio Grande",
+       "f": "2027-01-15"
+      }
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2027-01-29",
+     "partidos": [
+      {
+       "l": "EDM Bormujos",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "Espartinas CF",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "FBJD Puebla",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "Camino Viejo CF",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "CD Estrella Aljarafe",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "CD Atco. Maribañez",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "CD Mairena",
+       "f": "2027-01-29"
+      }
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2027-02-12",
+     "partidos": [
+      {
+       "l": "EF Ayto. Gines",
+       "v": "EDM Bormujos",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "EEMM Villamanrique",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "EF Rio Grande",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CD Isidro Reguera",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "CD Híspalis",
+       "f": "2027-02-12"
+      }
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-03-05",
+     "partidos": [
+      {
+       "l": "EDM Bormujos",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "EF Ayto. Gines",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "Espartinas CF",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "FBJD Puebla",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "Camino Viejo CF",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "CD Atco. Maribañez",
+       "f": "2027-03-05"
+      }
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-03-12",
+     "partidos": [
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "EDM Bormujos",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "EEMM Villamanrique",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "EF Rio Grande",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "CD Isidro Reguera",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "CD Híspalis",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "CD Mairena",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CD Atco. Maribañez",
+       "f": "2027-03-12"
+      }
+     ]
+    },
+    {
+     "j": 16,
+     "fecha": "2027-03-19",
+     "partidos": [
+      {
+       "l": "EDM Bormujos",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "EF Ayto. Gines",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "Espartinas CF",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "FBJD Puebla",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "Camino Viejo CF",
+       "f": "2027-03-19"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-03-19"
+      }
+     ]
+    },
+    {
+     "j": 17,
+     "fecha": "2027-04-02",
+     "partidos": [
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "EDM Bormujos",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "EEMM Villamanrique",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "EF Rio Grande",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "CD Isidro Reguera",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "CD Híspalis",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "CD Mairena",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "CD Atco. Maribañez",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "CD Estrella Aljarafe",
+       "f": "2027-04-02"
+      }
+     ]
+    },
+    {
+     "j": 18,
+     "fecha": "2027-04-09",
+     "partidos": [
+      {
+       "l": "EDM Bormujos",
+       "v": "EEMM Villamanrique",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "EF Rio Grande",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "EF Ayto. Gines",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "Espartinas CF",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "FBJD Puebla",
+       "f": "2027-04-09"
+      }
+     ]
+    },
+    {
+     "j": 19,
+     "fecha": "2027-04-23",
+     "partidos": [
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "EDM Bormujos",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "EF Rio Grande",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "La Moneda CF \"Compañerismo\"",
+       "v": "CD Isidro Reguera",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "CD Híspalis",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "CD Mairena",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "EF Ayto. Gines",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "CD Estrella Aljarafe",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "Real Betis Academy \"Abde\"",
+       "v": "Camino Viejo CF",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "Espartinas CF",
+       "f": "2027-04-23"
+      }
+     ]
+    },
+    {
+     "j": 20,
+     "fecha": "2027-04-30",
+     "partidos": [
+      {
+       "l": "EDM Bormujos",
+       "v": "EF Rio Grande",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "CD Isidro Reguera",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "CD Híspalis",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "CD Tor del Rey de Pilas",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "CD Dani Triana Ar-Rabad",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Real Betis Academy \"Antony\"",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "CD Estrella Aljarafe",
+       "v": "EF Ayto. Gines",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "Camino Viejo CF",
+       "v": "CF Comarca los Alcores \"B\"",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "FBJD Puebla",
+       "v": "CF Comarca los Alcores \"A\"",
+       "f": "2027-04-30"
+      },
+      {
+       "l": "Espartinas CF",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2027-04-30"
+      }
+     ]
+    },
+    {
+     "j": 21,
+     "fecha": "2027-05-07",
+     "partidos": [
+      {
+       "l": "CD Isidro Reguera",
+       "v": "EDM Bormujos",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "CD Híspalis",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "EEMM Villamanrique",
+       "v": "CD Mairena",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "CD Atco. Maribañez",
+       "v": "La Moneda CF \"Compañerismo\"",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "CD Tor del Rey de Pilas",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "CD Dani Triana Ar-Rabad",
+       "v": "CD Estrella Aljarafe",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "Real Betis Academy \"Antony\"",
+       "v": "Camino Viejo CF",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "EF Ayto. Gines",
+       "v": "FBJD Puebla",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "CF Comarca los Alcores \"B\"",
+       "v": "Espartinas CF",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "CF Comarca los Alcores \"A\"",
+       "v": "Real Betis Academy \"Abde\"",
+       "f": "2027-05-07"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "prebenjamin",
@@ -4308,7 +13510,694 @@ window.DATOS = {
     "AD Mosqueo": "icons/escudos/educa-ad-mosqueo.png",
     "CDM Gerena": "icons/escudos/educa-cdm-gerena.png",
     "Club Atco. Libertad": "icons/escudos/educa-club-atco-libertad.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-10-16",
+     "partidos": [
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "UD Mairena del Aljarafe",
+       "g": [
+        9,
+        6
+       ],
+       "f": "2026-10-16",
+       "h": "17:00"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Club Atco. Algabeño",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "18:15"
+      },
+      {
+       "l": "CMD San Juan",
+       "v": "CD Santiponce",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "18:30"
+      },
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "CD San Roque Balompié (Fem)",
+       "g": [
+        3,
+        2
+       ],
+       "f": "2026-10-16",
+       "h": "10:00"
+      },
+      {
+       "l": "Lora CF",
+       "v": "Círculo del Porvenir CD",
+       "g": [
+        0,
+        5
+       ],
+       "f": "2026-10-16",
+       "h": "10:00"
+      },
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "CD Mairena",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "10:00"
+      },
+      {
+       "l": "AD Mosqueo",
+       "v": "CDM Gerena",
+       "g": [
+        1,
+        0
+       ],
+       "f": "2026-10-16",
+       "h": "11:00"
+      }
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-23",
+     "partidos": [
+      {
+       "l": "CDM Gerena",
+       "v": "CD San Roque Balompié (Fem)",
+       "g": [
+        3,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "17:30"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "AD Mosqueo",
+       "g": [
+        2,
+        3
+       ],
+       "f": "2026-10-23",
+       "h": "10:00"
+      },
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "CD Aznalcóllar FB",
+       "g": [
+        1,
+        6
+       ],
+       "f": "2026-10-23",
+       "h": "10:00"
+      },
+      {
+       "l": "Club Atco. Libertad",
+       "v": "Club Náutico Sevilla",
+       "g": [
+        2,
+        7
+       ],
+       "f": "2026-10-23",
+       "h": "11:00"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "Lora CF",
+       "g": [
+        0,
+        2
+       ],
+       "f": "2026-10-23",
+       "h": "11:00"
+      },
+      {
+       "l": "Círculo del Porvenir CD",
+       "v": "CMD San Juan",
+       "g": [
+        7,
+        3
+       ],
+       "f": "2026-10-23",
+       "h": "11:15"
+      },
+      {
+       "l": "CD Santiponce",
+       "v": "Alcalá del Río CF (Fem)",
+       "g": [
+        0,
+        5
+       ],
+       "f": "2026-10-23",
+       "h": "12:00"
+      }
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-11-06",
+     "partidos": [
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "CDM Gerena",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "CD San Roque Balompié (Fem)",
+       "v": "CD Santiponce",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "AD Mosqueo",
+       "v": "Club Atco. Libertad",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "Círculo del Porvenir CD",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "Club Atco. Algabeño",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "CMD San Juan",
+       "v": "CD Mairena",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "Lora CF",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-11-06"
+      }
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-11-13",
+     "partidos": [
+      {
+       "l": "CDM Gerena",
+       "v": "CD Santiponce",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "Club Atco. Libertad",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "Círculo del Porvenir CD",
+       "v": "CD San Roque Balompié (Fem)",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "Club Atco. Algabeño",
+       "v": "AD Mosqueo",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "Alcalá del Río CF (Fem)",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "Club Náutico Sevilla",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CMD San Juan",
+       "f": "2026-11-13"
+      }
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-11-20",
+     "partidos": [
+      {
+       "l": "Club Atco. Libertad",
+       "v": "CDM Gerena",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "CD Santiponce",
+       "v": "Círculo del Porvenir CD",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "Club Atco. Algabeño",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "CD San Roque Balompié (Fem)",
+       "v": "CD Mairena",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "AD Mosqueo",
+       "v": "Real Betis Academy \"Bartra\"",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "Lora CF",
+       "f": "2026-11-20"
+      }
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-11-27",
+     "partidos": [
+      {
+       "l": "CDM Gerena",
+       "v": "Círculo del Porvenir CD",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "Club Atco. Algabeño",
+       "v": "Club Atco. Libertad",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "CD Santiponce",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "CD San Roque Balompié (Fem)",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "Lora CF",
+       "v": "AD Mosqueo",
+       "f": "2026-11-27"
+      },
+      {
+       "l": "CMD San Juan",
+       "v": "Club Náutico Sevilla",
+       "f": "2026-11-27"
+      }
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2026-12-11",
+     "partidos": [
+      {
+       "l": "Club Atco. Algabeño",
+       "v": "CDM Gerena",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "Círculo del Porvenir CD",
+       "v": "CD Mairena",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "Club Atco. Libertad",
+       "v": "Real Betis Academy \"Bartra\"",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "CD Santiponce",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "Lora CF",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "AD Mosqueo",
+       "v": "CMD San Juan",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "Club Náutico Sevilla",
+       "f": "2026-12-11"
+      }
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2026-12-18",
+     "partidos": [
+      {
+       "l": "CDM Gerena",
+       "v": "CD Mairena",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "Club Atco. Algabeño",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Círculo del Porvenir CD",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "Lora CF",
+       "v": "Club Atco. Libertad",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "CMD San Juan",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CD San Roque Balompié (Fem)",
+       "f": "2026-12-18"
+      },
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "AD Mosqueo",
+       "f": "2026-12-18"
+      }
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2027-01-08",
+     "partidos": [
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "CDM Gerena",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "Club Atco. Algabeño",
+       "v": "Lora CF",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "Club Atco. Libertad",
+       "v": "CMD San Juan",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CD Santiponce",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "Alcalá del Río CF (Fem)",
+       "f": "2027-01-08"
+      },
+      {
+       "l": "CD San Roque Balompié (Fem)",
+       "v": "AD Mosqueo",
+       "f": "2027-01-08"
+      }
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2027-01-15",
+     "partidos": [
+      {
+       "l": "CDM Gerena",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "Lora CF",
+       "v": "Real Betis Academy \"Bartra\"",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CMD San Juan",
+       "v": "Club Atco. Algabeño",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "Círculo del Porvenir CD",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "Club Atco. Libertad",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "AD Mosqueo",
+       "v": "CD Santiponce",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "CD San Roque Balompié (Fem)",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2027-01-15"
+      }
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2027-01-29",
+     "partidos": [
+      {
+       "l": "Lora CF",
+       "v": "CDM Gerena",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "CMD San Juan",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "Club Atco. Algabeño",
+       "v": "Alcalá del Río CF (Fem)",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "Círculo del Porvenir CD",
+       "v": "AD Mosqueo",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "Club Atco. Libertad",
+       "v": "CD San Roque Balompié (Fem)",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "CD Santiponce",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2027-01-29"
+      }
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2027-02-12",
+     "partidos": [
+      {
+       "l": "CMD San Juan",
+       "v": "Lora CF",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "Real Betis Academy \"Bartra\"",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "AD Mosqueo",
+       "v": "CD Mairena",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CD San Roque Balompié (Fem)",
+       "v": "Club Atco. Algabeño",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "Círculo del Porvenir CD",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "CD Santiponce",
+       "v": "Club Atco. Libertad",
+       "f": "2027-02-12"
+      }
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2027-03-05",
+     "partidos": [
+      {
+       "l": "CMD San Juan",
+       "v": "CDM Gerena",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "Lora CF",
+       "v": "Alcalá del Río CF (Fem)",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "AD Mosqueo",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "CD San Roque Balompié (Fem)",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "UD Mairena del Aljarafe",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "Club Atco. Algabeño",
+       "v": "CD Santiponce",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "Círculo del Porvenir CD",
+       "v": "Club Atco. Libertad",
+       "f": "2027-03-05"
+      }
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-03-12",
+     "partidos": [
+      {
+       "l": "CDM Gerena",
+       "v": "Club Náutico Sevilla",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "CMD San Juan",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CD San Roque Balompié (Fem)",
+       "v": "Lora CF",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "UD Mairena del Aljarafe",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CD Santiponce",
+       "v": "Real Betis Academy \"Bartra\"",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "Club Atco. Libertad",
+       "v": "CD Mairena",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "Círculo del Porvenir CD",
+       "v": "Club Atco. Algabeño",
+       "f": "2027-03-12"
+      }
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-04-02",
+     "partidos": [
+      {
+       "l": "Alcalá del Río CF (Fem)",
+       "v": "CDM Gerena",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "Club Náutico Sevilla",
+       "v": "AD Mosqueo",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CMD San Juan",
+       "v": "CD San Roque Balompié (Fem)",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "Lora CF",
+       "v": "CD Santiponce",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Club Atco. Libertad",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "Real Betis Academy \"Bartra\"",
+       "v": "Círculo del Porvenir CD",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CD Mairena",
+       "v": "Club Atco. Algabeño",
+       "f": "2027-04-02"
+      }
+     ]
+    }
+   ]
   },
   {
    "id": "minis",
@@ -4577,7 +14466,354 @@ window.DATOS = {
     "FB Coria": "icons/escudos/educa-fb-coria.png",
     "Umbrete CF": "icons/escudos/educa-umbrete-cf.png",
     "UD Loreto": "icons/escudos/educa-ud-loreto.png"
-   }
+   },
+   "grupo": [
+    {
+     "j": 1,
+     "fecha": "2026-10-16",
+     "partidos": [
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Atco. Olivarense \"B\"",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "17:00"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "FB Coria",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "17:15"
+      },
+      {
+       "l": "Umbrete CF",
+       "v": "UD Loreto",
+       "g": [
+        6,
+        1
+       ],
+       "f": "2026-10-16",
+       "h": "18:10"
+      }
+     ]
+    },
+    {
+     "j": 2,
+     "fecha": "2026-10-23",
+     "partidos": [
+      {
+       "l": "Atco. Olivarense \"B\"",
+       "v": "Umbrete CF",
+       "g": [
+        0,
+        2
+       ],
+       "f": "2026-10-23",
+       "h": "17:00"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "RCD Nueva Sevilla",
+       "g": [
+        2,
+        3
+       ],
+       "f": "2026-10-23",
+       "h": "17:30"
+      },
+      {
+       "l": "UD Loreto",
+       "v": "FB Coria",
+       "g": [
+        5,
+        1
+       ],
+       "f": "2026-10-23",
+       "h": "11:20"
+      }
+     ]
+    },
+    {
+     "j": 3,
+     "fecha": "2026-11-06",
+     "partidos": [
+      {
+       "l": "Atco. Olivarense \"B\"",
+       "v": "UD Loreto",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "Umbrete CF",
+       "v": "RCD Nueva Sevilla",
+       "f": "2026-11-06"
+      },
+      {
+       "l": "FB Coria",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-11-06"
+      }
+     ]
+    },
+    {
+     "j": 4,
+     "fecha": "2026-11-13",
+     "partidos": [
+      {
+       "l": "UD Loreto",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "Atco. Olivarense \"B\"",
+       "f": "2026-11-13"
+      },
+      {
+       "l": "Umbrete CF",
+       "v": "FB Coria",
+       "f": "2026-11-13"
+      }
+     ]
+    },
+    {
+     "j": 5,
+     "fecha": "2026-11-20",
+     "partidos": [
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "UD Loreto",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Umbrete CF",
+       "f": "2026-11-20"
+      },
+      {
+       "l": "Atco. Olivarense \"B\"",
+       "v": "FB Coria",
+       "f": "2026-11-20"
+      }
+     ]
+    },
+    {
+     "j": 6,
+     "fecha": "2026-12-11",
+     "partidos": [
+      {
+       "l": "UD Loreto",
+       "v": "Umbrete CF",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "Atco. Olivarense \"B\"",
+       "v": "CD Aznalcóllar FB",
+       "f": "2026-12-11"
+      },
+      {
+       "l": "FB Coria",
+       "v": "RCD Nueva Sevilla",
+       "f": "2026-12-11"
+      }
+     ]
+    },
+    {
+     "j": 7,
+     "fecha": "2027-01-15",
+     "partidos": [
+      {
+       "l": "Umbrete CF",
+       "v": "Atco. Olivarense \"B\"",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-01-15"
+      },
+      {
+       "l": "FB Coria",
+       "v": "UD Loreto",
+       "f": "2027-01-15"
+      }
+     ]
+    },
+    {
+     "j": 8,
+     "fecha": "2027-01-29",
+     "partidos": [
+      {
+       "l": "UD Loreto",
+       "v": "Atco. Olivarense \"B\"",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "Umbrete CF",
+       "f": "2027-01-29"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "FB Coria",
+       "f": "2027-01-29"
+      }
+     ]
+    },
+    {
+     "j": 9,
+     "fecha": "2027-02-12",
+     "partidos": [
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "UD Loreto",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "Atco. Olivarense \"B\"",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-02-12"
+      },
+      {
+       "l": "FB Coria",
+       "v": "Umbrete CF",
+       "f": "2027-02-12"
+      }
+     ]
+    },
+    {
+     "j": 10,
+     "fecha": "2027-03-05",
+     "partidos": [
+      {
+       "l": "UD Loreto",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "Umbrete CF",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-03-05"
+      },
+      {
+       "l": "FB Coria",
+       "v": "Atco. Olivarense \"B\"",
+       "f": "2027-03-05"
+      }
+     ]
+    },
+    {
+     "j": 11,
+     "fecha": "2027-03-12",
+     "partidos": [
+      {
+       "l": "Umbrete CF",
+       "v": "UD Loreto",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Atco. Olivarense \"B\"",
+       "f": "2027-03-12"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "FB Coria",
+       "f": "2027-03-12"
+      }
+     ]
+    },
+    {
+     "j": 12,
+     "fecha": "2027-04-02",
+     "partidos": [
+      {
+       "l": "Atco. Olivarense \"B\"",
+       "v": "Umbrete CF",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-04-02"
+      },
+      {
+       "l": "UD Loreto",
+       "v": "FB Coria",
+       "f": "2027-04-02"
+      }
+     ]
+    },
+    {
+     "j": 13,
+     "fecha": "2027-04-09",
+     "partidos": [
+      {
+       "l": "Atco. Olivarense \"B\"",
+       "v": "UD Loreto",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "Umbrete CF",
+       "v": "RCD Nueva Sevilla",
+       "f": "2027-04-09"
+      },
+      {
+       "l": "FB Coria",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-04-09"
+      }
+     ]
+    },
+    {
+     "j": 14,
+     "fecha": "2027-04-23",
+     "partidos": [
+      {
+       "l": "UD Loreto",
+       "v": "CD Aznalcóllar FB",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "Atco. Olivarense \"B\"",
+       "f": "2027-04-23"
+      },
+      {
+       "l": "Umbrete CF",
+       "v": "FB Coria",
+       "f": "2027-04-23"
+      }
+     ]
+    },
+    {
+     "j": 15,
+     "fecha": "2027-05-07",
+     "partidos": [
+      {
+       "l": "RCD Nueva Sevilla",
+       "v": "UD Loreto",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "CD Aznalcóllar FB",
+       "v": "Umbrete CF",
+       "f": "2027-05-07"
+      },
+      {
+       "l": "Atco. Olivarense \"B\"",
+       "v": "FB Coria",
+       "f": "2027-05-07"
+      }
+     ]
+    }
+   ]
   }
  ],
  "avisos": []
