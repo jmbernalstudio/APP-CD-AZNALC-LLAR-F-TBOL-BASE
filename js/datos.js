@@ -1,6 +1,6 @@
 /* Generado por herramientas/actualizar.py desde rfaf.es y educationleague.es. No editar a mano. */
 window.DATOS = {
- "actualizado": "2026-10-27T17:56:58+00:00",
+ "actualizado": "2026-10-27T18:15:03+00:00",
  "equipos": [
   {
    "id": "senior",
@@ -103,7 +103,7 @@ window.DATOS = {
     },
     {
      "j": 7,
-     "fecha": "2026-11-30",
+     "fecha": "2026-10-30",
      "hora": "21:00",
      "casa": true,
      "rival": "C.D. SAN JERONIMO",
@@ -1089,7 +1089,7 @@ window.DATOS = {
       {
        "l": "C.D. AZNALCOLLAR FUTBOL BASE",
        "v": "C.D. SAN JERONIMO",
-       "f": "2026-11-30",
+       "f": "2026-10-30",
        "h": "21:00"
       }
      ],

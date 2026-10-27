@@ -1,0 +1,6 @@
+{
+ "_nota": "Correcciones a mano de errores de la RFAF o la Liga Educa. Solo se aplican mientras la web siga mostrando el dato erróneo ('si_web'); si la web lo cambia, se usa lo de la web.",
+ "senior": {
+  "7": {"si_web": {"fecha": "2026-11-30", "hora": "21:00"}, "fecha": "2026-10-30", "hora": "21:00", "motivo": "La RFAF pone 30-11-2026 (lunes); el club confirma el viernes 30-10-2026 a las 21:00 (Jose, 27-10-2026)"}
+ }
+}
