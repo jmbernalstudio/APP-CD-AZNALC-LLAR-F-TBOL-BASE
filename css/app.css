@@ -686,10 +686,53 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .cv-place { display: flex; align-items: center; gap: 6px; margin-top: 12px; opacity: .9; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cv-place .i { width: 16px; height: 16px; flex: none; }
 
-/* Pantalla de carga al abrir la app: fondo azul y el escudo da una vuelta (empieza cuando la imagen está lista) */
-.splash { position: fixed; inset: 0; z-index: 1000; background: var(--club); display: grid; place-items: center; perspective: 600px; transition: opacity .4s ease; }
-.splash img { width: 112px; height: 112px; object-fit: contain; opacity: 0; will-change: transform, opacity; }
-.splash.go img { animation: splash-spin 2.4s cubic-bezier(.45, 0, .25, 1) both; }
+/* Pantalla de carga al abrir la app: fondo azul y el escudo da una vuelta.
+   El giro se simula en 2D (escala horizontal = coseno del ángulo) porque el rotateY 3D se queda trabado en iPhone. */
+.splash { position: fixed; inset: 0; z-index: 1000; background: var(--club); display: grid; place-items: center; transition: opacity .4s ease; }
+.splash img { width: 112px; height: 112px; object-fit: contain; opacity: 0; }
+.splash.go img { animation: splash-spin 2.4s linear both; }
 .splash.out { opacity: 0; pointer-events: none; }
-@keyframes splash-spin { 0% { opacity: 0; transform: rotateY(-90deg); } 15% { opacity: 1; } 100% { opacity: 1; transform: rotateY(360deg); } }
+@keyframes splash-spin {
+  0.0% { transform: scaleX(1.000); opacity: 0.00; }
+  2.5% { transform: scaleX(1.000); opacity: 0.25; }
+  5.0% { transform: scaleX(1.000); opacity: 0.50; }
+  7.5% { transform: scaleX(1.000); opacity: 0.75; }
+  10.0% { transform: scaleX(1.000); opacity: 1.00; }
+  12.5% { transform: scaleX(0.999); opacity: 1.00; }
+  15.0% { transform: scaleX(0.996); opacity: 1.00; }
+  17.5% { transform: scaleX(0.991); opacity: 1.00; }
+  20.0% { transform: scaleX(0.980); opacity: 1.00; }
+  22.5% { transform: scaleX(0.959); opacity: 1.00; }
+  25.0% { transform: scaleX(0.924); opacity: 1.00; }
+  27.5% { transform: scaleX(0.866); opacity: 1.00; }
+  30.0% { transform: scaleX(0.778); opacity: 1.00; }
+  32.5% { transform: scaleX(0.650); opacity: 1.00; }
+  35.0% { transform: scaleX(0.473); opacity: 1.00; }
+  37.5% { transform: scaleX(0.243); opacity: 1.00; }
+  40.0% { transform: scaleX(-0.038); opacity: 1.00; }
+  42.5% { transform: scaleX(-0.351); opacity: 1.00; }
+  45.0% { transform: scaleX(-0.659); opacity: 1.00; }
+  47.5% { transform: scaleX(-0.901); opacity: 1.00; }
+  50.0% { transform: scaleX(-1.000); opacity: 1.00; }
+  52.5% { transform: scaleX(-0.901); opacity: 1.00; }
+  55.0% { transform: scaleX(-0.659); opacity: 1.00; }
+  57.5% { transform: scaleX(-0.351); opacity: 1.00; }
+  60.0% { transform: scaleX(-0.038); opacity: 1.00; }
+  62.5% { transform: scaleX(0.243); opacity: 1.00; }
+  65.0% { transform: scaleX(0.473); opacity: 1.00; }
+  67.5% { transform: scaleX(0.650); opacity: 1.00; }
+  70.0% { transform: scaleX(0.778); opacity: 1.00; }
+  72.5% { transform: scaleX(0.866); opacity: 1.00; }
+  75.0% { transform: scaleX(0.924); opacity: 1.00; }
+  77.5% { transform: scaleX(0.959); opacity: 1.00; }
+  80.0% { transform: scaleX(0.980); opacity: 1.00; }
+  82.5% { transform: scaleX(0.991); opacity: 1.00; }
+  85.0% { transform: scaleX(0.996); opacity: 1.00; }
+  87.5% { transform: scaleX(0.999); opacity: 1.00; }
+  90.0% { transform: scaleX(1.000); opacity: 1.00; }
+  92.5% { transform: scaleX(1.000); opacity: 1.00; }
+  95.0% { transform: scaleX(1.000); opacity: 1.00; }
+  97.5% { transform: scaleX(1.000); opacity: 1.00; }
+  100.0% { transform: scaleX(1.000); opacity: 1.00; }
+}
 @media (prefers-reduced-motion: reduce) { .splash img, .splash.go img { animation: none; opacity: 1; } .splash { transition: none; } }
