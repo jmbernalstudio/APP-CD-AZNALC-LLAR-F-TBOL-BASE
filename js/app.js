@@ -2,6 +2,7 @@ const I = {
   home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   team: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.7.2 4.4 1.9 5 4.9"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
@@ -699,9 +700,9 @@ const teamsList = () => D.equipos.map(e => {
     ${l ? `<span class="res ${res}" title="Último: ${esc(nice(l.rival))}">${scoreTxt(l)}</span>` : ''}</button>`;
 }).join('');
 /* Un aviso enviado con cuántos entrenadores lo han leído */
-const sentRow = n => `<div class="rq"><span class="ic b">${ic('bell')}</span>
+const sentRow = (n, del) => `<div class="rq"><span class="ic b">${ic('bell')}</span>
   <div class="grow"><b>${esc(n.title)}</b><small>${esc(n.body)}</small><div class="meter" role="img" aria-label="Leído por ${n.readBy} de ${n.total}"><i style="width:${n.total ? n.readBy / n.total * 100 : 0}%"></i></div></div>
-  <span class="pill ${n.readBy === n.total ? '' : 'blue'}">${n.readBy} de ${n.total}</span></div>`;
+  <span class="pill ${n.readBy === n.total ? '' : 'blue'}">${n.readBy} de ${n.total}</span>${del ? `<button type="button" class="btn red sm del" data-del="${n.id}" aria-label="Borrar el aviso ${esc(n.title)}">${ic('trash')} Borrar aviso</button>` : ''}</div>`;
 const coachCount = () => S.people.filter(p => p.rol === 'entrenador').length;
 const teamOf = id => (D.equipos.find(e => e.id === id) || {}).nombre || id;
 /* Entrenadores y junta con sus equipos; alta de cuentas nuevas */
@@ -854,8 +855,7 @@ const BOARD = {
   msg() {
     return {
       kicker: 'Comunicación', title: 'Avisos enviados',
-      body: S.notices.length ? `<div class="cards-grid">${S.notices.map(n => `<section class="card sent" aria-label="${esc(n.title)}">${sentRow(n)}
-          <div class="sent-f"><button type="button" class="linkbtn" data-del="${n.id}" aria-label="Borrar el aviso ${esc(n.title)}">Borrar aviso</button></div></section>`).join('')}</div>`
+      body: S.notices.length ? `<div class="cards-grid">${S.notices.map(n => `<section class="card sent" aria-label="${esc(n.title)}">${sentRow(n, true)}</section>`).join('')}</div>`
         : '<p class="card muted" style="margin:0">Aún no has enviado avisos.</p>',
       bind() { document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
         const n = S.notices.find(x => x.id == b.dataset.del);

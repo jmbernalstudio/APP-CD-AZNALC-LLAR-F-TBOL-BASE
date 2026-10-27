@@ -524,8 +524,11 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .facts.tr > div:first-child { grid-column: 1 / -1; }
 /* Móvil estrecho: "Dar de alta" baja a su propia línea para no cortar el título */
 @media (max-width: 440px) { .a-people > .card-h { flex-wrap: wrap; } .a-people > .card-h .btn { width: 100%; } }
-.card.sent { display: flex; flex-direction: column; }
-.sent-f { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; }
+.card.sent > .rq { padding: 0; border-bottom: 0; }
+.card.sent .del { flex: none; }
+.card.sent { container-type: inline-size; }
+/* Tarjeta estrecha: lectura y botón bajan debajo del texto, a la derecha y sin línea */
+@container (max-width: 620px) { .card.sent .rq .grow { flex-basis: calc(100% - 56px); } .card.sent .rq .pill { margin-left: 56px; } .card.sent .del { margin-left: auto; } }
 .g-filters { display: flex; flex-wrap: wrap; gap: 10px 12px; }
 @media (max-width: 440px) { .g-filters .seg { width: 100%; } .g-filters .seg button { flex: 1; padding-left: .5rem; padding-right: .5rem; } }
 .kpis.k3 > .kpi:first-child { grid-column: 1 / -1; }
