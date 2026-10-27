@@ -542,7 +542,7 @@ const COACH = {
           <span class="kick">${tt ? `Hoy · ${esc(trainLbl(tt))}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>
           <h2 id="h-hero">Semana de partido para el ${S.team}</h2>
           <p>Estas son tus acciones:</p>
-          <div class="btns"><button type="button" class="btn gold" data-go="team:list">${ic('list')} Pasar lista de entrenamiento</button><button type="button" class="btn glass" data-go="ask">${ic('plus')} Pedir algo a la junta</button></div>
+          <div class="btns"><button type="button" class="btn gold" data-go="team:list">${ic('list')} Pasar lista de entrenamiento</button><button type="button" class="btn blue" data-go="ask">${ic('plus')} Pedir algo a la junta</button></div>
         </section>
         <section class="actions a-actions" aria-label="Acciones rápidas">
           <button type="button" class="act p" data-go="team:list"><span class="ic">${ic('list')}</span>Pasar lista</button>
