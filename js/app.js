@@ -852,8 +852,14 @@ const BOARD = {
   msg() {
     return {
       kicker: 'Comunicación', title: 'Avisos enviados',
-      body: S.notices.length ? `<div class="cards-grid">${S.notices.map(n => `<section class="card sent" aria-label="${esc(n.title)}">${sentRow(n)}</section>`).join('')}</div>`
-        : '<p class="card muted" style="margin:0">Aún no has enviado avisos.</p>'
+      body: S.notices.length ? `<div class="cards-grid">${S.notices.map(n => `<section class="card sent" aria-label="${esc(n.title)}">${sentRow(n)}
+          <div class="sent-f"><button type="button" class="linkbtn" data-del="${n.id}" aria-label="Borrar el aviso ${esc(n.title)}">Borrar aviso</button></div></section>`).join('')}</div>`
+        : '<p class="card muted" style="margin:0">Aún no has enviado avisos.</p>',
+      bind() { document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+        const n = S.notices.find(x => x.id == b.dataset.del);
+        if (!(await ask(`¿Borrar “${n.title}”?`, 'Desaparecerá también de los móviles de los entrenadores. No se puede deshacer.', 'Sí, borrar'))) return;
+        try { API() && await API().borrarAviso(n.id); } catch (_) { say('No se ha podido borrar. Revisa la conexión.'); return; }
+        S.notices = S.notices.filter(x => x !== n); render(); say('Aviso borrado.'); }); }
     };
   }
 };

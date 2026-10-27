@@ -524,3 +524,5 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .facts.tr > div:first-child { grid-column: 1 / -1; }
 /* Móvil estrecho: "Dar de alta" baja a su propia línea para no cortar el título */
 @media (max-width: 440px) { .a-people > .card-h { flex-wrap: wrap; } .a-people > .card-h .btn { width: 100%; } }
+.card.sent { display: flex; flex-direction: column; }
+.sent-f { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; }

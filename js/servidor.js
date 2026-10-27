@@ -31,6 +31,7 @@
     },
     async estado(id, st) { ok(await sb.from('peticiones').update({ estado: st }).eq('id', id)); },
     async aviso(n) { return ok(await sb.from('avisos').insert({ titulo: n.title, texto: n.body }).select('id').single()).id; },
+    async borrarAviso(id) { ok(await sb.from('avisos').delete().eq('id', id)); },
     async leido(id) { ok(await sb.from('avisos_leidos').upsert({ aviso: id }, { ignoreDuplicates: true })); },
     async alta(p) { return ok(await sb.rpc('crear_usuario', { p_usuario: p.usuario, p_clave: p.clave, p_nombre: p.nombre, p_rol: p.rol, p_equipos: p.equipos })); },
     async entreno(team, t) { ok(await sb.from('equipos').update({ dias: t.dias, hora: t.h, lugar: t.where }).eq('id', idEq(team))); },
