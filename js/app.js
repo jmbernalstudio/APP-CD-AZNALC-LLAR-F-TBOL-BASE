@@ -1312,6 +1312,36 @@ function bindAlta() {
     go('team'); say(`${p.nombre} ya puede entrar con “${p.usuario}” y su contraseña.`);
   };
 }
+/* Junta: quién entrena cada día, por horas (un día o la semana entera) */
+function trainSessions() {
+  return D.equipos.map(e => e.nombre).concat(Object.keys(S.teams).filter(n => !EQ[n]))
+    .flatMap(team => sesiones(trainOf(team)).map(x => ({ team, d: x.d, h: x.h || '', where: x.where || '' })));
+}
+function trainRows(list) {
+  const hours = [...new Set(list.map(x => x.h))].sort((a, b) => (a || '99').localeCompare(b || '99'));
+  return hours.map(h => `<div class="tt-row"><span class="tt-h">${h || 'Sin hora'}</span><div class="tt-cells">${list.filter(x => x.h === h).map(x =>
+    `<div class="tt-c"><b title="${esc(x.team)}">${esc(x.team)}</b><small>${esc(x.where || 'Sin campo')}</small></div>`).join('')}</div></div>`).join('');
+}
+function trainView() {
+  const all = trainSessions(), sel = S.ttDay || String(dow(TODAY));
+  const seg = `<div class="seg g-scope seg-x" role="group" aria-label="Elige el día">
+    <button type="button" data-tt="week" aria-pressed="${sel === 'week'}">Semana</button>${DIAS.map((d, i) =>
+    `<button type="button" data-tt="${i + 1}" aria-pressed="${sel === String(i + 1)}">${d}</button>`).join('')}</div>`;
+  if (!all.length) return seg + emptyPage('cal', 'Todavía no hay entrenamientos', 'Ponlos en cada equipo, en Equipos > el equipo > Entrenamientos.', 'g');
+  if (sel !== 'week') {
+    const d = +sel, list = all.filter(x => x.d === d);
+    return `${seg}${list.length ? card('h-tt', `${DIAS_D[d - 1]} · ${list.length} equipo${list.length === 1 ? '' : 's'}`, `<div class="tt">${trainRows(list)}</div>`)
+      : emptyPage('cal', `Nadie entrena el ${DIAS_D[d - 1].toLowerCase()}`, 'Elige otro día o mira la semana entera.', 'g')}`;
+  }
+  /* Semana: en el ordenador, una tabla por horas y días; en el móvil, un bloque por día */
+  const hours = [...new Set(all.map(x => x.h))].sort((a, b) => (a || '99').localeCompare(b || '99'));
+  const grid = `<div class="tt-week" role="table" aria-label="Entrenamientos de la semana"><div class="tt-wr th" role="row"><span role="columnheader"></span>${DIAS_D.map(d => `<span role="columnheader">${d}</span>`).join('')}</div>
+    ${hours.map(h => `<div class="tt-wr" role="row"><span class="tt-h" role="rowheader">${h || 'Sin hora'}</span>${DIAS_D.map((_, i) => `<span role="cell">${all.filter(x => x.d === i + 1 && x.h === h).map(x =>
+      `<span class="tt-c"><b title="${esc(x.team)}">${esc(x.team)}</b><small>${esc(x.where || 'Sin campo')}</small></span>`).join('')}</span>`).join('')}</div>`).join('')}</div>`;
+  const days = DIAS_D.map((dn, i) => ({ dn, list: all.filter(x => x.d === i + 1) })).filter(x => x.list.length);
+  return `${seg}<div class="tt-desk">${card('h-ttw', 'Semana completa', grid)}</div>
+    <div class="tt-mob stack">${days.map((x, i) => card(`h-tt${i}`, `${x.dn} · ${x.list.length} equipo${x.list.length === 1 ? '' : 's'}`, `<div class="tt">${trainRows(x.list)}</div>`)).join('')}</div>`;
+}
 function gamesScreen() {
   return { kicker: S.role === 'coach' ? 'Fines de semana' : 'Todos los equipos', title: 'Partidos', body: gamesView(),
     bind() {
@@ -1356,12 +1386,20 @@ const BOARD = {
       return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), back: () => go('team'),
         body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div>${rosterCard(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); } };
     }
+    const view = S.eqView === 'train' ? 'train' : 'teams';
+    const vseg = `<div class="seg g-scope" role="group" aria-label="Qué ver"><button type="button" data-eqv="teams" aria-pressed="${view === 'teams'}">Equipos</button><button type="button" data-eqv="train" aria-pressed="${view === 'train'}">Entrenamientos</button></div>`;
+    const bindV = () => {
+      document.querySelectorAll('[data-eqv]').forEach(b => b.onclick = () => { S.eqView = b.dataset.eqv; render(); });
+      document.querySelectorAll('[data-tt]').forEach(b => b.onclick = () => { S.ttDay = b.dataset.tt; render(); });
+      document.querySelectorAll('.seg-x [aria-pressed="true"]').forEach(b => { const s = b.parentElement; s.scrollLeft = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2; });
+    };
+    if (view === 'train') return { kicker: 'Club · Quién entrena cada día', title: 'Entrenamientos', body: `<div class="stack">${vseg}${trainView()}</div>`, bind: bindV };
     const all = D.equipos.flatMap(e => played(e));
     const wins = all.filter(p => outcome(p) === 'G').length;
     const week = AGENDA.filter(x => x.kind === 'match');
     return {
       kicker: `Club · Temporada 2026/27 · actualizado ${updated()}`, title: 'Equipos',
-      body: `<div class="stack"><div class="kpis">
+      body: `<div class="stack">${vseg}<div class="kpis">
           <div class="kpi dark"><small>Equipos</small><b>${D.equipos.length}</b></div>
           <div class="kpi"><small>Partidos jugados</small><b>${all.length}</b></div>
           <div class="kpi"><small>Victorias</small><b>${wins}</b></div>
@@ -1369,7 +1407,7 @@ const BOARD = {
         ${peopleCard()}
         ${card('h-eq', 'Clasificación y plantillas', teamsList())}
         ${week.length ? card('h-wk', 'Partidos de los próximos 7 días', week.map(x => agendaRow(x, false)).join('')) : ''}</div>`,
-      bind: bindPeople
+      bind() { bindV(); bindPeople(); }
     };
   },
   ask() {

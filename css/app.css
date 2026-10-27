@@ -806,3 +806,19 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .pweeks { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
 .pweeks div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 12px; background: var(--shell); font-size: .9rem; }
 .pweeks span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .pweeks b { white-space: nowrap; }
+
+/* Entrenamientos (junta): por horas */
+.tt { display: flex; flex-direction: column; gap: 10px; }
+.tt-row { display: grid; grid-template-columns: 4rem minmax(0, 1fr); gap: 12px; align-items: start; }
+.tt-h { font-weight: 800; color: var(--club); font-size: 1rem; padding-top: 10px; white-space: nowrap; }
+.tt-cells { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr)); }
+.tt-c { display: flex; flex-direction: column; min-width: 0; padding: 8px 12px; border-radius: 12px; background: var(--shell); }
+.tt-c b { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-c small { color: var(--muted); font-size: .8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-week { display: flex; flex-direction: column; gap: 8px; }
+.tt-wr { display: grid; grid-template-columns: 4rem repeat(7, minmax(0, 1fr)); gap: 8px; align-items: start; }
+.tt-wr.th span { font-weight: 700; color: var(--muted); font-size: .85rem; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-wr > span[role=cell] { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.tt-wr .tt-c { padding: 6px 8px; } .tt-wr .tt-c b { font-size: .85rem; } .tt-wr .tt-c small { font-size: .74rem; }
+.tt-desk { display: none; }
+@media (min-width: 1080px) { .tt-desk { display: block; } .tt-mob { display: none; } }
