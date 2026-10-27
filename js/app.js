@@ -604,19 +604,26 @@ function editPlayer(team, p) {
 }
 
 /* ---------- CONVOCATORIA ---------- */
-/* El entrenador elige quién va al próximo partido, la hora y el sitio de quedada, y puede mandarla por WhatsApp */
+/* El entrenador elige quién va al próximo partido, la hora y el sitio de la citación, y puede mandarla por WhatsApp */
 const convKey = (team, p) => `${team} ${p.fecha}`;
+/* Convocados en orden: si todos tienen dorsal, por dorsal (de menor a mayor) y se muestra el dorsal;
+   si no, por orden alfabético y numerados del 1 al total */
+function convList(players, c) {
+  const list = players.filter(x => c.ids.includes(x.id)), dorsales = list.length > 0 && list.every(x => x.dorsal);
+  if (dorsales) return { dorsales, rows: list.sort((a, b) => a.dorsal - b.dorsal).map(x => ({ num: x.dorsal, n: x.n })) };
+  return { dorsales, rows: list.sort((a, b) => a.n.localeCompare(b.n, 'es')).map((x, i) => ({ num: i + 1, n: x.n })) };
+}
 function convText(team, p, c, players) {
-  const names = players.filter(x => c.ids.includes(x.id)).map((x, i) => `${i + 1}. ${x.n}`);
+  const names = convList(players, c).rows.map(x => `${x.num}. ${x.n}`);
   return [`*Convocatoria ${team}*`, `${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${p.casa ? 'Local' : 'Visitante'} vs ${nice(p.rival)}`,
-    placeOf(p) ? `Campo: ${placeOf(p)}` : '', c.hora || c.lugar ? `Quedamos${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
+    placeOf(p) ? `Campo: ${placeOf(p)}` : '', c.hora || c.lugar ? `Citación${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
     c.nota || '', '', ...names].filter((l, i, a) => l || (i > 0 && a[i - 1])).join('\n');
 }
 /* Cartel de la convocatoria: se dibuja en el propio móvil (sin servicios externos) con los escudos y los datos reales */
 const loadImg = src => new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
 async function convPoster(team, p, c, players) {
   await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
-  const e = EQ[team], list = players.filter(q => c.ids.includes(q.id)), W = 1080, ROW = 68;
+  const e = EQ[team], { dorsales, rows: list } = convList(players, c), W = 1080, ROW = 68;
   const tableY = 744, rowsY = tableY + 150, notaH = c.nota ? 70 : 0, H = rowsY + list.length * ROW + 30 + notaH + 48;
   const cv = document.createElement('canvas'), x = cv.getContext('2d');
   cv.width = W; cv.height = H;
@@ -651,19 +658,19 @@ async function convPoster(team, p, c, players) {
   if (p.hora) text(p.hora, W / 2, 385, 800, 76, INK, 240);
   else { text('Hora por', W / 2, 365, 600, 32, MUTED, 220); text('confirmar', W / 2, 403, 600, 32, MUTED, 220); }
   text(`${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + placeOf(p) : ''}`, W / 2, 558, 500, 30, MUTED);
-  // Quedada
+  // Citación
   rr(48, 624, W - 96, 96, 32, BLUE);
-  text(`Quedada: ${[c.hora, c.lugar].filter(Boolean).join(' · ')}`, W / 2, 673, 700, 36, '#FFFFFF');
+  text(`Citación: ${[c.hora, c.lugar].filter(Boolean).join(' · ')}`, W / 2, 673, 700, 36, '#FFFFFF');
   // Tabla de convocados
   rr(48, tableY, W - 96, H - tableY - 48, 40, '#FFFFFF');
   text('Convocados', 96, tableY + 60, 800, 40, INK, 500, 'left');
   text(list.length === 1 ? '1 jugador' : `${list.length} jugadores`, W - 96, tableY + 60, 500, 30, MUTED, 300, 'right');
-  text('Número', 140, tableY + 122, 600, 26, MUTED, 120);
+  text(dorsales ? 'Dorsal' : 'Número', 140, tableY + 122, 600, 26, MUTED, 120);
   text('Jugador', 240, tableY + 122, 600, 26, MUTED, 300, 'left');
   list.forEach((q, i) => {
     const y = rowsY + i * ROW;
     if (i % 2 === 0) rr(72, y, W - 144, ROW, 18, BG);
-    text(String(i + 1), 140, y + ROW / 2, 800, 34, BLUE, 120);
+    text(String(q.num), 140, y + ROW / 2, 800, 34, BLUE, 120);
     text(q.n, 240, y + ROW / 2, 500, 34, INK, W - 240 - 96, 'left');
   });
   if (c.nota) text(`Nota: ${c.nota}`, 96, rowsY + list.length * ROW + 30 + 30, 500, 30, MUTED, W - 192, 'left');
@@ -685,7 +692,7 @@ async function sharePoster(team, p, c, players) {
       : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} Descargar cartel</button><button type="button" class="btn ghost block" id="pst-wa">${ic('send')} Enviar el texto por WhatsApp</button>`}
     <button type="button" class="btn ghost block" data-v="0">Cerrar</button>`;
   const sh = $('#pst-sh'), dl = $('#pst-dl'), wa = $('#pst-wa');
-  if (sh) { sh.focus(); sh.onclick = () => navigator.share({ files: [file], text: txt }).catch(() => {}); }
+  if (sh) { sh.focus(); sh.onclick = () => navigator.share({ files: [file], text: `*CONVOCATORIA vs ${nice(p.rival)}* 💙` }).catch(() => {}); }
   if (dl) { dl.focus(); dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); }; }
   if (wa) wa.onclick = () => open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
 }
@@ -708,7 +715,7 @@ function convScreen() {
       <p class="muted" style="margin:0">Toca a cada jugador para convocarlo o quitarlo.</p>
       ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
       <ul class="players">${t.players.map(row).join('')}</ul></div>
-      <form id="cvf" class="card stack" novalidate aria-labelledby="h-cv"><h2 id="h-cv" style="margin:0;font-size:1.1rem">Quedada</h2>
+      <form id="cvf" class="card stack" novalidate aria-labelledby="h-cv"><h2 id="h-cv" style="margin:0;font-size:1.1rem">Citación</h2>
         <div class="row2"><label class="f" for="cvh">Hora<input type="time" id="cvh" required aria-required="true" value="${esc(c.hora || '')}"></label>
         <label class="f" for="cvl">Sitio<input type="text" id="cvl" required aria-required="true" maxlength="60" placeholder="P. ej. puerta del campo" value="${esc(c.lugar || '')}"></label></div>
         <label class="f" for="cvo">Nota (opcional)<textarea id="cvo" maxlength="300" placeholder="P. ej. traed la 2ª equipación">${esc(c.nota || '')}</textarea></label>
@@ -725,7 +732,7 @@ function convScreen() {
       ['#cvh', '#cvl', '#cvo'].forEach(s => $(s).oninput = sync);
       const check = () => {
         sync(); $('#cvh').removeAttribute('aria-invalid'); $('#cvl').removeAttribute('aria-invalid');
-        const bad = !c.ids.length ? ['Elige al menos a un jugador convocado.', null] : !c.hora ? ['Pon la hora de la quedada.', '#cvh'] : !c.lugar ? ['Pon el sitio de la quedada.', '#cvl'] : null;
+        const bad = !c.ids.length ? ['Elige al menos a un jugador convocado.', null] : !c.hora ? ['Pon la hora de la citación.', '#cvh'] : !c.lugar ? ['Pon el sitio de la citación.', '#cvl'] : null;
         $('#cverr').hidden = !bad; if (!bad) return true;
         $('#cverr').textContent = bad[0]; if (bad[1]) { $(bad[1]).setAttribute('aria-invalid', 'true'); $(bad[1]).focus(); }
         return false;
