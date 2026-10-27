@@ -175,6 +175,23 @@ def equipacion_rfaf(cod):
     return EQUIPACIONES[cod]
 
 
+def _clave(n):
+    n = unicodedata.normalize('NFD', n.lower())
+    n = ''.join(c for c in n if unicodedata.category(c) != 'Mn')
+    n = re.sub(r'\(fem\)|"[a-z0-9 ]*"', ' ', n)
+    return ' '.join(re.sub(r'[^a-z0-9 ]', ' ', n).split())
+
+
+# La Liga Educa no publica los colores: salen del PDF de indumentaria que mandó Jose
+EQUIP_EDUCA = {_clave(k): dict(camiseta=v[0], pantalon=v[1], medias=v[2])
+               for k, v in json.loads((RAIZ / 'herramientas' / 'equipaciones_educa.json').read_text(encoding='utf-8')).items() if not k.startswith('_')}
+
+
+def equipacion_educa(rival):
+    k = _clave(rival)
+    return EQUIP_EDUCA.get(k) or next((v for c, v in EQUIP_EDUCA.items() if k.startswith(c + ' ') or c.startswith(k + ' ')), None)
+
+
 def equipo_rfaf(eq, pool):
     for intento in range(6):  # a veces la RFAF devuelve la lista vacía
         exe = bajar(f'{RFAF}NFG_CmpJornada_Exec?cod_primaria=1000120&codgrupo={eq["grupo"]}')
@@ -301,6 +318,9 @@ def equipo_educa(eq, pool):
         partidos.append(dict(j=n, fecha=fecha, hora=hora, casa=casa, rival=m['visitante'] if casa else m['local'], campo=campo,
                              estado='Aplazado' if re.search(r'aplaz|suspend', todo, re.I) else None,
                              goles=m['goles'] if re.search(r'Finalizado', todo, re.I) else None))
+        equip = None if casa else equipacion_educa(m['local'])
+        if equip:
+            partidos[-1]['equipacion'] = equip
 
     # La tabla de la Liga Educa está mal cerrada en el HTML: se lee del texto, buscando cada equipo por su nombre
     texto = limpio(BeautifulSoup(bajar(url_educa(eq, 'id_sec=4')), 'html.parser').get_text(' '))

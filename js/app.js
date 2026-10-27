@@ -485,7 +485,7 @@ function openMatch(e, p) {
   const k = p.equipacion;
   const kit = k ? `<div class="kit">${[['Camiseta', k.camiseta], ['Pantalón', k.pantalon], ['Medias', k.medias]].filter(x => x[1]).map(([l, v]) =>
       `<div class="kit-r">${swatch(v)}<span class="kit-l">${l}</span><b>${esc(v)}</b></div>`).join('')}</div>`
-    : `<p class="muted" style="margin:0">${e.fuente === 'RFAF' ? 'La federación no tiene registrados los colores de este equipo.' : 'La Liga Educa no publica los colores de los equipos.'}</p>`;
+    : `<p class="muted" style="margin:0">Todavía no tenemos los colores de este equipo.</p>`;
   const m = modal(`<div class="rqd-h"><span class="pill ${S.teams[e.nombre] && S.role === 'coach' ? 'gold' : 'blue'}">${esc(e.nombre)}</span><div class="grow"><small>Jornada ${p.j}</small></div>
       <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
     <h2 id="mdl-t" class="sr">${p.casa ? 'Aznalcóllar contra ' + esc(rv) : esc(rv) + ' contra Aznalcóllar'}</h2>

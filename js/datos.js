@@ -3084,7 +3084,12 @@ window.DATOS = {
      "goles": [
       2,
       5
-     ]
+     ],
+     "equipacion": {
+      "camiseta": "Verde",
+      "pantalon": "Verde",
+      "medias": "Verde"
+     }
     },
     {
      "j": 2,
@@ -3117,7 +3122,12 @@ window.DATOS = {
      "rival": "CF Comarca los Alcores",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Rayas azules y blancas",
+      "pantalon": "Azul",
+      "medias": "Azul"
+     }
     },
     {
      "j": 5,
@@ -3137,7 +3147,12 @@ window.DATOS = {
      "rival": "CD Toro Tocina Los Rosales (Fem)",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Negra",
+      "pantalon": "Negras",
+      "medias": "Rojas"
+     }
     },
     {
      "j": 7,
@@ -3147,7 +3162,12 @@ window.DATOS = {
      "rival": "CD Atco. San Martín",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Rayas roja y blanca",
+      "pantalon": "Azul",
+      "medias": "Azul"
+     }
     },
     {
      "j": 8,
@@ -3167,7 +3187,12 @@ window.DATOS = {
      "rival": "RCD Nueva Sevilla",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Raya amarilla y azul",
+      "pantalon": "Amarillas",
+      "medias": "Amarillas"
+     }
     },
     {
      "j": 10,
@@ -3177,7 +3202,12 @@ window.DATOS = {
      "rival": "JD Gines",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Amarilla",
+      "pantalon": "Azules",
+      "medias": "Azules"
+     }
     },
     {
      "j": 11,
@@ -3197,7 +3227,12 @@ window.DATOS = {
      "rival": "CA Aznalcázar",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Roja",
+      "pantalon": "Azules",
+      "medias": "Rojas"
+     }
     },
     {
      "j": 13,
@@ -3227,7 +3262,12 @@ window.DATOS = {
      "rival": "Club Náutico Sevilla",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Verde",
+      "pantalon": "Verde",
+      "medias": "Verde"
+     }
     },
     {
      "j": 16,
@@ -3257,7 +3297,12 @@ window.DATOS = {
      "rival": "CF Comarca los Alcores",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Rayas azules y blancas",
+      "pantalon": "Azul",
+      "medias": "Azul"
+     }
     },
     {
      "j": 19,
@@ -3277,7 +3322,12 @@ window.DATOS = {
      "rival": "CD Toro Tocina Los Rosales (Fem)",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Negra",
+      "pantalon": "Negras",
+      "medias": "Rojas"
+     }
     },
     {
      "j": 21,
@@ -3287,7 +3337,12 @@ window.DATOS = {
      "rival": "CD Atco. San Martín",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Rayas roja y blanca",
+      "pantalon": "Azul",
+      "medias": "Azul"
+     }
     }
    ],
    "tabla": [
@@ -3400,7 +3455,12 @@ window.DATOS = {
      "goles": [
       3,
       3
-     ]
+     ],
+     "equipacion": {
+      "camiseta": "Burdeos",
+      "pantalon": "Negras",
+      "medias": "Negras"
+     }
     },
     {
      "j": 2,
@@ -3448,7 +3508,12 @@ window.DATOS = {
      "rival": "Camino Viejo CF",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Amarilla",
+      "pantalon": "Azules",
+      "medias": "Amarillas"
+     }
     },
     {
      "j": 7,
@@ -3468,7 +3533,12 @@ window.DATOS = {
      "rival": "CF Comarca los Alcores \"A\"",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Rayas azules y blancas",
+      "pantalon": "Azul",
+      "medias": "Azul"
+     }
     },
     {
      "j": 9,
@@ -3488,7 +3558,12 @@ window.DATOS = {
      "rival": "CD Dani Triana Ar-Rabad",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Azul",
+      "pantalon": "Azul marino",
+      "medias": "Blancas"
+     }
     },
     {
      "j": 11,
@@ -3508,7 +3583,12 @@ window.DATOS = {
      "rival": "UD Mairena del Aljarafe",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Blanca",
+      "pantalon": "Azules",
+      "medias": "Blancas"
+     }
     },
     {
      "j": 13,
@@ -3528,7 +3608,12 @@ window.DATOS = {
      "rival": "CD Híspalis",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Azul y blanca",
+      "pantalon": "Azules",
+      "medias": "Azules"
+     }
     },
     {
      "j": 15,
@@ -3548,7 +3633,12 @@ window.DATOS = {
      "rival": "CD Estrella Aljarafe",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Blanca con raya diagonal roja",
+      "pantalon": "Negras",
+      "medias": "Negras"
+     }
     },
     {
      "j": 17,
@@ -3558,7 +3648,12 @@ window.DATOS = {
      "rival": "FBJD Puebla",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Roja",
+      "pantalon": "Azules",
+      "medias": "Rojas"
+     }
     },
     {
      "j": 18,
@@ -3578,7 +3673,12 @@ window.DATOS = {
      "rival": "CF Comarca los Alcores \"B\"",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Rayas azules y blancas",
+      "pantalon": "Azul",
+      "medias": "Azul"
+     }
     },
     {
      "j": 20,
@@ -3598,7 +3698,12 @@ window.DATOS = {
      "rival": "CD Tor del Rey de Pilas",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Azul marino",
+      "pantalon": "Azul marino",
+      "medias": "Blancas"
+     }
     }
    ],
    "tabla": [
@@ -3867,7 +3972,12 @@ window.DATOS = {
      "goles": [
       1,
       6
-     ]
+     ],
+     "equipacion": {
+      "camiseta": "Verde y blanca",
+      "pantalon": "Negras",
+      "medias": "Verdes"
+     }
     },
     {
      "j": 3,
@@ -3877,7 +3987,12 @@ window.DATOS = {
      "rival": "Lora CF",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Blanca",
+      "pantalon": "Blancas",
+      "medias": "Blancas"
+     }
     },
     {
      "j": 4,
@@ -3897,7 +4012,12 @@ window.DATOS = {
      "rival": "Alcalá del Río CF (Fem)",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Azul",
+      "pantalon": "Azules",
+      "medias": "Azules"
+     }
     },
     {
      "j": 6,
@@ -3917,7 +4037,12 @@ window.DATOS = {
      "rival": "CD Santiponce",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Azul y blanca",
+      "pantalon": "Azules",
+      "medias": "Azules"
+     }
     },
     {
      "j": 8,
@@ -3937,7 +4062,12 @@ window.DATOS = {
      "rival": "CD Mairena",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Rayas negras y blancas",
+      "pantalon": "Negras",
+      "medias": "Negras"
+     }
     },
     {
      "j": 10,
@@ -3947,7 +4077,12 @@ window.DATOS = {
      "rival": "CDM Gerena",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Roja y negra",
+      "pantalon": "Negras",
+      "medias": "Negras"
+     }
     },
     {
      "j": 11,
@@ -3962,7 +4097,12 @@ window.DATOS = {
      "rival": "Club Náutico Sevilla",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Verde",
+      "pantalon": "Verde",
+      "medias": "Verde"
+     }
     },
     {
      "j": 13,
@@ -3982,7 +4122,12 @@ window.DATOS = {
      "rival": "UD Mairena del Aljarafe",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Blanca",
+      "pantalon": "Azules",
+      "medias": "Blancas"
+     }
     },
     {
      "j": 15,
@@ -4205,7 +4350,12 @@ window.DATOS = {
      "rival": "FB Coria",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Amarilla",
+      "pantalon": "Azules",
+      "medias": "Amarillas"
+     }
     },
     {
      "j": 4,
@@ -4215,7 +4365,12 @@ window.DATOS = {
      "rival": "UD Loreto",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Franjas blanca y azul",
+      "pantalon": "Azules",
+      "medias": "Azules"
+     }
     },
     {
      "j": 5,
@@ -4235,7 +4390,12 @@ window.DATOS = {
      "rival": "Atco. Olivarense \"B\"",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Roja y blanca",
+      "pantalon": "Negras",
+      "medias": "Negras"
+     }
     },
     {
      "j": 7,
@@ -4245,7 +4405,12 @@ window.DATOS = {
      "rival": "RCD Nueva Sevilla",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Raya amarilla y azul",
+      "pantalon": "Amarillas",
+      "medias": "Amarillas"
+     }
     },
     {
      "j": 8,
@@ -4275,7 +4440,12 @@ window.DATOS = {
      "rival": "Umbrete CF",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Amarilla y negra",
+      "pantalon": "Negras",
+      "medias": "Amarillas y negras"
+     }
     },
     {
      "j": 11,
@@ -4305,7 +4475,12 @@ window.DATOS = {
      "rival": "FB Coria",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Amarilla",
+      "pantalon": "Azules",
+      "medias": "Amarillas"
+     }
     },
     {
      "j": 14,
@@ -4315,7 +4490,12 @@ window.DATOS = {
      "rival": "UD Loreto",
      "campo": null,
      "estado": null,
-     "goles": null
+     "goles": null,
+     "equipacion": {
+      "camiseta": "Franjas blanca y azul",
+      "pantalon": "Azules",
+      "medias": "Azules"
+     }
     },
     {
      "j": 15,
