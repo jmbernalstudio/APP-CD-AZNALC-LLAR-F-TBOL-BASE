@@ -1,6 +1,6 @@
 /* Generado por herramientas/actualizar.py desde rfaf.es y educationleague.es. No editar a mano. */
 window.DATOS = {
- "actualizado": "2026-10-26T22:50:00+00:00",
+ "actualizado": "2026-10-27T02:52:14+00:00",
  "equipos": [
   {
    "id": "senior",
@@ -2753,8 +2753,8 @@ window.DATOS = {
      "j": 6,
      "fecha": "2026-11-20",
      "hora": null,
-     "casa": true,
-     "rival": "CF Comarca los Alcores",
+     "casa": false,
+     "rival": "CD Toro Tocina Los Rosales (Fem)",
      "campo": null,
      "estado": null,
      "goles": null
@@ -2763,8 +2763,8 @@ window.DATOS = {
      "j": 7,
      "fecha": "2026-11-27",
      "hora": null,
-     "casa": true,
-     "rival": "JD Gines",
+     "casa": false,
+     "rival": "CD Atco. San Martín",
      "campo": null,
      "estado": null,
      "goles": null
@@ -2773,8 +2773,8 @@ window.DATOS = {
      "j": 8,
      "fecha": "2026-12-11",
      "hora": null,
-     "casa": false,
-     "rival": "CD Toro Tocina Los Rosales (Fem)",
+     "casa": true,
+     "rival": "Club Náutico Sevilla",
      "campo": null,
      "estado": null,
      "goles": null
@@ -2813,8 +2813,8 @@ window.DATOS = {
      "j": 12,
      "fecha": "2027-01-29",
      "hora": null,
-     "casa": true,
-     "rival": "CD Aznalcóllar FB",
+     "casa": false,
+     "rival": "CA Aznalcázar",
      "campo": null,
      "estado": null,
      "goles": null
@@ -2823,8 +2823,8 @@ window.DATOS = {
      "j": 13,
      "fecha": "2027-02-12",
      "hora": null,
-     "casa": false,
-     "rival": "CF Comarca los Alcores",
+     "casa": true,
+     "rival": "CD Toro Tocina Los Rosales (Fem)",
      "campo": null,
      "estado": null,
      "goles": null
@@ -2833,8 +2833,8 @@ window.DATOS = {
      "j": 14,
      "fecha": "2027-03-05",
      "hora": null,
-     "casa": false,
-     "rival": "JD Gines",
+     "casa": true,
+     "rival": "CD Atco. San Martín",
      "campo": null,
      "estado": null,
      "goles": null
@@ -2843,8 +2843,8 @@ window.DATOS = {
      "j": 15,
      "fecha": "2027-03-12",
      "hora": null,
-     "casa": true,
-     "rival": "CD Toro Tocina Los Rosales (Fem)",
+     "casa": false,
+     "rival": "Club Náutico Sevilla",
      "campo": null,
      "estado": null,
      "goles": null
@@ -2893,8 +2893,8 @@ window.DATOS = {
      "j": 20,
      "fecha": "2027-04-30",
      "hora": null,
-     "casa": true,
-     "rival": "CF Comarca los Alcores",
+     "casa": false,
+     "rival": "CD Toro Tocina Los Rosales (Fem)",
      "campo": null,
      "estado": null,
      "goles": null
@@ -2903,8 +2903,8 @@ window.DATOS = {
      "j": 21,
      "fecha": "2027-05-07",
      "hora": null,
-     "casa": true,
-     "rival": "JD Gines",
+     "casa": false,
+     "rival": "CD Atco. San Martín",
      "campo": null,
      "estado": null,
      "goles": null

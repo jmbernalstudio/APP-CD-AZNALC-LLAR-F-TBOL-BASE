@@ -34,7 +34,7 @@ const D = window.DATOS || { equipos: [] };
 const ORDEN = ['senior', 'juvenil', 'cadete', 'infantil', 'alevin2', 'alevin1', 'benjamin2', 'benjamin1', 'prebenjamin', 'minis'];
 D.equipos.sort((a, b) => (ORDEN.indexOf(a.id) + 1 || 99) - (ORDEN.indexOf(b.id) + 1 || 99));
 const EQ = Object.fromEntries(D.equipos.map(e => [e.nombre, e]));
-const US = /AZNALC/i;
+const US = /AZNALC[OÓ]LLAR/i; /* nunca solo "AZNALC": coincidiría con el C.A. Aznalcázar */
 const ISO = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const TODAY = ISO(new Date());
 const WD = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];

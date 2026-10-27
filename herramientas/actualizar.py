@@ -41,7 +41,7 @@ EQUIPOS = [
     dict(id='minis', nombre='Minis', cat='Liga Educa · Minis · Grupo 1', web='educa', age=72, gro1=474, sea=1828, sta=2244, jornadas=15),
 ]
 
-NOSOTROS = re.compile(r'AZNALC', re.I)
+NOSOTROS = re.compile(r'AZNALC[OÓ]LLAR', re.I)  # nunca solo 'AZNALC': coincidiría con el C.A. AZNALCÁZAR
 CTX = ssl.create_default_context()
 # La RFAF necesita una sesión (cookie) antes de enseñar las jornadas
 ABRIDOR = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()),
@@ -333,6 +333,9 @@ def main():
                                                     for k, v in escudos.items()]))
             if len(partidos) != eq['jornadas']:
                 avisos.append(f'{eq["nombre"]}: {len(partidos)} jornadas en la web (se esperaban {eq["jornadas"]})')
+            nuestras = [r for r in tabla if NOSOTROS.search(r['equipo'])]
+            if len(nuestras) != 1:
+                avisos.append(f'{eq["nombre"]}: {len(nuestras)} filas de la clasificación parecen nuestras (debe ser 1)')
             fila = next((r for r in tabla if NOSOTROS.search(r['equipo'])), None)
             jug = [p for p in partidos if p.get('goles')]
             gf = sum(p['goles'][0 if p['casa'] else 1] for p in jug)
