@@ -173,13 +173,20 @@ i.dm { background: var(--gold); } i.dt { background: var(--ink); }
 .dark .card-h h2 { color: #fff; }
 .bignum { font-size: 2.6rem; font-weight: 700; letter-spacing: -1px; line-height: 1; font-variant-numeric: tabular-nums; }
 .bignum small { font-size: 1.2rem; opacity: .7; }
-.delta { color: #5BE39A; font-size: .85rem; font-weight: 600; }
-.bars { display: flex; align-items: flex-end; gap: 8px; height: 110px; margin-top: 16px; padding-bottom: 4px; border-bottom: 1px solid rgba(255, 255, 255, .12); }
-.bars span { flex: 1; border-radius: 6px 6px 2px 2px; background: rgba(255, 255, 255, .18); }
-.bars span.hi { background: #12A15A; }
-.bars span.lo { background: #E23B4E; }
-.bars-x { display: flex; gap: 8px; white-space: nowrap; margin-top: 6px; font-size: .7rem; color: rgba(255, 255, 255, .65); } .bars-x span { flex: 1; text-align: center; }
-.last { margin-top: 14px; display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, .08); border-radius: 16px; padding: 10px 12px; font-size: .9rem; }
+.delta { color: var(--ok-ink); font-size: .85rem; font-weight: 600; }
+/* Asistencia: barras por entreno. Verde 90% o más, amarillo 70–89%, rojo menos de 70% */
+.bars { display: flex; align-items: flex-end; gap: 8px; height: 120px; margin-top: 16px; padding-bottom: 4px; border-bottom: 1px solid var(--line); }
+.bars span { flex: 1; border-radius: 6px 6px 2px 2px; background: var(--line); position: relative; min-width: 0; }
+.bars span b { position: absolute; bottom: calc(100% + 3px); left: 0; right: 0; text-align: center; font-size: .66rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.bars .hi, .bars-key i.hi { background: #12A15A; }
+.bars .mid, .bars-key i.mid { background: var(--gold); }
+.bars .lo, .bars-key i.lo { background: #E23B4E; }
+.bars-x { display: flex; gap: 8px; white-space: nowrap; margin-top: 6px; font-size: .7rem; color: var(--muted); } .bars-x span { flex: 1; text-align: center; }
+.bars-key { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 12px; font-size: .75rem; color: var(--muted); }
+.bars-key span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.bars-key i { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.a-attend .tag { background: var(--club-soft); color: var(--club); }
+.last { margin-top: 14px; display: flex; align-items: center; gap: 10px; background: var(--shell); border-radius: 16px; padding: 10px 12px; font-size: .9rem; }
 .last b { margin-left: auto; }
 
 /* Aviso */
