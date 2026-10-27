@@ -517,3 +517,6 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .off b { color: var(--ink); }
 .g-scope { align-self: flex-start; max-width: 100%; }
 .g-scope button { min-height: 44px; padding: .4rem 1.1rem; }
+/* Entrenamientos: días a lo ancho; hora y campo debajo */
+.facts.tr { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.facts.tr > div:first-child { grid-column: 1 / -1; }
