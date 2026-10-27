@@ -292,6 +292,10 @@ function reqRow(r, ctl = '') {
     <div class="grow"><b title="${esc(r.title)}">${esc(r.title)}</b><div class="rq-meta">${stPill(r)}<small>${S.role === 'board' ? `${r.by} · ${r.team} · ` : ''}${r.when}${r.where ? ' · ' + esc(r.where) : ''}</small></div>${stepsHTML(r, !!ctl)}</div>
     ${ctl}</div>`;
 }
+/* Pantalla sin contenido: tarjeta alta con el mensaje centrado en la parte visible */
+function emptyPage(icon, title, text, cls = '', action = '') {
+  return `<section class="card empty empty-page ${cls}">${ic(icon)}<b>${title}</b><small>${text}</small>${action}</section>`;
+}
 function card(id, title, body, cls = '', more = '') {
   return `<section class="card ${cls}" aria-labelledby="${id}"><div class="card-h"><h2 id="${id}">${title}</h2>${more}</div>${body}</section>`;
 }
@@ -361,7 +365,7 @@ function gamesView() {
       ${done.length ? `<div class="kpi"><small>Ganados</small><b class="ok">${cnt('G')}</b></div><div class="kpi"><small>Empatados</small><b>${cnt('E')}</b></div><div class="kpi"><small>Perdidos</small><b class="bad">${cnt('P')}</b></div>`
         : `<div class="kpi"><small>De local</small><b>${week.filter(g => g.p.casa).length}</b></div><div class="kpi"><small>De visitante</small><b>${week.filter(g => !g.p.casa).length}</b></div>`}</div>`;
   const body = list.length ? `<div class="games">${list.map(g => gameCard(g.e, g.p, own(g.e))).join('')}</div>`
-    : `<section class="card empty"><b>No hay partidos${venue === 'home' ? ' de local' : venue === 'away' ? ' de visitante' : ''} este fin de semana</b></section>`;
+    : emptyPage('cal', `No hay partidos${venue === 'home' ? ' de local' : venue === 'away' ? ' de visitante' : ''}`, 'Usa las flechas para ver otro fin de semana.', 'g');
   const n = Object.keys(S.teams).length;
   const scope = coach ? `<div class="seg g-scope" role="group" aria-label="Qué partidos ver">
       <button type="button" data-gs="mine" aria-pressed="${mineOnly}">${n === 1 ? 'Mi equipo' : 'Mis equipos'}</button>
@@ -680,7 +684,7 @@ const COACH = {
   msg() {
     return {
       kicker: 'Mensajes', title: 'Avisos del club',
-      body: `<div class="cards-grid">${S.notices.length ? '' : '<p class="card muted" style="margin:0">Todavía no hay avisos del club.</p>'}${S.notices.map(n => `<section class="card notice" aria-labelledby="m${n.id}">
+      body: `<div class="cards-grid">${S.notices.length ? '' : emptyPage('bell', 'Todavía no hay avisos', 'Cuando la junta envíe un aviso, lo verás aquí.')}${S.notices.map(n => `<section class="card notice" aria-labelledby="m${n.id}">
           <div class="card-h" style="margin-bottom:6px"><span class="eyebrow">${esc(n.from)}</span>${n.read ? '<span class="pill">Leído</span>' : '<span class="pill gold">Nuevo</span>'}</div>
           <h3 id="m${n.id}">${esc(n.title)}</h3><p style="margin:6px 0 0">${esc(n.body)}</p>
           ${n.read ? '' : `<button type="button" class="btn blue block" style="margin-top:14px" data-read="${n.id}">${ic('check')} Entendido</button>`}</section>`).join('')}</div>`,
@@ -842,7 +846,7 @@ const BOARD = {
         <label class="f" for="nb">Mensaje<textarea id="nb">${S.live ? '' : 'El jueves 29 a las 20:30 en la sede. Hablaremos del torneo de Navidad.'}</textarea></label>
         <p id="nerr" class="err" role="alert" hidden>Escribe el mensaje.</p>
         <button type="submit" class="btn gold block">${ic('send')} Enviar aviso</button></form>
-        ${card('h-last', 'Últimos avisos enviados', S.notices.length ? S.notices.slice(0, 4).map(sentRow).join('') : '<p class="muted" style="margin:0">Aún no has enviado avisos.</p>', '', S.notices.length > 4 ? '<button type="button" class="more" data-go="msg">Ver todos</button>' : '')}</div>`,
+        ${card('h-last', 'Últimos avisos enviados', S.notices.length ? S.notices.slice(0, 4).map(n => sentRow(n)).join('') : '<p class="muted" style="margin:0">Aún no has enviado avisos.</p>', '', S.notices.length > 4 ? '<button type="button" class="more" data-go="msg">Ver todos</button>' : '')}</div>`,
       bind() { $('#nf').onsubmit = async e => { e.preventDefault();
         const n = { id: Date.now(), from: 'Junta directiva', title: $('#nt').value.trim() || 'Aviso', body: $('#nb').value.trim(), read: false, readBy: 0, total: S.live ? coachCount() : 24 };
         if (!n.body) { $('#nerr').hidden = false; $('#nb').focus(); return; }
@@ -856,7 +860,7 @@ const BOARD = {
     return {
       kicker: 'Comunicación', title: 'Avisos enviados',
       body: S.notices.length ? `<div class="cards-grid">${S.notices.map(n => `<section class="card sent" aria-label="${esc(n.title)}">${sentRow(n, true)}</section>`).join('')}</div>`
-        : '<p class="card muted" style="margin:0">Aún no has enviado avisos.</p>',
+        : emptyPage('bell', 'Aún no has enviado avisos', 'Cuando envíes uno, aquí verás quién lo ha leído.', '', '<button type="button" class="btn blue" data-go="ask">' + ic('send') + ' Enviar un aviso</button>'),
       bind() { document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
         const n = S.notices.find(x => x.id == b.dataset.del);
         if (!(await ask(`¿Borrar “${n.title}”?`, 'Desaparecerá también de los móviles de los entrenadores. No se puede deshacer.', 'Sí, borrar'))) return;
