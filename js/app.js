@@ -615,7 +615,7 @@ function convList(players, c) {
 }
 function convText(team, p, c, players) {
   const names = convList(players, c).rows.map(x => `${x.num}. ${x.n}`);
-  return [`*Convocatoria ${team}*`, `${dateLbl(p.fecha)}${p.hora ? ' - ' + p.hora : ''} - ${p.casa ? 'Local' : 'Visitante'} vs ${nice(p.rival)}`,
+  return [`*Convocatoria ${team}*`, `${dateLbl(p.fecha)}${p.hora ? ' - ' + p.hora : ''} - vs ${nice(p.rival)}`,
     placeOf(p) ? `Campo: ${placeOf(p).replace(/ · /g, ' - ')}` : '', c.hora || c.lugar ? `Citación${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
     c.nota || '', '', ...names].filter((l, i, a) => l || (i > 0 && a[i - 1])).join('\n');
 }
@@ -657,7 +657,7 @@ async function convPoster(team, p, c, players) {
   side(...(p.casa ? us : them), 270); side(...(p.casa ? them : us), 810);
   if (p.hora) text(p.hora, W / 2, 385, 800, 76, INK, 240);
   else { text('Hora por', W / 2, 365, 600, 32, MUTED, 220); text('confirmar', W / 2, 403, 600, 32, MUTED, 220); }
-  text(`${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' - ' + placeOf(p).replace(/ · /g, ' - ') : ''}`, W / 2, 558, 500, 30, MUTED);
+  text(placeOf(p) ? placeOf(p).replace(/ · /g, ' - ') : 'Campo por confirmar', W / 2, 558, 500, 30, MUTED);
   // Citación
   rr(48, 624, W - 96, 96, 32, BLUE);
   text(`Citación: ${[c.hora, c.lugar].filter(Boolean).join(' - ')}`, W / 2, 673, 700, 36, '#FFFFFF');
