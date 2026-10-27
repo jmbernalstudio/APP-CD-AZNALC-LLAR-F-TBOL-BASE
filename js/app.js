@@ -423,7 +423,7 @@ const CAMPOS = ['Campo entero', 'Campo 1', 'Campo 2'];
 function trainCard(team) {
   const t = trainOf(team) || { dias: [], h: '', where: '' };
   /* Ya guardado: se muestra como ficha, con botón para editar */
-  if (trainOf(team) && S.editTrain !== team) return card('h-tr', 'Entrenamientos', `<dl class="facts">
+  if (trainOf(team) && S.editTrain !== team) return card('h-tr', 'Entrenamientos', `<dl class="facts tr">
       <div><dt>Días</dt><dd>${t.dias.map(d => DIAS[d - 1]).join(' · ')}</dd></div>
       <div><dt>Hora</dt><dd>${esc(t.h || 'Sin hora')}</dd></div>
       <div><dt>Campo</dt><dd>${esc(t.where || 'Sin campo')}</dd></div></dl>`, '', '<button type="button" class="more" id="tedit">Editar</button>');
