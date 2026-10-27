@@ -26,6 +26,9 @@ const STATES = ['Enviada', 'Vista', 'En marcha', 'Resuelta'];
 
 /* Equipos, partidos y clasificaciones reales (js/datos.js, sacado de rfaf.es y educationleague.es) */
 const D = window.DATOS || { equipos: [] };
+/* Orden del club: de mayores a pequeños */
+const ORDEN = ['senior', 'juvenil', 'cadete', 'infantil', 'alevin2', 'alevin1', 'benjamin2', 'benjamin1', 'prebenjamin', 'minis'];
+D.equipos.sort((a, b) => (ORDEN.indexOf(a.id) + 1 || 99) - (ORDEN.indexOf(b.id) + 1 || 99));
 const EQ = Object.fromEntries(D.equipos.map(e => [e.nombre, e]));
 const US = /AZNALC/i;
 const ISO = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
