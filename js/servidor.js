@@ -47,7 +47,7 @@
     box.hidden = false;
     box.innerHTML = `<main class="card stack" aria-labelledby="lg-t">
       <img class="cr crest" src="${CREST}" alt="">
-      <div><h1 id="lg-t">C.D. Aznalcóllar F.B.</h1><p class="sub">Entrenadores y junta directiva</p></div>
+      <div><h1 id="lg-t">C.D. Aznalcóllar Fútbol Base</h1><p class="sub">Entrenadores y junta directiva</p></div>
       <form id="lg" class="stack" novalidate>
         <label class="f" for="lu">Usuario o correo<input type="text" id="lu" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
         <label class="f" for="lp">Contraseña<span class="pw"><input type="password" id="lp" autocomplete="current-password" required>

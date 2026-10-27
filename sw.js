@@ -1,5 +1,5 @@
 // Guarda la app en el móvil para que abra rápido y sin cobertura en el campo.
-const CACHE = 'cd-aznalcollar-v29';
+const CACHE = 'cd-aznalcollar-v30';
 const FILES = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/datos.js', 'js/config.js', 'js/servidor.js', 'js/vendor/supabase.js', 'manifest.webmanifest', 'icons/escudo-160.png', 'icons/escudo.png', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -17,7 +17,7 @@ self.addEventListener('fetch', e => {
   // Solo los archivos de la app; las llamadas al servidor del club van siempre directas.
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' })
       .then(res => {
         if (res.ok && new URL(e.request.url).origin === location.origin) {
           const copy = res.clone();

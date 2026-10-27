@@ -386,7 +386,7 @@ function matchRow(e, p) {
 function tableHTML(e) {
   const gd = r => r.gf != null ? r.gf - r.gc : r.dif;
   return `<div class="tbl" role="table" aria-label="Clasificación"><div class="tr th" role="row"><span role="columnheader">#</span><span role="columnheader">Equipo</span><span role="columnheader" title="Jugados">PJ</span><span role="columnheader" title="Diferencia de goles">DG</span><span role="columnheader">Pts</span></div>
-    ${e.tabla.map(r => `<div class="tr ${US.test(r.equipo) ? 'us' : ''}" role="row"><span role="cell">${r.pos}</span><span role="cell" class="tn">${crestBadge(e, r.equipo)}<b title="${esc(nice(r.equipo))}">${esc(US.test(r.equipo) ? 'C.D. Aznalcóllar F.B.' : nice(r.equipo))}</b></span><span role="cell">${r.j}</span><span role="cell">${gd(r) > 0 ? '+' : ''}${gd(r)}</span><span role="cell"><b>${r.pts}</b></span></div>`).join('')}</div>`;
+    ${e.tabla.map(r => `<div class="tr ${US.test(r.equipo) ? 'us' : ''}" role="row"><span role="cell">${r.pos}</span><span role="cell" class="tn">${crestBadge(e, r.equipo)}<b title="${esc(nice(r.equipo))}">${esc(US.test(r.equipo) ? 'C.D. Aznalcóllar Fútbol Base' : nice(r.equipo))}</b></span><span role="cell">${r.j}</span><span role="cell">${gd(r) > 0 ? '+' : ''}${gd(r)}</span><span role="cell"><b>${r.pts}</b></span></div>`).join('')}</div>`;
 }
 function agendaCard(filter) {
   const f = filter || 'all';
