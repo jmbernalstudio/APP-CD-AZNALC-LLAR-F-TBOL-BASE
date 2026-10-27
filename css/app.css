@@ -113,6 +113,7 @@ i.dm { background: var(--gold); } i.dt { background: var(--ink); }
 .btn.gold { background: var(--gold); color: var(--gold-ink); }
 .btn.blue { background: var(--club); color: #fff; }
 .btn.glass { background: rgba(255, 255, 255, .14); color: #fff; }
+.btn.white { background: #fff; color: var(--club); }
 .btn.block { width: 100%; min-height: 58px; font-size: 1.05rem; }
 .btn.sm { min-height: 42px; padding: 0 14px; border-radius: 12px; font-size: .9rem; }
 
