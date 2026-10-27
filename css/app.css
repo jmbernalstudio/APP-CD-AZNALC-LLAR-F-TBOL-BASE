@@ -600,8 +600,10 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 @container (max-width: 620px) { .card.sent .rq .grow { flex-basis: calc(100% - 56px); } .card.sent .rq .pill { margin-left: 56px; } .card.sent .del { margin-left: auto; } }
 .g-filters { display: flex; flex-wrap: wrap; gap: 10px 12px; }
 @media (max-width: 440px) { .g-filters .seg { width: 100%; } .g-filters .seg button { flex: 1; padding-left: .5rem; padding-right: .5rem; } }
-.kpis.k3 > .kpi:first-child { grid-column: 1 / -1; }
-@media (min-width: 720px) { .kpis.k3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .kpis.k3 > .kpi:first-child { grid-column: auto; } }
+.kpis.k3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+/* Móvil: las tres tarjetas en una fila, más compactas para que quepa "De visitante" */
+@media (max-width: 719px) { .kpis.k3 { gap: 8px; } .kpis.k3 .kpi { padding: 12px; border-radius: 18px; } .kpis.k3 .kpi small { font-size: .74rem; } .kpis.k3 .kpi b { font-size: 1.8rem; } }
+@media (max-width: 360px) { .kpis.k3 { gap: 6px; } .kpis.k3 .kpi { padding: 12px 8px; } .kpis.k3 .kpi small { font-size: .68rem; } }
 .empty-page { min-height: max(300px, calc(100vh - 210px)); grid-column: 1 / -1; }
 .empty-page.g { min-height: max(260px, calc(100vh - 560px)); }
 .empty-page .btn { margin-top: 10px; }
