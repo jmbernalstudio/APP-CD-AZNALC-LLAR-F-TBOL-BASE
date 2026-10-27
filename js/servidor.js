@@ -170,9 +170,16 @@
       const { data, error } = await sb.functions.invoke('avisar', { body: { accion: 'clave' } });
       if (error || !data || !data.clave) throw new Error('sin clave');
       const sub = await suscripcion() || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(data.clave) });
+      await Push.guardar(sub);
+      return 'on';
+    },
+    async guardar(sub) {
       const j = sub.toJSON();
       ok(await sb.from('push_subs').upsert({ endpoint: j.endpoint, perfil: S.me.id, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: 'endpoint' }));
-      return 'on';
+    },
+    /* Si este móvil ya las tenía activadas, al entrar se apuntan a quien inicia sesión sin volver a preguntar */
+    async recuperar() {
+      try { const sub = Notification.permission === 'granted' && await suscripcion(); if (sub) await Push.guardar(sub); } catch (_) {}
     }
   };
   /* La notificación llega o se toca con la app abierta: traer lo nuevo e ir a su pantalla */
@@ -182,9 +189,10 @@
     if (m.refrescar) refrescar(true);
   });
 
-  /* Al cerrar sesión, este móvil deja de recibir las notificaciones de esa persona */
+  /* Al cerrar sesión, este móvil deja de recibir las notificaciones de esa persona,
+     pero el permiso se queda: al volver a entrar se activan solas */
   window.logout = async () => {
-    try { const sub = await suscripcion(); if (sub) { await sb.from('push_subs').delete().eq('endpoint', sub.endpoint); await sub.unsubscribe(); } } catch (_) {}
+    try { const sub = await suscripcion(); if (sub) await sb.from('push_subs').delete().eq('endpoint', sub.endpoint); } catch (_) {}
     await sb.auth.signOut(); location.reload();
   };
 
@@ -207,6 +215,7 @@
     S.tab = ['home', 'team', 'ask', 'games', 'msg'].includes(pide) ? pide : 'home'; S.sub = null;
     if (pide) history.replaceState(null, '', location.pathname);
     S.push = await Push.estado();
+    if (S.push === 'on') await Push.recuperar();
     render();
   }
 
