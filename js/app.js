@@ -396,14 +396,16 @@ function bindTrain(team) {
 function rosterCard(team) {
   const t = S.teams[team];
   const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n));
-  return `<div class="stack">${card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? list.map(p => `<button type="button" class="tm tm-btn" data-edit="${p.id}" aria-label="Editar a ${esc(p.n)}"><span class="k">${p.dorsal || '–'}</span>
+  return card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? `<div class="roster">${list.map(p => `<button type="button" class="tm tm-btn pcard" data-edit="${p.id}" aria-label="Editar a ${esc(p.n)}"><span class="k">${p.dorsal || '–'}</span>
       <span class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.dorsal ? 'Dorsal ' + p.dorsal : 'Sin dorsal'}</small></span>
-      <span class="go" aria-hidden="true">${ic('chev')}</span></button>`).join('') : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>')}
-    <form id="pf" class="card stack" novalidate aria-labelledby="h-add"><h2 id="h-add" style="margin:0;font-size:1.1rem">Añadir jugador</h2>
-      <label class="f" for="pn">Nombre y apellidos<input type="text" id="pn" autocomplete="off" required></label>
-      <label class="f" for="pd">Dorsal (opcional)<input type="number" id="pd" inputmode="numeric" min="1" max="99"></label>
+      <span class="go" aria-hidden="true">${ic('chev')}</span></button>`).join('')}</div>` : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>');
+}
+function addPlayerCard(team) {
+  return `<form id="pf" class="card stack add-pl" novalidate aria-labelledby="h-add"><h2 id="h-add" style="margin:0;font-size:1.1rem">Añadir jugador</h2>
+      <div class="add-row"><label class="f" for="pn">Nombre y apellidos<input type="text" id="pn" autocomplete="off" required></label>
+      <label class="f" for="pd">Dorsal (opcional)<input type="number" id="pd" inputmode="numeric" min="1" max="99"></label></div>
       <p id="perr" class="err" role="alert" hidden>Escribe el nombre del jugador.</p>
-      <button type="submit" class="btn blue block">${ic('plus')} Añadir a ${esc(team)}</button></form></div>`;
+      <button type="submit" class="btn blue block">${ic('plus')} Añadir a ${esc(team)}</button></form>`;
 }
 function bindRoster(team) {
   const t = S.teams[team], f = $('#pf');
@@ -525,7 +527,7 @@ const COACH = {
         <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${p.dorsal || i + 1}</span><span class="pname">${esc(p.n)}</span>
         <span class="pstate">${a.has(p.id) ? 'Ha venido' : 'Sin marcar'}</span></button></li>`).join('')}</ul></div>
       ${attendanceCard(S.team, 'h-at2')}</div>`;
-    if (sub === 'roster') body = rosterCard(S.team);
+    if (sub === 'roster') body = `<div class="stack">${addPlayerCard(S.team)}${rosterCard(S.team)}</div>`;
     const e = EQ[S.team];
     if (sub === 'games') body = card('h-gm', `Temporada · ${e.partidos.length} jornadas`, e.partidos.map(p => matchRow(e, p)).join(''), '', `<span class="tag src">${e.fuente}</span>`);
     if (sub === 'table') body = card('h-tb', e.cat, tableHTML(e), '', `<span class="tag src">${e.fuente}</span>`);
@@ -739,8 +741,8 @@ const BOARD = {
     if (S.sub && S.sub.startsWith('eq:')) {
       const team = S.sub.slice(3);
       S.teams[team] = S.teams[team] || { cat: (EQ[team] || {}).cat || '', train: null, players: [] };
-      return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), layout: 'narrow', back: () => go('team'),
-        body: `<div class="stack">${trainCard(team)}${rosterCard(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); } };
+      return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), back: () => go('team'),
+        body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div>${rosterCard(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); } };
     }
     const all = D.equipos.flatMap(e => played(e));
     const wins = all.filter(p => outcome(p) === 'G').length;
