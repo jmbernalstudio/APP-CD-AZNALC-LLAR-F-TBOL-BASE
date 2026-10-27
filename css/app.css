@@ -331,7 +331,7 @@ html.big .act { flex-direction: row; justify-content: flex-start; min-height: 66
   .rail button.plus { background: var(--gold); color: var(--gold-ink); }
   .rail button.plus[aria-current="page"] { box-shadow: 0 0 0 3px var(--navy); }
   .rail .badge { top: 6px; right: 14px; }
-  .content { padding: 6px 12px 12px; }
+  .content { padding: 6px 2px 2px; }
   .topbar .logo, .days, .bottom { display: none; }
   .topbar h1 { font-size: 1.9rem; }
   .who { display: flex; align-items: center; gap: 12px; text-align: right; }
@@ -461,9 +461,12 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 @media (min-width: 1360px) {
   .board-home { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "kpis kpis kpis kpis" "inbox inbox inbox teams" "inbox inbox inbox notice"; }
   .board-home .kpis { gap: 16px; }
-  .board-home > .a-inbox { align-self: stretch; min-height: 480px; }
-  /* Vacía: el aviso se coloca en la parte visible de la pantalla, no al fondo de la tarjeta */
-  .board-home > .a-inbox > .empty { flex: none; min-height: 0; margin-top: max(24px, calc(50vh - 260px)); }
+  /* Peticiones y equipos llenan el alto de la pantalla (mismo margen abajo que entre tarjetas); lo que no cabe hace scroll dentro */
+  .board-home { height: max(640px, calc(100vh - 144px)); grid-template-rows: auto minmax(0, 1fr) auto; }
+  .board-home > .a-inbox, .board-home > .a-teams { align-self: stretch; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .board-home > .a-notice { align-self: end; }
+  .board-home .scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin-right: -10px; padding-right: 10px; }
+  .board-home > .a-inbox .empty { height: 100%; min-height: 0; margin: 0; }
 }
 
 /* Ficha de equipo: entrenamientos y alta en la misma fila; plantilla a todo el ancho en tarjetas */
@@ -538,3 +541,8 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .empty-page .btn { margin-top: 10px; }
 @media (max-width: 1079px) { .empty-page { min-height: max(300px, calc(100vh - 260px)); } }
 #lg-t { font-size: clamp(1rem, calc((100vw - 96px) / 14), 1.4rem); }
+/* Escritorio: las pantallas vacías llegan hasta abajo, con el mismo margen que a los lados */
+@media (min-width: 1080px) {
+  .empty-page { min-height: max(300px, calc(100vh - 144px)); }
+  .empty-page.g { min-height: max(260px, calc(100vh - 470px)); }
+}
