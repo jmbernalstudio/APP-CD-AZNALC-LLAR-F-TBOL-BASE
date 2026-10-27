@@ -574,7 +574,7 @@ async function matchPoster(e, p) {
 }
 async function shareMatch(e, p) {
   const maps = p.campo ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}` : '';
-  const msg = maps ? `Cómo llegar y ubicación del partido: ${maps}` : '';
+  const msg = maps ? `*Cómo llegar y ubicación del partido:*\n\n📍 ${maps}` : '';
   let url = null;
   const m = modal(`<h2 id="mdl-t">Enviar el partido</h2><p id="pst-w">Preparando la imagen…</p><div id="pst"></div>`, 'dialog', () => { if (url) URL.revokeObjectURL(url); });
   const blob = await matchPoster(e, p);
