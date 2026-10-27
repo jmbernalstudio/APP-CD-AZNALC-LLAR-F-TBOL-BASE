@@ -708,7 +708,7 @@ function peopleCard() {
   return card('h-pp', `Entrenadores y accesos · ${S.people.length}`, (S.people.length ? S.people.map(p => `<div class="tm">${avatar(p, 'av')}
     <div class="grow"><b title="${esc(p.nombre)}">${esc(p.nombre)}</b><small title="${esc(p.usuario)}">${p.rol === 'junta' ? 'Junta directiva' : p.equipos.length ? p.equipos.map(teamOf).join(', ') : 'Sin equipo asignado'} · ${esc(p.usuario)}</small></div>
     <button type="button" class="more" data-pw="${p.id}" aria-label="Cambiar foto o contraseña de ${esc(p.nombre)}">Editar</button></div>`).join('') : '<p class="muted" style="margin:0">Aún no hay nadie dado de alta.</p>'),
-    'a-people', '<button type="button" class="more" data-go="team:alta">Dar de alta</button>');
+    'a-people', `<button type="button" class="btn blue sm" data-go="team:alta">${ic('plus')} Dar de alta</button>`);
 }
 function bindPeople() {
   document.querySelectorAll('[data-pw]').forEach(b => b.onclick = () => go('team', 'pw:' + b.dataset.pw));

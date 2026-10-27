@@ -522,3 +522,5 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 /* Entrenamientos: días a lo ancho; hora y campo debajo */
 .facts.tr { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .facts.tr > div:first-child { grid-column: 1 / -1; }
+/* Móvil estrecho: "Dar de alta" baja a su propia línea para no cortar el título */
+@media (max-width: 440px) { .a-people > .card-h { flex-wrap: wrap; } .a-people > .card-h .btn { width: 100%; } }
