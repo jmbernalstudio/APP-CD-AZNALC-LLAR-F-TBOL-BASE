@@ -24,6 +24,7 @@
     async jugador(team, p) {
       return ok(await sb.from('jugadores').insert({ equipo: idEq(team), nombre: p.n, dorsal: p.dorsal }).select('id').single()).id;
     },
+    async editarJugador(id, n, dorsal) { ok(await sb.from('jugadores').update({ nombre: n, apellidos: '', dorsal }).eq('id', id)); },
     async quitarJugador(id, activo) { ok(await sb.from('jugadores').update({ activo }).eq('id', id)); },
     async peticion(r) {
       return ok(await sb.from('peticiones').insert({ equipo: idEq(r.team), tipo: r.kind, titulo: r.title, lugar: r.where || '', urgente: r.urgent }).select('id').single()).id;
