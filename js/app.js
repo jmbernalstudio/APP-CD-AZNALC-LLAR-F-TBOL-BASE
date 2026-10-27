@@ -120,6 +120,30 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('');
 const short = n => { const [a, b] = n.split(' '); return b ? `${a} ${b[0]}.` : a; };
 
+/* Ventanas propias (sirven en todos los móviles y en la vista previa). onClose recibe el valor de cierre. */
+function modal(html, role, onClose) {
+  const back = document.activeElement, d = document.createElement('div');
+  d.className = 'modal'; d.setAttribute('role', role); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'mdl-t');
+  d.innerHTML = `<div class="card stack">${html}</div>`;
+  const focusables = () => [...d.querySelectorAll('button, input, select, textarea')];
+  const key = e => {
+    if (e.key === 'Escape') close(false);
+    if (e.key === 'Tab') { const f = focusables(), first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } }
+  };
+  const close = v => { d.remove(); document.removeEventListener('keydown', key); back && back.focus && back.focus(); onClose(v); };
+  d.onclick = e => { if (e.target === d) close(false); const b = e.target.closest('[data-v]'); if (b) close(b.dataset.v === '1'); };
+  document.addEventListener('keydown', key);
+  document.body.append(d);
+  return { el: d, close };
+}
+function ask(title, text, okLabel) {
+  return new Promise(done => {
+    const m = modal(`<h2 id="mdl-t">${esc(title)}</h2><p>${esc(text)}</p>
+      <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="button" class="btn red" data-v="1">${esc(okLabel)}</button></div>`, 'alertdialog', done);
+    m.el.querySelector('[data-v="0"]').focus();
+  });
+}
 function say(msg, undo) {
   $('#live').textContent = msg;
   const t = $('#toast');
@@ -339,20 +363,28 @@ function noticeCard(n, cls = '') {
 }
 
 /* Días, hora y campo de entreno de un equipo (lo edita la junta) */
+const CAMPOS = ['Campo entero', 'Campo 1', 'Campo 2'];
 function trainCard(team) {
   const t = trainOf(team) || { dias: [], h: '', where: '' };
+  /* Ya guardado: se muestra como ficha, con botón para editar */
+  if (trainOf(team) && S.editTrain !== team) return card('h-tr', 'Entrenamientos', `<dl class="facts">
+      <div><dt>Días</dt><dd>${t.dias.map(d => DIAS[d - 1]).join(' · ')}</dd></div>
+      <div><dt>Hora</dt><dd>${esc(t.h || 'Sin hora')}</dd></div>
+      <div><dt>Campo</dt><dd>${esc(t.where || 'Sin campo')}</dd></div></dl>`, '', '<button type="button" class="more" id="tedit">Editar</button>');
   return `<form id="tf" class="card stack" novalidate aria-labelledby="h-tr"><h2 id="h-tr" style="margin:0;font-size:1.1rem">Entrenamientos</h2>
     <fieldset class="f"><legend>Días</legend><div class="chips">${DIAS.map((d, i) => `<label class="chip"><input type="checkbox" value="${i + 1}" ${t.dias.includes(i + 1) ? 'checked' : ''}> <span aria-hidden="true">${d}</span><span class="sr">${DIAS_L[i]}</span></label>`).join('')}</div></fieldset>
     <div class="row2"><label class="f" for="th">Hora<input type="time" id="th" value="${esc(t.h || '')}"></label>
-    <label class="f" for="tw">Campo<input type="text" id="tw" value="${esc(t.where || '')}" placeholder="Campo 1"></label></div>
-    <button type="submit" class="btn blue block">${ic('check')} Guardar entrenamientos</button></form>`;
+    <label class="f" for="tw">Campo<select id="tw">${[...new Set([...CAMPOS, ...(t.where ? [t.where] : [])])].map(c => `<option ${(t.where || 'Campo entero') === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label></div>
+    <div class="btn-row">${trainOf(team) ? '<button type="button" class="btn ghost" id="tcancel">Cancelar</button>' : ''}<button type="submit" class="btn blue block">${ic('check')} Guardar</button></div></form>`;
 }
 function bindTrain(team) {
+  if ($('#tedit')) { $('#tedit').onclick = () => { S.editTrain = team; render(); $('#tf input') && $('#tf input').focus(); }; return; }
+  if ($('#tcancel')) $('#tcancel').onclick = () => { S.editTrain = null; render(); };
   $('#tf').onsubmit = async e => {
     e.preventDefault();
-    const tr = { dias: [...document.querySelectorAll('#tf input[type=checkbox]:checked')].map(x => +x.value), h: $('#th').value, where: $('#tw').value.trim() };
+    const tr = { dias: [...document.querySelectorAll('#tf input[type=checkbox]:checked')].map(x => +x.value), h: $('#th').value, where: $('#tw').value };
     try { API() && await API().entreno(team, tr); } catch (_) { say('No se ha podido guardar. Revisa la conexión.'); return; }
-    S.teams[team].train = tr; AGENDA = buildAgenda(); render();
+    S.teams[team].train = tr; S.editTrain = null; AGENDA = buildAgenda(); render();
     say(tr.dias.length ? `${team} entrena los ${tr.dias.map(d => DIAS_L[d - 1]).join(', ').replace(/, ([^,]*)$/, ' y $1')}` : `${team} sin días de entreno`);
   };
 }
@@ -361,9 +393,9 @@ function bindTrain(team) {
 function rosterCard(team) {
   const t = S.teams[team];
   const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n));
-  return `<div class="stack">${card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? list.map(p => `<div class="tm"><span class="k">${p.dorsal || '–'}</span>
-      <div class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.dorsal ? 'Dorsal ' + p.dorsal : 'Sin dorsal'}</small></div>
-      <button type="button" class="more" data-del="${p.id}" aria-label="Quitar a ${esc(p.n)} de la plantilla">Quitar</button></div>`).join('') : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>')}
+  return `<div class="stack">${card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? list.map(p => `<button type="button" class="tm tm-btn" data-edit="${p.id}" aria-label="Editar a ${esc(p.n)}"><span class="k">${p.dorsal || '–'}</span>
+      <span class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.dorsal ? 'Dorsal ' + p.dorsal : 'Sin dorsal'}</small></span>
+      <span class="go" aria-hidden="true">${ic('chev')}</span></button>`).join('') : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>')}
     <form id="pf" class="card stack" novalidate aria-labelledby="h-add"><h2 id="h-add" style="margin:0;font-size:1.1rem">Añadir jugador</h2>
       <label class="f" for="pn">Nombre y apellidos<input type="text" id="pn" autocomplete="off" required></label>
       <label class="f" for="pd">Dorsal (opcional)<input type="number" id="pd" inputmode="numeric" min="1" max="99"></label>
@@ -380,12 +412,34 @@ function bindRoster(team) {
     try { p.id = API() ? await API().jugador(team, p) : Date.now(); } catch (_) { say('No se ha podido guardar. Revisa la conexión.'); return; }
     t.players.push(p); render(); say(`${p.n} añadido a ${team}`); $('#pn') && $('#pn').focus();
   };
-  document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
-    const p = t.players.find(x => x.id == b.dataset.del);
+  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => editPlayer(team, t.players.find(x => x.id == b.dataset.edit)));
+}
+/* Ventana para cambiar nombre y dorsal, o quitar al jugador (con confirmación) */
+function editPlayer(team, p) {
+  const t = S.teams[team];
+  const m = modal(`<h2 id="mdl-t">Editar jugador</h2>
+    <form id="ef" class="stack" novalidate>
+      <label class="f" for="en">Nombre y apellidos<input type="text" id="en" autocomplete="off" value="${esc(p.n)}"></label>
+      <label class="f" for="ed">Dorsal (opcional)<input type="number" id="ed" inputmode="numeric" min="1" max="99" value="${p.dorsal || ''}"></label>
+      <p id="eerr" class="err" role="alert" hidden>Escribe el nombre del jugador.</p>
+      <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="submit" class="btn blue">${ic('check')} Guardar</button></div>
+    </form>
+    <button type="button" class="linkbtn" id="edel">Quitar de la plantilla</button>`, 'dialog', () => {});
+  $('#en').focus();
+  $('#ef').onsubmit = async e => {
+    e.preventDefault();
+    const n = $('#en').value.trim(), dorsal = +$('#ed').value || null;
+    if (!n) { $('#eerr').hidden = false; $('#en').focus(); return; }
+    try { API() && await API().editarJugador(p.id, n, dorsal); } catch (_) { $('#eerr').textContent = 'No se ha podido guardar. Revisa la conexión.'; $('#eerr').hidden = false; return; }
+    p.n = n; p.dorsal = dorsal; m.close(); render(); say(`${n} guardado`);
+  };
+  $('#edel').onclick = async () => {
+    m.close();
+    if (!(await ask(`¿Quitar a ${p.n}?`, `Se eliminará de la plantilla de ${team} y ya no saldrá al pasar lista.`, 'Sí, quitar'))) return;
     try { API() && await API().quitarJugador(p.id, false); } catch (_) { say('No se ha podido quitar. Revisa la conexión.'); return; }
     t.players = t.players.filter(x => x !== p); render();
     say(`${p.n} ya no está en la plantilla`, () => { t.players.push(p); API() && API().quitarJugador(p.id, true); });
-  });
+  };
 }
 
 /* ---------- ENTRENADOR ---------- */
