@@ -2,6 +2,7 @@ const I = {
   home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   team: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.7.2 4.4 1.9 5 4.9"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
   check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
@@ -291,6 +292,10 @@ function reqRow(r, ctl = '') {
     <div class="grow"><b title="${esc(r.title)}">${esc(r.title)}</b><div class="rq-meta">${stPill(r)}<small>${S.role === 'board' ? `${r.by} · ${r.team} · ` : ''}${r.when}${r.where ? ' · ' + esc(r.where) : ''}</small></div>${stepsHTML(r, !!ctl)}</div>
     ${ctl}</div>`;
 }
+/* Pantalla sin contenido: tarjeta alta con el mensaje centrado en la parte visible */
+function emptyPage(icon, title, text, cls = '', action = '') {
+  return `<section class="card empty empty-page ${cls}">${ic(icon)}<b>${title}</b><small>${text}</small>${action}</section>`;
+}
 function card(id, title, body, cls = '', more = '') {
   return `<section class="card ${cls}" aria-labelledby="${id}"><div class="card-h"><h2 id="${id}">${title}</h2>${more}</div>${body}</section>`;
 }
@@ -349,28 +354,25 @@ function gamesView() {
   const week = all.filter(g => g.wk === wk && !g.p.descansa);
   const list = week.filter(g => venue === 'all' || (venue === 'home') === !!g.p.casa)
     .sort((a, b) => a.p.fecha.localeCompare(b.p.fecha) || (a.p.hora || '99').localeCompare(b.p.hora || '99') || ORDEN.indexOf(a.e.id) - ORDEN.indexOf(b.e.id));
-  const playing = new Set(week.map(g => g.e.id));
-  const off = D.equipos.filter(e => (!mineOnly || own(e)) && !playing.has(e.id)).sort((a, b) => ORDEN.indexOf(a.id) - ORDEN.indexOf(b.id));
   const done = list.filter(g => g.p.goles), cnt = k => done.filter(g => outcome(g.p) === k).length;
   const nav = `<div class="wk-nav card">
       <button type="button" class="iconbtn" data-wk="${prev || ''}" ${prev ? '' : 'disabled'} aria-label="Fin de semana anterior">${ic('back')}</button>
       <div class="wk-t"><small>${wk === now ? 'Este fin de semana' : wk < now ? 'Ya jugado' : 'Próximamente'}</small><b>${weekLbl(wk, week.length ? week.map(g => g.p.fecha).sort()[0] : null)}</b></div>
       <button type="button" class="iconbtn" data-wk="${next || ''}" ${next ? '' : 'disabled'} aria-label="Fin de semana siguiente">${ic('chev')}</button>
       ${wk !== now && weeks.includes(now) ? `<button type="button" class="more wk-now" data-wk="${now}">Volver a este fin de semana</button>` : ''}</div>`;
-  const stats = `<div class="kpis wk-k">
+  const stats = `<div class="kpis wk-k ${done.length ? '' : 'k3'}">
       <div class="kpi dark"><small>Partidos</small><b>${list.length}</b></div>
       ${done.length ? `<div class="kpi"><small>Ganados</small><b class="ok">${cnt('G')}</b></div><div class="kpi"><small>Empatados</small><b>${cnt('E')}</b></div><div class="kpi"><small>Perdidos</small><b class="bad">${cnt('P')}</b></div>`
-        : `<div class="kpi"><small>De local</small><b>${week.filter(g => g.p.casa).length}</b></div><div class="kpi"><small>De visitante</small><b>${week.filter(g => !g.p.casa).length}</b></div><div class="kpi"><small>Sin partido</small><b>${off.length}</b></div>`}</div>`;
+        : `<div class="kpi"><small>De local</small><b>${week.filter(g => g.p.casa).length}</b></div><div class="kpi"><small>De visitante</small><b>${week.filter(g => !g.p.casa).length}</b></div>`}</div>`;
   const body = list.length ? `<div class="games">${list.map(g => gameCard(g.e, g.p, own(g.e))).join('')}</div>`
-    : `<section class="card empty"><b>No hay partidos${venue === 'home' ? ' de local' : venue === 'away' ? ' de visitante' : ''} este fin de semana</b></section>`;
-  const rest = off.length ? `<p class="off"><b>Sin partido:</b> ${off.map(e => esc(e.nombre)).join(' · ')}</p>` : '';
+    : emptyPage('cal', `No hay partidos${venue === 'home' ? ' de local' : venue === 'away' ? ' de visitante' : ''}`, 'Usa las flechas para ver otro fin de semana.', 'g');
   const n = Object.keys(S.teams).length;
   const scope = coach ? `<div class="seg g-scope" role="group" aria-label="Qué partidos ver">
       <button type="button" data-gs="mine" aria-pressed="${mineOnly}">${n === 1 ? 'Mi equipo' : 'Mis equipos'}</button>
       <button type="button" data-gs="all" aria-pressed="${!mineOnly}">Todo el club</button></div>` : '';
   const venueSeg = `<div class="seg g-scope" role="group" aria-label="Local o visitante">${[['all', 'Todos'], ['home', 'Local'], ['away', 'Visitante']].map(([k, l]) =>
       `<button type="button" data-gv="${k}" aria-pressed="${venue === k}">${l}</button>`).join('')}</div>`;
-  return `<div class="stack"><div class="g-filters">${scope}${venueSeg}</div>${nav}${stats}${body}${rest}</div>`;
+  return `<div class="stack"><div class="g-filters">${scope}${venueSeg}</div>${nav}${stats}${body}</div>`;
 }
 /* Un partido de la temporada: fecha, rival con escudo, resultado o hora */
 function matchRow(e, p) {
@@ -682,7 +684,7 @@ const COACH = {
   msg() {
     return {
       kicker: 'Mensajes', title: 'Avisos del club',
-      body: `<div class="cards-grid">${S.notices.length ? '' : '<p class="card muted" style="margin:0">Todavía no hay avisos del club.</p>'}${S.notices.map(n => `<section class="card notice" aria-labelledby="m${n.id}">
+      body: `<div class="cards-grid">${S.notices.length ? '' : emptyPage('bell', 'Todavía no hay avisos', 'Cuando la junta envíe un aviso, lo verás aquí.')}${S.notices.map(n => `<section class="card notice" aria-labelledby="m${n.id}">
           <div class="card-h" style="margin-bottom:6px"><span class="eyebrow">${esc(n.from)}</span>${n.read ? '<span class="pill">Leído</span>' : '<span class="pill gold">Nuevo</span>'}</div>
           <h3 id="m${n.id}">${esc(n.title)}</h3><p style="margin:6px 0 0">${esc(n.body)}</p>
           ${n.read ? '' : `<button type="button" class="btn blue block" style="margin-top:14px" data-read="${n.id}">${ic('check')} Entendido</button>`}</section>`).join('')}</div>`,
@@ -702,9 +704,9 @@ const teamsList = () => D.equipos.map(e => {
     ${l ? `<span class="res ${res}" title="Último: ${esc(nice(l.rival))}">${scoreTxt(l)}</span>` : ''}</button>`;
 }).join('');
 /* Un aviso enviado con cuántos entrenadores lo han leído */
-const sentRow = n => `<div class="rq"><span class="ic b">${ic('bell')}</span>
+const sentRow = (n, del) => `<div class="rq"><span class="ic b">${ic('bell')}</span>
   <div class="grow"><b>${esc(n.title)}</b><small>${esc(n.body)}</small><div class="meter" role="img" aria-label="Leído por ${n.readBy} de ${n.total}"><i style="width:${n.total ? n.readBy / n.total * 100 : 0}%"></i></div></div>
-  <span class="pill ${n.readBy === n.total ? '' : 'blue'}">${n.readBy} de ${n.total}</span></div>`;
+  <span class="pill ${n.readBy === n.total ? '' : 'blue'}">${n.readBy} de ${n.total}</span>${del ? `<button type="button" class="btn red sm del" data-del="${n.id}" aria-label="Borrar el aviso ${esc(n.title)}">${ic('trash')} Borrar aviso</button>` : ''}</div>`;
 const coachCount = () => S.people.filter(p => p.rol === 'entrenador').length;
 const teamOf = id => (D.equipos.find(e => e.id === id) || {}).nombre || id;
 /* Entrenadores y junta con sus equipos; alta de cuentas nuevas */
@@ -844,7 +846,7 @@ const BOARD = {
         <label class="f" for="nb">Mensaje<textarea id="nb">${S.live ? '' : 'El jueves 29 a las 20:30 en la sede. Hablaremos del torneo de Navidad.'}</textarea></label>
         <p id="nerr" class="err" role="alert" hidden>Escribe el mensaje.</p>
         <button type="submit" class="btn gold block">${ic('send')} Enviar aviso</button></form>
-        ${card('h-last', 'Últimos avisos enviados', S.notices.length ? S.notices.slice(0, 4).map(sentRow).join('') : '<p class="muted" style="margin:0">Aún no has enviado avisos.</p>', '', S.notices.length > 4 ? '<button type="button" class="more" data-go="msg">Ver todos</button>' : '')}</div>`,
+        ${card('h-last', 'Últimos avisos enviados', S.notices.length ? S.notices.slice(0, 4).map(n => sentRow(n)).join('') : '<p class="muted" style="margin:0">Aún no has enviado avisos.</p>', '', S.notices.length > 4 ? '<button type="button" class="more" data-go="msg">Ver todos</button>' : '')}</div>`,
       bind() { $('#nf').onsubmit = async e => { e.preventDefault();
         const n = { id: Date.now(), from: 'Junta directiva', title: $('#nt').value.trim() || 'Aviso', body: $('#nb').value.trim(), read: false, readBy: 0, total: S.live ? coachCount() : 24 };
         if (!n.body) { $('#nerr').hidden = false; $('#nb').focus(); return; }
@@ -857,9 +859,8 @@ const BOARD = {
   msg() {
     return {
       kicker: 'Comunicación', title: 'Avisos enviados',
-      body: S.notices.length ? `<div class="cards-grid">${S.notices.map(n => `<section class="card sent" aria-label="${esc(n.title)}">${sentRow(n)}
-          <div class="sent-f"><button type="button" class="linkbtn" data-del="${n.id}" aria-label="Borrar el aviso ${esc(n.title)}">Borrar aviso</button></div></section>`).join('')}</div>`
-        : '<p class="card muted" style="margin:0">Aún no has enviado avisos.</p>',
+      body: S.notices.length ? `<div class="cards-grid">${S.notices.map(n => `<section class="card sent" aria-label="${esc(n.title)}">${sentRow(n, true)}</section>`).join('')}</div>`
+        : emptyPage('bell', 'Aún no has enviado avisos', 'Cuando envíes uno, aquí verás quién lo ha leído.', '', '<button type="button" class="btn blue" data-go="ask">' + ic('send') + ' Enviar un aviso</button>'),
       bind() { document.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
         const n = S.notices.find(x => x.id == b.dataset.del);
         if (!(await ask(`¿Borrar “${n.title}”?`, 'Desaparecerá también de los móviles de los entrenadores. No se puede deshacer.', 'Sí, borrar'))) return;
