@@ -664,7 +664,7 @@ const COACH = {
     const tt = date && trainAt(S.team, date);
     const pct = () => t.players.length ? Math.round(a.size / t.players.length * 100) : 0;
     const head = `<div class="stack" style="margin-bottom:16px">
-      <div class="chips" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n => `<button type="button" class="chip" data-team="${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>
+      <div class="seg g-scope seg-x" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n => `<button type="button" data-team=""${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>
       <div class="tabs" role="group" aria-label="Vista">${[['list', 'Pasar lista'], ['games', 'Partidos'], ['table', 'Clasificación'], ['roster', 'Plantilla']].map(([k, l]) =>
         `<button type="button" data-sub="${k}" aria-pressed="${sub === k}">${l}</button>`).join('')}</div></div>`;
     let body = '';
@@ -672,7 +672,7 @@ const COACH = {
       ${attendanceCard(S.team, 'h-at2')}</div>`;
     else if (sub === 'list') body = `<div class="split"><div class="stack">
       ${!dates.includes(TODAY) ? `<p class="card muted" style="margin:0">${esc(noTrainMsg)} Si se te olvidó alguna, puedes completarla aquí:</p>` : ''}
-      ${dates.length > 1 || !dates.includes(TODAY) ? `<div class="chips scroll" role="group" aria-label="Elige el entreno">${dates.map(d => `<button type="button" class="chip" data-date="${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
+      ${dates.length > 1 || !dates.includes(TODAY) ? `<div class="seg g-scope seg-x" role="group" aria-label="Elige el entreno">${dates.map(d => `<button type="button" data-date=""${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
       <section class="card match" aria-label="Resumen de asistencia"><div class="att-top">
         <div><span class="tag">${isToday ? 'Hoy' : dateLbl(date)}${tt ? ` · ${esc([tt.h, tt.where].filter(Boolean).join(' · '))}` : ''}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
         <button type="button" class="btn gold" id="all">${ic('check')} Marcar a todos</button></div>
@@ -692,6 +692,8 @@ const COACH = {
       body: head + body,
       bind() {
         document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; S.attDate = null; render(); });
+        /* El equipo y el día elegidos siempre a la vista, aunque el selector se deslice */
+        document.querySelectorAll('.seg-x [aria-pressed="true"]').forEach(b => { const s = b.parentElement; s.scrollLeft = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2; });
         document.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { S.sub = b.dataset.sub; render(); });
         bindRoster(S.team);
         document.querySelectorAll('[data-date]').forEach(b => b.onclick = () => { S.attDate = b.dataset.date; render(); });
