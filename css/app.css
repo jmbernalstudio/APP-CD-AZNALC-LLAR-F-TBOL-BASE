@@ -291,11 +291,14 @@ textarea { min-height: 120px; resize: vertical; }
 /* Navegación inferior (móvil) */
 /* Flotante: separada de los bordes, con las mismas esquinas que las tarjetas */
 .bottom { position: fixed; left: 0; right: 0; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 5; margin: 0 auto; padding: 6px;
-  width: min(600px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
-  background: var(--card); border-radius: 24px; box-shadow: 0 14px 34px -12px rgba(0, 0, 0, .35), 0 0 0 1px rgba(0, 0, 0, .04); }
-.bottom ul { list-style: none; margin: 0 auto; padding: 0; max-width: 560px; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  width: min(392px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+  background: var(--card); border-radius: 999px; box-shadow: 0 14px 34px -12px rgba(0, 0, 0, .35), 0 0 0 1px rgba(0, 0, 0, .04); }
+.bottom ul { list-style: none; margin: 0 auto; padding: 0; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 .bottom button { width: 100%; border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: .75rem; font-weight: 600; color: var(--muted);
-  min-height: 60px; justify-content: center; cursor: pointer; position: relative; border-radius: 18px; }
+  min-height: 60px; justify-content: center; cursor: pointer; position: relative; border-radius: 999px; }
+/* En tablet el menú no se estira: mismo tamaño que en el móvil (5 × 76 px) */
+.bottom li { display: flex; justify-content: center; }
+.bottom button { max-width: 76px; }
 .bottom button[aria-current="page"] { color: var(--club); }
 .bottom button[aria-current="page"] { background: var(--club-soft); }
 /* Solicitar / Aviso: dentro del menú, a la misma altura que el resto, solo con el icono en dorado */
