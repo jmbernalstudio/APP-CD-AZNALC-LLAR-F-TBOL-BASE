@@ -462,6 +462,8 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
   .board-home { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "kpis kpis kpis kpis" "inbox inbox inbox teams" "inbox inbox inbox notice"; }
   .board-home .kpis { gap: 16px; }
   .board-home > .a-inbox { align-self: stretch; min-height: 480px; }
+  /* Vacía: el aviso se coloca en la parte visible de la pantalla, no al fondo de la tarjeta */
+  .board-home > .a-inbox > .empty { flex: none; min-height: 0; margin-top: max(24px, calc(50vh - 260px)); }
 }
 
 /* Ficha de equipo: entrenamientos y alta en la misma fila; plantilla a todo el ancho en tarjetas */
@@ -520,3 +522,5 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 /* Entrenamientos: días a lo ancho; hora y campo debajo */
 .facts.tr { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .facts.tr > div:first-child { grid-column: 1 / -1; }
+/* Móvil estrecho: "Dar de alta" baja a su propia línea para no cortar el título */
+@media (max-width: 440px) { .a-people > .card-h { flex-wrap: wrap; } .a-people > .card-h .btn { width: 100%; } }
