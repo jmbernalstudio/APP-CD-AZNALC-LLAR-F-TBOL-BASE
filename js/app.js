@@ -736,7 +736,7 @@ const teamOf = id => (D.equipos.find(e => e.id === id) || {}).nombre || id;
 function peopleCard() {
   return card('h-pp', `Entrenadores y accesos · ${S.people.length}`, (S.people.length ? S.people.map(p => `<div class="tm">${avatar(p, 'av')}
     <div class="grow"><b title="${esc(p.nombre)}">${esc(p.nombre)}</b><small title="${esc(p.usuario)}">${p.rol === 'junta' ? 'Junta directiva' : p.equipos.length ? p.equipos.map(teamOf).join(', ') : 'Sin equipo asignado'} · ${esc(p.usuario)}</small></div>
-    <button type="button" class="more" data-pw="${p.id}" aria-label="Cambiar foto o contraseña de ${esc(p.nombre)}">Editar</button></div>`).join('') : '<p class="muted" style="margin:0">Aún no hay nadie dado de alta.</p>'),
+    <button type="button" class="more" data-pw="${p.id}" aria-label="Editar a ${esc(p.nombre)}">Editar</button></div>`).join('') : '<p class="muted" style="margin:0">Aún no hay nadie dado de alta.</p>'),
     'a-people', `<button type="button" class="btn blue sm" data-go="team:alta">${ic('plus')} Dar de alta</button>`);
 }
 function bindPeople() {
@@ -746,7 +746,8 @@ function claveForm(p) {
   return `<form id="cf" class="card stack" novalidate>
     <div class="form2"><div class="stack"><h2 class="fh">Foto</h2><p style="margin:0">Entra con “${esc(p.usuario)}”.</p>
     ${photoField(p.foto, p.nombre)}</div>
-    <div class="stack"><h2 class="fh">Contraseña</h2><label class="f" for="cp">Contraseña nueva<span class="hint">Déjala vacía para no cambiarla</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false"></label></div></div>
+    <div class="stack"><h2 class="fh">${p.rol === 'entrenador' ? 'Contraseña y equipos' : 'Contraseña'}</h2><label class="f" for="cp">Contraseña nueva<span class="hint">Déjala vacía para no cambiarla</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+    ${p.rol === 'entrenador' ? `<fieldset class="f" id="ceq"><legend>Sus equipos</legend><div class="chips">${D.equipos.map(e => `<label class="chip"><input type="checkbox" value="${e.id}"${p.equipos.includes(e.id) ? ' checked' : ''}> ${esc(e.nombre)}</label>`).join('')}</div></fieldset>` : ''}</div></div>
     <p id="cerr" class="err" role="alert" hidden></p>
     <button type="submit" class="btn blue block">${ic('check')} Guardar</button></form>`;
 }
@@ -757,11 +758,15 @@ function bindClave(p) {
     e.preventDefault();
     const pw = $('#cp').value, err = m => { $('#cerr').textContent = m; $('#cerr').hidden = false; };
     if (pw && pw.length < 8) return err('La contraseña debe tener al menos 8 caracteres.');
+    const eqs = $('#ceq') ? [...document.querySelectorAll('#ceq input:checked')].map(x => x.value) : p.equipos;
+    if ($('#ceq') && !eqs.length) return err('Marca al menos un equipo.');
+    const cambiaEq = [...eqs].sort().join() !== [...p.equipos].sort().join();
     try {
       if (pw && API()) await API().clave(p.id, pw);
       if (st.foto !== p.foto && API()) await API().foto(p.id, st.foto);
+      if (cambiaEq && API()) await API().equipos(p.id, eqs);
     } catch (_) { return err('No se ha podido guardar. Revisa la conexión.'); }
-    p.foto = st.foto; if (p.id === S.me.id) S.me.foto = st.foto;
+    p.foto = st.foto; p.equipos = eqs; if (p.id === S.me.id) S.me.foto = st.foto;
     go('team'); say(pw ? `Guardado. Dale la contraseña nueva a ${p.nombre.split(' ')[0]}.` : 'Guardado.');
   };
 }
