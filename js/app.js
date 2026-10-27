@@ -699,6 +699,26 @@ function attendanceHist(team) {
   const days = Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort().slice(-8);
   return { days: days.map(d => toDate(d).getDate()), pct: days.map(d => n ? Math.round(S.attend[`${team} ${d}`].size / n * 100) : 0) };
 }
+/* Asistencia de un jugador: entrenos con lista pasada a los que ha venido (global y por semana) */
+const listDays = team => Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort();
+const attLvl = p => p >= 90 ? 'hi' : p < 70 ? 'lo' : 'mid';
+function playerAtt(team, id, days = listDays(team)) {
+  const v = days.filter(d => S.attend[`${team} ${d}`].has(id)).length;
+  return { n: days.length, v, pct: days.length ? Math.round(v / days.length * 100) : null };
+}
+const attPill = (team, id, short) => { const a = playerAtt(team, id); return a.pct == null ? '' : `<span class="ppct ${attLvl(a.pct)}" ${short ? `aria-label="${a.pct}% de asistencia"` : ''}>${a.pct}%${short ? '' : ' asistencia'}</span>`; };
+function playerAttHTML(team, p) {
+  const days = listDays(team), g = playerAtt(team, p.id, days);
+  if (g.pct == null) return `<div class="patt"><b>Asistencia</b><p class="muted" style="margin:0">Todavía no se ha pasado lista en ${esc(team)}.</p></div>`;
+  const weeks = [...new Set(days.map(weekOf))].slice(-8).map(w => ({ w, ...playerAtt(team, p.id, days.filter(d => weekOf(d) === w)) }));
+  const wl = w => { const d = toDate(w); return `${d.getDate()} ${MES[d.getMonth()]}`; };
+  return `<div class="patt"><b>Asistencia a los entrenos</b>
+    <div class="patt-g"><span class="bignum ${attLvl(g.pct)}">${g.pct}%</span><small>Global: ha venido a ${g.v} de ${g.n} entreno${g.n === 1 ? '' : 's'} desde el ${dateLbl(days[0]).toLowerCase()}</small></div>
+    <small class="muted">Por semana (de lunes a domingo)</small>
+    <div class="bars" role="img" aria-label="Asistencia por semana: ${weeks.map(x => `semana del ${wl(x.w)}, ${x.pct}%`).join('; ')}">${weeks.map(x => `<span class="${attLvl(x.pct)}" style="height:${Math.max(x.pct, 4) * .82}%"><b>${x.pct}%</b></span>`).join('')}</div>
+    <div class="bars-x" aria-hidden="true">${weeks.map(x => `<span>${wl(x.w)}</span>`).join('')}</div>
+    <div class="pweeks">${weeks.slice().reverse().map(x => `<div><span>Semana del ${wl(x.w)}</span><b>${x.v} de ${x.n}</b></div>`).join('')}</div></div>`;
+}
 function attendanceCard(team, id) {
   const { days, pct } = attendanceHist(team);
   const avg = pct.length ? Math.round(pct.reduce((a, b) => a + b) / pct.length) : null;
@@ -766,7 +786,7 @@ function rosterCard(team) {
   const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n));
   return card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? `<div class="roster">${list.map(p => `<button type="button" class="tm tm-btn pcard" data-edit="${p.id}" aria-label="Editar a ${esc(p.n)}"><span class="k">${p.dorsal || '–'}</span>
       <span class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.dorsal ? 'Dorsal ' + p.dorsal : 'Sin dorsal'}</small></span>
-      <span class="go" aria-hidden="true">${ic('chev')}</span></button>`).join('')}</div>` : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>');
+      ${attPill(team, p.id, true)}<span class="go" aria-hidden="true">${ic('chev')}</span></button>`).join('')}</div>` : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>');
 }
 function addPlayerCard(team) {
   return `<form id="pf" class="card stack add-pl" novalidate aria-labelledby="h-add"><h2 id="h-add" style="margin:0;font-size:1.1rem">Añadir jugador</h2>
@@ -790,8 +810,9 @@ function bindRoster(team) {
 /* Ventana para cambiar nombre y dorsal, o quitar al jugador (con confirmación) */
 function editPlayer(team, p) {
   const t = S.teams[team];
-  const m = modal(`<h2 id="mdl-t">Editar jugador</h2>
-    <form id="ef" class="stack" novalidate>
+  const m = modal(`<h2 id="mdl-t">${esc(p.n)}</h2>
+    ${playerAttHTML(team, p)}
+    <form id="ef" class="stack" novalidate><b style="margin-top:4px">Editar jugador</b>
       <label class="f" for="en">Nombre y apellidos<input type="text" id="en" autocomplete="off" value="${esc(p.n)}"></label>
       <label class="f" for="ed">Dorsal (opcional)<input type="number" id="ed" inputmode="numeric" min="1" max="99" value="${p.dorsal || ''}"></label>
       <p id="eerr" class="err" role="alert" hidden>Escribe el nombre del jugador.</p>
@@ -906,7 +927,7 @@ function convScreen() {
   const allBtn = on => on ? `${ic('x')} Quitar a todos` : `${ic('check')} Convocar a todos`;
   const row = (x, i) => `<li><button type="button" class="player" data-cv="${x.id}" aria-pressed="${c.ids.includes(x.id)}">
     <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${x.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(x.n)}">${esc(x.n)}</span>
-    <span class="pstate">${c.ids.includes(x.id) ? 'Convocado' : 'No va'}</span></span></button></li>`;
+    <span class="pstate">${c.ids.includes(x.id) ? 'Convocado' : 'No va'}</span>${attPill(team, x.id)}</span></button></li>`;
   return {
     kicker: `Convocatoria · ${esc(team)}`, title: `vs ${esc(nice(p.rival))}`, back,
     body: `<div class="split"><div class="stack">
