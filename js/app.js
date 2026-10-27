@@ -241,7 +241,7 @@ function tabsFor() {
   const open = S.requests.filter(r => r.st < 3).length;
   return S.role === 'coach'
     ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team', '', pendingAll().length], ['ask', 'Pedir', 'plus', 'plus'], ['msg', 'Mensajes', 'chat', '', unread]]
-    : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Aviso', 'send', 'plus'], ['msg', 'Enviados', 'chat']];
+    : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Aviso', 'send', 'plus'], ['games', 'Partidos', 'cal'], ['msg', 'Enviados', 'chat']];
 }
 
 function go(tab, sub = null) { S.tab = tab; S.sub = sub; if (tab !== 'ask') S.draft = null; render(true); }
@@ -314,6 +314,52 @@ function agendaRow(e, withAct) {
     ? `<button type="button" class="btn gold sm ev-act" data-team-go="${e.team}">Pasar lista</button>`
     : `<span class="pill ${e.kind === 'match' ? 'gold' : e.kind === 'club' ? 'grey' : 'blue'} ev-act">${e.kind === 'club' ? 'Club' : e.team}</span>`;
   return `<div class="ev"><div class="when"><b>${e.h}</b><small>${e.day}</small></div><div class="what">${what}</div>${act}</div>`;
+}
+/* Partidos de todos los equipos, agrupados por fin de semana (semana de lunes a domingo) */
+const weekOf = iso => addDays(iso, 1 - dow(iso));
+function allGames() {
+  return D.equipos.flatMap(e => e.partidos.filter(p => p.fecha).map(p => ({ e, p, wk: weekOf(p.fecha) })));
+}
+function weekLbl(wk, first) {
+  const sa = toDate(first && first < addDays(wk, 5) ? first : addDays(wk, 5)), su = toDate(addDays(wk, 6));
+  if (first && first < addDays(wk, 5)) return sa.getMonth() === su.getMonth() ? `${sa.getDate()} – ${su.getDate()} ${MES[su.getMonth()]}` : `${sa.getDate()} ${MES[sa.getMonth()]} – ${su.getDate()} ${MES[su.getMonth()]}`;
+  return sa.getMonth() === su.getMonth() ? `${sa.getDate()} y ${su.getDate()} ${MES[su.getMonth()]}` : `${sa.getDate()} ${MES[sa.getMonth()]} y ${su.getDate()} ${MES[su.getMonth()]}`;
+}
+function gameCard(e, p) {
+  const us = `<span class="gs">${crestImg('gcr')}<b>Aznalcóllar</b></span>`;
+  const src = crestOf(e, p.rival);
+  const them = `<span class="gs">${src ? `<img class="gcr" src="${src}" alt="" loading="lazy">` : `<span class="gcr rv" aria-hidden="true">${initials(nice(p.rival).replace(/^[A-Z.]+\s/, '').replace(/"/g, ''))}</span>`}<b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b></span>`;
+  const res = p.goles ? outcome(p) : null;
+  const mid = res ? `<span class="res ${res}" aria-label="${res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado'} ${scoreTxt(p)}">${scoreTxt(p)}</span>`
+    : p.estado ? `<span class="pill red">${esc(p.estado)}</span>` : p.hora ? `<span class="gtime">${p.hora}</span>` : '<span class="gtime tbd">Hora por<br>confirmar</span>';
+  return `<article class="gm"><div class="gm-h"><span class="pill blue">${esc(e.nombre)}</span><small>${dateLbl(p.fecha)}${p.hora && res ? ' · ' + p.hora : ''} · J${p.j}</small></div>
+    <div class="gm-s">${p.casa ? us : them}${mid}${p.casa ? them : us}</div>
+    <small class="where">${p.casa ? 'En casa' : 'Fuera'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></article>`;
+}
+function gamesView() {
+  const all = allGames();
+  const weeks = [...new Set(all.filter(g => !g.p.descansa).map(g => g.wk))].sort();
+  const now = weekOf(TODAY);
+  const wk = S.wk || weeks.find(w => w >= now) || weeks[weeks.length - 1] || now;
+  const i = weeks.indexOf(wk), prev = weeks.filter(w => w < wk).pop(), next = weeks.find(w => w > wk);
+  const list = all.filter(g => g.wk === wk && !g.p.descansa)
+    .sort((a, b) => a.p.fecha.localeCompare(b.p.fecha) || (a.p.hora || '99').localeCompare(b.p.hora || '99') || ORDEN.indexOf(a.e.id) - ORDEN.indexOf(b.e.id));
+  const playing = new Set(list.map(g => g.e.id));
+  const off = D.equipos.filter(e => !playing.has(e.id)).sort((a, b) => ORDEN.indexOf(a.id) - ORDEN.indexOf(b.id));
+  const done = list.filter(g => g.p.goles), cnt = k => done.filter(g => outcome(g.p) === k).length;
+  const nav = `<div class="wk-nav card">
+      <button type="button" class="iconbtn" data-wk="${prev || ''}" ${prev ? '' : 'disabled'} aria-label="Fin de semana anterior">${ic('back')}</button>
+      <div class="wk-t"><small>${wk === now ? 'Este fin de semana' : wk < now ? 'Ya jugado' : 'Próximamente'}</small><b>${weekLbl(wk, list.length ? list[0].p.fecha : null)}</b></div>
+      <button type="button" class="iconbtn" data-wk="${next || ''}" ${next ? '' : 'disabled'} aria-label="Fin de semana siguiente">${ic('chev')}</button>
+      ${wk !== now && weeks.includes(now) ? `<button type="button" class="more wk-now" data-wk="${now}">Volver a este fin de semana</button>` : ''}</div>`;
+  const stats = `<div class="kpis wk-k">
+      <div class="kpi dark"><small>Partidos</small><b>${list.length}</b></div>
+      ${done.length ? `<div class="kpi"><small>Ganados</small><b class="ok">${cnt('G')}</b></div><div class="kpi"><small>Empatados</small><b>${cnt('E')}</b></div><div class="kpi"><small>Perdidos</small><b class="bad">${cnt('P')}</b></div>`
+        : `<div class="kpi"><small>En casa</small><b>${list.filter(g => g.p.casa).length}</b></div><div class="kpi"><small>Fuera</small><b>${list.filter(g => !g.p.casa).length}</b></div><div class="kpi"><small>Sin partido</small><b>${off.length}</b></div>`}</div>`;
+  const body = list.length ? `<div class="games">${list.map(g => gameCard(g.e, g.p)).join('')}</div>`
+    : '<section class="card empty"><b>No hay partidos este fin de semana</b></section>';
+  const rest = off.length ? `<p class="off"><b>Sin partido:</b> ${off.map(e => esc(e.nombre)).join(' · ')}</p>` : '';
+  return `<div class="stack">${nav}${stats}${body}${rest}</div>`;
 }
 /* Un partido de la temporada: fecha, rival con escudo, resultado o hora */
 function matchRow(e, p) {
@@ -786,6 +832,10 @@ const BOARD = {
         S.notices.unshift(n);
         go('msg'); say('Aviso enviado. Verás quién lo ha leído.'); }; }
     };
+  },
+  games() {
+    return { kicker: 'Todos los equipos', title: 'Partidos', body: gamesView(),
+      bind() { document.querySelectorAll('[data-wk]').forEach(b => b.onclick = () => { if (b.dataset.wk) { S.wk = b.dataset.wk; render(); } }); } };
   },
   msg() {
     return {
