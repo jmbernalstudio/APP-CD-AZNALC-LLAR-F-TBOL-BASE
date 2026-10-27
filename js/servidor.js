@@ -151,7 +151,42 @@
     return true;
   }
 
-  window.logout = async () => { await sb.auth.signOut(); location.reload(); };
+  /* ---------- Notificaciones al móvil ---------- */
+  /* Estados: 'on' activadas · 'off' se pueden activar · 'denied' bloqueadas en el móvil ·
+     'ios' iPhone sin la app en la pantalla de inicio (allí no hay notificaciones) · 'no' el navegador no puede */
+  const u8 = b64 => { const s = atob((b64 + '='.repeat((4 - b64.length % 4) % 4)).replace(/-/g, '+').replace(/_/g, '/')); return Uint8Array.from(s, c => c.charCodeAt(0)); };
+  const suscripcion = async () => { const r = await navigator.serviceWorker.getRegistration(); return r && r.pushManager ? r.pushManager.getSubscription() : null; };
+  window.Push = {
+    async estado() {
+      const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+      const app = matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+      if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return ios && !app ? 'ios' : 'no';
+      if (Notification.permission === 'denied') return 'denied';
+      try { return Notification.permission === 'granted' && await suscripcion() ? 'on' : 'off'; } catch (_) { return 'off'; }
+    },
+    async activar() {
+      if (await Notification.requestPermission() !== 'granted') return Push.estado();
+      const reg = await navigator.serviceWorker.ready;
+      const { data, error } = await sb.functions.invoke('avisar', { body: { accion: 'clave' } });
+      if (error || !data || !data.clave) throw new Error('sin clave');
+      const sub = await suscripcion() || await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: u8(data.clave) });
+      const j = sub.toJSON();
+      ok(await sb.from('push_subs').upsert({ endpoint: j.endpoint, perfil: S.me.id, p256dh: j.keys.p256dh, auth: j.keys.auth }, { onConflict: 'endpoint' }));
+      return 'on';
+    }
+  };
+  /* La notificación llega o se toca con la app abierta: traer lo nuevo e ir a su pantalla */
+  if ('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('message', e => {
+    const m = e.data || {};
+    if (m.tab && S.live && typeof go === 'function') { S.tab = m.tab; }
+    if (m.refrescar) refrescar(true);
+  });
+
+  /* Al cerrar sesión, este móvil deja de recibir las notificaciones de esa persona */
+  window.logout = async () => {
+    try { const sub = await suscripcion(); if (sub) { await sb.from('push_subs').delete().eq('endpoint', sub.endpoint); await sub.unsubscribe(); } } catch (_) {}
+    await sb.auth.signOut(); location.reload();
+  };
 
   async function entrar() {
     try {
@@ -167,32 +202,48 @@
         <p style="margin:0">Todavía no tienes ningún equipo asignado. Pide a la junta que te asigne el tuyo y vuelve a entrar.</p></section>`;
       return;
     }
-    S.tab = 'home'; S.sub = null;
+    /* Al abrir desde una notificación, ir directamente a su pantalla */
+    const pide = new URLSearchParams(location.search).get('tab');
+    S.tab = ['home', 'team', 'ask', 'games', 'msg'].includes(pide) ? pide : 'home'; S.sub = null;
+    if (pide) history.replaceState(null, '', location.pathname);
+    S.push = await Push.estado();
     render();
   }
 
   /* Traer lo último (peticiones nuevas, avisos, estados) sin tener que cerrar sesión:
-     al volver a la app y cada 30 segundos mientras está abierta. No se repinta si la persona
+     al volver a la app y en cuanto algo cambie (se mira cada 10 segundos). No se repinta si la persona
      está escribiendo, rellenando una petición o con una ventana abierta, ni si nada ha cambiado. */
   let refrescando = false;
-  async function refrescar() {
-    if (refrescando || document.visibilityState !== 'visible' || !S.live) return;
+  async function refrescar(forzar) {
+    if (refrescando || (!forzar && document.visibilityState !== 'visible') || !S.live) return false;
     const ocupado = () => S.tab === 'team' || (S.tab === 'ask' && S.askView !== 'mine' && S.draft && S.draft.step > 1) || $('.modal') || ($('#me-menu') && !$('#me-menu').hidden) || document.activeElement.matches('input, textarea, select');
-    if (ocupado()) return;
+    if (ocupado()) return false;
     refrescando = true;
     try {
       const antes = JSON.stringify([S.requests, S.notices, S.conv]);
       const tab = S.tab, sub = S.sub, team = S.team, y = scrollY;
-      if (await cargar() && !ocupado() && JSON.stringify([S.requests, S.notices, S.conv]) !== antes) {
+      if (await cargar() && !ocupado() && (forzar === true || JSON.stringify([S.requests, S.notices, S.conv]) !== antes)) {
         S.tab = tab; S.sub = sub; if (S.teams[team]) S.team = team;
         render(); scrollTo(0, y);
       }
-    } catch (_) {} finally { refrescando = false; }
+      return true;
+    } catch (_) { return false; } finally { refrescando = false; }
   }
-  document.addEventListener('visibilitychange', refrescar);
-  window.addEventListener('focus', refrescar);
-  window.addEventListener('online', refrescar);
-  setInterval(refrescar, 30000);
+  document.addEventListener('visibilitychange', () => refrescar());
+  window.addEventListener('focus', () => refrescar());
+  window.addEventListener('online', () => refrescar());
+  /* Cada 10 segundos, una comprobación muy ligera (solo números de peticiones, estados y avisos);
+     si algo ha cambiado, se trae todo */
+  let huella = '';
+  setInterval(async () => {
+    if (document.visibilityState !== 'visible' || !S.live) return;
+    try {
+      const [p, a, l] = await Promise.all([sb.from('peticiones').select('id, estado'), sb.from('avisos').select('id'), sb.from('avisos_leidos').select('aviso, perfil')].map(q => Promise.resolve(q).then(ok)));
+      const h = JSON.stringify([p.map(x => x.id + ':' + x.estado).sort(), a.map(x => x.id).sort(), l.length]);
+      /* Si ahora no se puede repintar (está escribiendo, etc.), se reintenta en la siguiente vuelta */
+      if (h === huella || await refrescar()) huella = h;
+    } catch (_) {}
+  }, 10000);
   window.refrescar = refrescar;
 
   window.startServer = async () => {

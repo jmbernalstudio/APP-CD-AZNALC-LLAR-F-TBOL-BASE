@@ -180,8 +180,30 @@ function bindMe() {
   document.onclick = close;
   if ($('#logout')) $('#logout').onclick = () => window.logout && window.logout();
   $('#rename').onclick = () => { close(); renameMe(); };
+  if ($('#push-menu')) $('#push-menu').onclick = () => { close(); activarPush(); };
   m.querySelectorAll('[data-role]').forEach(x => x.onclick = () => { S.role = x.dataset.role; go('home'); });
 }
+/* ---------- Notificaciones al móvil ---------- */
+const pushNo = () => { try { return localStorage.getItem('push-no') === '1'; } catch (_) { return false; } };
+function pushCard() {
+  if (!S.live || !['off', 'ios'].includes(S.push) || pushNo()) return '';
+  const quien = S.role === 'coach' ? 'cuando la junta te mande un aviso o conteste a tus peticiones' : 'cuando un entrenador haga una petición';
+  return `<section class="card push-card" aria-labelledby="h-push"><span class="ic">${ic('bell')}</span>
+    <div class="grow">${S.push === 'ios'
+      ? '<h2 id="h-push">Recibe los avisos en el móvil</h2><p>Para que te lleguen las notificaciones, abre la app desde su icono en la pantalla de inicio.</p></div><div class="btns one"><button type="button" class="btn ghost" id="push-no">Entendido</button></div>'
+      : `<h2 id="h-push">Activa las notificaciones</h2><p>Te avisaremos en el móvil ${quien}.</p></div><div class="btns"><button type="button" class="btn ghost" id="push-no">Ahora no</button><button type="button" class="btn blue" id="push-si">${ic('bell')} Activar</button></div>`}
+  </section>`;
+}
+async function activarPush() {
+  try { S.push = await window.Push.activar(); } catch (_) { say('No se han podido activar. Prueba otra vez en un momento.'); return; }
+  render();
+  say(S.push === 'on' ? 'Notificaciones activadas' : 'Las notificaciones están bloqueadas. Actívalas en los ajustes del móvil.');
+}
+function bindPush() {
+  if ($('#push-si')) $('#push-si').onclick = activarPush;
+  if ($('#push-no')) $('#push-no').onclick = () => { try { localStorage.setItem('push-no', '1'); } catch (_) {} render(); };
+}
+
 /* Ventana para cambiar el nombre que sale junto a la foto */
 function renameMe() {
   const m = modal(`<h2 id="mdl-t">Cambiar mi nombre</h2>
@@ -306,6 +328,9 @@ function render(focus) {
       ${S.tab === 'home' ? `<span class="me-t"><small>${roleName()}</small></span>` : `<span class="me-t"><small>${roleName()}</small><b>${esc(myName())}</b></span>`}${avatar(myPerson(), 'av')}</button>
       <div class="me-menu card" id="me-menu" hidden>${avatar(myPerson(), 'av big')}<b>${esc(myName())}</b><small>${roleName()}</small>
         <button type="button" class="btn ghost block" id="rename">${ic('pen')} Cambiar mi nombre</button>
+        ${!S.live ? '' : S.push === 'off' ? `<button type="button" class="btn ghost block" id="push-menu">${ic('bell')} Activar notificaciones</button>`
+          : S.push === 'on' ? `<small class="push-st">${ic('check')} Notificaciones activadas</small>`
+          : S.push === 'denied' ? '<small class="push-st">Notificaciones bloqueadas. Actívalas en los ajustes del móvil.</small>' : ''}
         ${S.live ? `<button type="button" class="btn red block" id="logout">${ic('out')} Cerrar sesión</button>`
           : `<div class="stack" style="width:100%;gap:8px"><small>Demostración · ver como</small>
             <button type="button" class="btn ${S.role === 'coach' ? 'blue' : 'out'} block" data-role="coach">Entrenador</button>
@@ -316,6 +341,7 @@ function render(focus) {
   $('#main').className = v.layout || '';
   $('#main').innerHTML = v.body;
   v.bind && v.bind();
+  bindPush();
   bindGo();
   if (v.back) $('[data-back]').onclick = v.back;
   if (focus) { $('#title').setAttribute('tabindex', '-1'); $('#title').focus({ preventScroll: true }); window.scrollTo(0, 0); }
@@ -807,6 +833,7 @@ const COACH = {
       <div class="days" aria-label="Esta semana">${MONWEEK.map(iso => { const [w, n] = dayLbl(iso).split(' '); const tr = Object.keys(S.teams).some(tm => trainsOn(tm, iso)), mt = mine2.has(iso);
         return `<span class="${iso === TODAY ? 'today' : ''}" aria-label="${dateLbl(iso)}${tr ? ', entreno' : ''}${mt ? ', partido' : ''}">${w}<b>${n}</b><i class="dots" aria-hidden="true">${tr ? '<i class="dt"></i>' : ''}${mt ? '<i class="dm"></i>' : ''}</i></span>`; }).join('')}</div>
       <p class="days-key" aria-hidden="true"><span><i class="dt"></i>Entreno</span><span><i class="dm"></i>Partido</span></p>
+      ${pushCard()}
       ${pend.length ? `<section class="card pend" aria-labelledby="h-pend"><div class="card-h"><h2 id="h-pend">${pend.length === 1 ? 'Tienes 1 lista sin pasar' : `Tienes ${pend.length} listas sin pasar`}</h2></div>
         <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
       <div class="grid coach-home">
@@ -1102,7 +1129,7 @@ const BOARD = {
     const order = [...S.requests].sort((a, b) => (a.st === 3) - (b.st === 3) || b.urgent - a.urgent || a.st - b.st);
     return {
       kicker: `${greet()}, ${esc(firstName())}`, title: 'Bandeja de la junta',
-      body: `<div class="grid board-home">
+      body: `${pushCard()}<div class="grid board-home">
         <div class="kpis a-kpis">
           <div class="kpi dark"><small>Abiertas</small><b>${open.length}</b></div>
           <div class="kpi ${open.some(r => r.urgent) ? 'alert' : ''}"><small>Urgentes</small><b>${open.filter(r => r.urgent).length}</b></div>
