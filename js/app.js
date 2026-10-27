@@ -658,7 +658,7 @@ async function convPoster(team, p, c, players) {
   rr(48, tableY, W - 96, H - tableY - 48, 40, '#FFFFFF');
   text('Convocados', 96, tableY + 60, 800, 40, INK, 500, 'left');
   text(list.length === 1 ? '1 jugador' : `${list.length} jugadores`, W - 96, tableY + 60, 500, 30, MUTED, 300, 'right');
-  text('Dorsal', 140, tableY + 122, 600, 26, MUTED, 120);
+  text('Número', 140, tableY + 122, 600, 26, MUTED, 120);
   text('Jugador', 240, tableY + 122, 600, 26, MUTED, 300, 'left');
   list.forEach((q, i) => {
     const y = rowsY + i * ROW;
