@@ -736,3 +736,16 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
   100.0% { transform: scaleX(1.000); opacity: 1.00; }
 }
 @media (prefers-reduced-motion: reduce) { .splash img, .splash.go img { animation: none; opacity: 1; } .splash { transition: none; } }
+
+/* Tarjeta para activar las notificaciones al móvil */
+.push-card { display: grid; grid-template-columns: auto 1fr; gap: 12px 14px; align-items: center; margin-bottom: 16px; }
+.push-card > .ic { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; background: #E8EDFF; color: var(--club); }
+.push-card > .ic svg { width: 24px; height: 24px; }
+.push-card h2 { margin: 0 0 2px; font-size: 1.05rem; }
+.push-card p { margin: 0; color: var(--muted, #5B6475); font-size: .92rem; }
+.push-card .btns { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.push-card .btns.one { grid-template-columns: 1fr; }
+.push-card .btns .btn { white-space: nowrap; justify-content: center; }
+@media (min-width: 720px) { .push-card { grid-template-columns: auto 1fr auto; } .push-card .btns { grid-column: auto; min-width: 300px; } .push-card .btns.one { min-width: 160px; } }
+.push-st { display: flex; align-items: center; justify-content: center; gap: 6px; color: var(--muted, #5B6475); text-align: center; }
+.push-st svg { width: 16px; height: 16px; flex: none; }

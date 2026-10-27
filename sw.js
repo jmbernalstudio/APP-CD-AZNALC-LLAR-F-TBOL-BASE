@@ -1,5 +1,5 @@
 // Guarda la app en el móvil para que abra rápido y sin cobertura en el campo.
-const CACHE = 'cd-aznalcollar-v72';
+const CACHE = 'cd-aznalcollar-v73';
 const FILES = ['./', 'index.html', 'css/app.css', 'js/app.js', 'js/datos.js', 'js/config.js', 'js/servidor.js', 'js/vendor/supabase.js', 'manifest.webmanifest', 'icons/escudo-160.png', 'icons/escudo.png', 'icons/icono-180.png', 'icons/icono-192.png', 'icons/icono-512.png'];
 
 self.addEventListener('install', e => {
@@ -27,4 +27,28 @@ self.addEventListener('fetch', e => {
       })
       .catch(() => caches.match(e.request).then(r => r || caches.match('index.html')))
   );
+});
+
+// Notificaciones al móvil: avisos de la junta, peticiones nuevas y cambios de estado.
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(Promise.all([
+    self.registration.showNotification(d.title || 'C.D. Aznalcóllar Fútbol Base', {
+      body: d.body || '', icon: 'icons/icono-192.png', badge: 'icons/escudo-160.png', tag: d.tab || 'club', renotify: true, data: { tab: d.tab || 'home' }
+    }),
+    // Si la app está abierta, que traiga lo nuevo al momento
+    self.clients.matchAll({ type: 'window' }).then(cs => cs.forEach(c => c.postMessage({ refrescar: true })))
+  ]));
+});
+
+// Al tocar la notificación se abre la app en la pantalla que toca
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  const tab = (e.notification.data || {}).tab || 'home';
+  e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(cs => {
+    const c = cs[0];
+    if (c) { c.postMessage({ refrescar: true, tab }); return c.focus(); }
+    return self.clients.openWindow(`./?tab=${tab}`);
+  }));
 });
