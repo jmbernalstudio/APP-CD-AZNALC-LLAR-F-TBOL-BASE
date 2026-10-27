@@ -4,12 +4,12 @@
   --canvas: #E4E8F1;
   --shell: #F3F5FA;
   --card: #FFFFFF;
-  --ink: #0E1530;
+  --ink: #111111;
   --muted: #5B6582;
   --line: #E6EAF2;
   --club: #0034DF;
   --club-soft: #E6EBFD;
-  --navy: #071A40;
+  --navy: #000000;
   --gold: #FDCB2B;
   --gold-ink: #241A00;
   --gold-soft: #FFF3CC;
@@ -18,7 +18,7 @@
   --warn-ink: #7A5600;
   --font: "Outfit", system-ui, -apple-system, "Segoe UI", sans-serif;
   --base: 17px;
-  --shadow: 0 10px 30px -22px rgba(14, 21, 48, .35);
+  --shadow: 0 10px 30px -22px rgba(0, 0, 0, .35);
   color-scheme: light;
 }
 html { font-size: var(--base); background: var(--canvas); }
@@ -261,7 +261,7 @@ textarea { min-height: 120px; resize: vertical; }
 
 /* Navegación inferior (móvil) */
 .bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 8px max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
-  background: var(--card); border-radius: 26px 26px 0 0; box-shadow: 0 -10px 30px -20px rgba(14, 21, 48, .4); }
+  background: var(--card); border-radius: 26px 26px 0 0; box-shadow: 0 -10px 30px -20px rgba(0, 0, 0, .4); }
 .bottom ul { list-style: none; margin: 0 auto; padding: 0; max-width: 560px; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 .bottom button { width: 100%; border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: .75rem; font-weight: 600; color: var(--muted);
   min-height: 58px; justify-content: center; cursor: pointer; position: relative; }
@@ -320,7 +320,7 @@ html.big .act { flex-direction: row; justify-content: flex-start; min-height: 66
 @media (min-width: 1080px) {
   body { padding: 16px; }
   .app { display: grid; grid-template-columns: 100px minmax(0, 1fr); border-radius: 30px; min-height: calc(100vh - 32px); max-width: 1440px; margin: 0 auto; padding: 14px;
-    box-shadow: 0 30px 60px -30px rgba(14, 21, 48, .35); }
+    box-shadow: 0 30px 60px -30px rgba(0, 0, 0, .35); }
   .rail { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 8px 0; position: sticky; top: 30px; align-self: start; }
   .rail .logo { width: 56px; margin-bottom: 14px; }
   .rail ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -420,7 +420,7 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .av img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .av.big { width: 76px; height: 76px; font-size: 1.5rem; }
 .me[aria-expanded="true"] .av { box-shadow: 0 0 0 3px var(--club); }
-.me-menu { position: absolute; right: 0; top: calc(100% + 10px); z-index: 20; width: min(17rem, calc(100vw - 32px)); display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; box-shadow: 0 18px 50px -20px rgba(14, 21, 48, .45); }
+.me-menu { position: absolute; right: 0; top: calc(100% + 10px); z-index: 20; width: min(17rem, calc(100vw - 32px)); display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; box-shadow: 0 18px 50px -20px rgba(0, 0, 0, .45); }
 .me-menu > b { font-size: 1.1rem; margin-top: 8px; } .me-menu > small { color: var(--muted); margin-bottom: 12px; }
 .me-menu > b, .me-menu > small { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .btn.out { background: var(--card); color: var(--bad-ink); border: 2px solid var(--bad-soft); }
@@ -449,7 +449,7 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .btn-row .btn { flex: 1 1 8rem; min-width: 0; }
 .btn.ghost { background: var(--shell); color: var(--ink); }
 .btn.red { background: var(--bad); color: #fff; }
-.modal { position: fixed; inset: 0; z-index: 50; background: rgba(14, 21, 48, .45); display: grid; place-items: center;
+.modal { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, .45); display: grid; place-items: center;
   padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); }
 .modal .card { width: 100%; max-width: 400px; padding: 24px; }
 .modal h2 { margin: 0; font-size: 1.25rem; }
