@@ -555,6 +555,13 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .wk-t small { display: block; color: var(--muted); font-weight: 600; font-size: .82rem; }
 .wk-t b { display: block; font-size: clamp(1.05rem, 4.6vw, 1.3rem); font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wk-now { flex-basis: 100%; text-align: center; }
+/* Móvil y tableta: Todos / Local / Visitante dentro de la tarjeta del fin de semana */
+.wk-v { flex-basis: 100%; display: flex; justify-content: center; gap: 8px; }
+.wk-v button { border: 0; border-radius: 999px; padding: .35rem 1rem; min-height: 40px; min-width: 0; font-weight: 600; font-size: .92rem; background: var(--shell); color: var(--muted); cursor: pointer; white-space: nowrap; }
+.wk-v button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+@media (max-width: 360px) { .wk-v { gap: 6px; } .wk-v button { padding-left: .7rem; padding-right: .7rem; font-size: .86rem; } }
+@media (max-width: 1079px) { .g-filters .g-venue { display: none; } .g-filters.only-v { display: none; } }
+@media (min-width: 1080px) { .wk-v { display: none; } }
 .kpi b.ok { color: var(--ok-ink); } .kpi b.bad { color: var(--bad-ink); }
 .gday h2 { margin: 6px 0 10px; font-size: 1.05rem; font-weight: 700; }
 .games { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); }
