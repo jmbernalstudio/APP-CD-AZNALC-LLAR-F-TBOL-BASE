@@ -463,3 +463,28 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
   .board-home .kpis { gap: 16px; }
   .board-home > .a-inbox { align-self: stretch; min-height: 480px; }
 }
+
+/* Ficha de equipo: entrenamientos y alta en la misma fila; plantilla a todo el ancho en tarjetas */
+.team-top { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+.add-row { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr); }
+.roster { display: grid; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) {
+  .add-row { grid-template-columns: minmax(0, 1fr) 9.5rem; }
+  .roster { grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 12px; }
+  .roster .pcard { border: 0; background: var(--shell); border-radius: 18px; padding: 12px 14px; }
+  .roster .pcard:hover { background: var(--club-soft); }
+  .roster .pcard .k { background: var(--card); }
+}
+@media (min-width: 1080px) {
+  .team-top { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
+  .team-top > .card { display: flex; flex-direction: column; }
+  .team-top > .add-pl > button[type=submit] { margin-top: auto; }
+}
+
+/* Pantallas de formulario y avisos: sin huecos a los lados en escritorio */
+.duo, .form2 { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.cards-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); align-items: stretch; }
+.fh { margin: 0; font-size: 1.05rem; font-weight: 700; }
+.card.sent .rq { padding: 0; border: 0; } .card.sent .rq small { white-space: normal; overflow: visible; display: block; margin: 2px 0 6px; }
+@media (min-width: 900px) { .form2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; } }
+@media (min-width: 1080px) { .duo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
