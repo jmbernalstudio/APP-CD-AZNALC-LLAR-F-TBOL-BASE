@@ -433,3 +433,5 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .notrain { flex-direction: row; align-items: center; gap: 14px; }
 .notrain .ic { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; background: var(--club-soft); color: var(--club); flex: none; }
 @media (min-width: 1080px) { .days-key { display: none; } }
+.chips.scroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chips.scroll .chip { flex: none; }

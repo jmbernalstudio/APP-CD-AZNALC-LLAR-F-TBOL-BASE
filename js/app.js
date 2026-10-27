@@ -186,8 +186,12 @@ const addDays = (iso, n) => { const d = toDate(iso); d.setDate(d.getDate() + n);
 const trainOf = team => S.teams[team] && S.teams[team].train && S.teams[team].train.dias.length ? S.teams[team].train : null;
 const trainsOn = (team, iso) => { const t = trainOf(team); return !!t && t.dias.includes(dow(iso)); };
 const trainLbl = t => ['Entrenamiento', t.h, t.where].filter(Boolean).join(' · ');
-/* La lista solo se pasa el mismo día del entreno: queda pendiente si hoy toca y aún no se ha pasado */
-const pendingLists = team => trainsOn(team, TODAY) && S.teams[team].players.length && !(S.attend[`${team} ${TODAY}`] || { size: 0 }).size ? [TODAY] : [];
+/* Solo se pasa lista en días de entreno: hoy si toca, o uno de las dos últimas semanas que se olvidó */
+const LOOKBACK = 14;
+const trainDates = team => [...Array(LOOKBACK)].map((_, i) => addDays(TODAY, i - LOOKBACK + 1)).filter(d => trainsOn(team, d));
+/* Cuentan como pendientes desde la primera lista pasada en la app (antes no se usaba) */
+const firstList = team => Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort()[0] || TODAY;
+const pendingLists = team => S.teams[team].players.length ? trainDates(team).filter(d => d >= firstList(team) && !(S.attend[`${team} ${d}`] || { size: 0 }).size) : [];
 const pendingAll = () => Object.keys(S.teams).flatMap(team => pendingLists(team).map(iso => ({ team, iso })));
 /* Agenda: entrenos y partidos reales de los próximos 7 días; tira de días de lunes a domingo */
 const WEEK = [...Array(7)].map((_, i) => addDays(TODAY, i));
@@ -399,8 +403,8 @@ const COACH = {
       <div class="days" aria-label="Esta semana">${MONWEEK.map(iso => { const [w, n] = dayLbl(iso).split(' '); const tr = Object.keys(S.teams).some(tm => trainsOn(tm, iso)), mt = mine2.has(iso);
         return `<span class="${iso === TODAY ? 'today' : ''}" aria-label="${dateLbl(iso)}${tr ? ', entreno' : ''}${mt ? ', partido' : ''}">${w}<b>${n}</b><i class="dots" aria-hidden="true">${tr ? '<i class="dt"></i>' : ''}${mt ? '<i class="dm"></i>' : ''}</i></span>`; }).join('')}</div>
       <p class="days-key" aria-hidden="true"><span><i class="dt"></i>Entreno</span><span><i class="dm"></i>Partido</span></p>
-      ${pend.length ? `<section class="card pend" aria-labelledby="h-pend"><div class="card-h"><h2 id="h-pend">${pend.length === 1 ? 'Hoy toca pasar lista' : `Hoy toca pasar ${pend.length} listas`}</h2></div>
-        <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${esc(x.team)}${trainOf(x.team).h ? ' · ' + trainOf(x.team).h : ''}</button>`).join('')}</div></section>` : ''}
+      ${pend.length ? `<section class="card pend" aria-labelledby="h-pend"><div class="card-h"><h2 id="h-pend">${pend.length === 1 ? 'Tienes 1 lista sin pasar' : `Tienes ${pend.length} listas sin pasar`}</h2></div>
+        <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
       <div class="grid coach-home">
         ${card('h-m', 'Próximo partido', `${scoreHTML(S.team)}
           <div class="match-btns"><button type="button" class="btn gold" data-say="La convocatoria llegará en la próxima versión.">Convocatoria</button>${nm && nm.campo ? `<a class="btn glass" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" data-say="Campo por confirmar">${ic('pin')}Cómo llegar</button>`}</div>`,
@@ -425,7 +429,7 @@ const COACH = {
       </div>`,
       bind() {
         bindAgenda();
-        document.querySelectorAll('[data-att]').forEach(b => b.onclick = () => { S.team = b.dataset.attTeam; go('team', 'list'); });
+        document.querySelectorAll('[data-att]').forEach(b => b.onclick = () => { S.team = b.dataset.attTeam; S.attDate = b.dataset.att; go('team', 'list'); });
         document.querySelectorAll('[data-say]').forEach(b => b.onclick = () => say(b.dataset.say));
       }
     };
@@ -434,7 +438,9 @@ const COACH = {
     const t = S.teams[S.team];
     const sub = S.sub || 'list';
     const pend = pendingLists(S.team);
-    const date = trainsOn(S.team, TODAY) ? TODAY : null, isToday = true;
+    const dates = trainDates(S.team);
+    if (!dates.includes(S.attDate)) S.attDate = dates.includes(TODAY) ? TODAY : pend[pend.length - 1] || dates[dates.length - 1] || null;
+    const date = S.attDate, isToday = date === TODAY;
     const nextTrain = [1, 2, 3, 4, 5, 6, 7].map(i => addDays(TODAY, i)).find(d => trainsOn(S.team, d));
     const noTrainMsg = !trainOf(S.team) ? 'La junta aún no ha puesto los días de entreno de este equipo.'
       : `Hoy no hay entreno, así que no se pasa lista.${nextTrain ? ` El próximo es el ${dateLbl(nextTrain).toLowerCase()}${trainOf(S.team).h ? ' a las ' + trainOf(S.team).h : ''}.` : ''}`;
@@ -450,6 +456,8 @@ const COACH = {
     if (sub === 'list' && !date) body = `<div class="split"><section class="card stack notrain" aria-label="Pasar lista"><span class="ic">${ic('cal')}</span><p style="margin:0">${esc(noTrainMsg)}</p></section>
       ${attendanceCard(S.team, 'h-at2')}</div>`;
     else if (sub === 'list') body = `<div class="split"><div class="stack">
+      ${!dates.includes(TODAY) ? `<p class="card muted" style="margin:0">${esc(noTrainMsg)} Si se te olvidó alguna, puedes completarla aquí:</p>` : ''}
+      ${dates.length > 1 || !dates.includes(TODAY) ? `<div class="chips scroll" role="group" aria-label="Elige el entreno">${dates.map(d => `<button type="button" class="chip" data-date="${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
       <section class="card match" aria-label="Resumen de asistencia"><div class="att-top">
         <div><span class="tag">${isToday ? 'Hoy' : dateLbl(date)}${tt ? ` · ${esc([tt.h, tt.where].filter(Boolean).join(' · '))}` : ''}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
         <button type="button" class="btn gold" id="all">${ic('check')} Marcar a todos</button></div>
@@ -468,9 +476,10 @@ const COACH = {
       kicker: `Mi equipo · ${EQ[S.team] ? EQ[S.team].cat : t.cat}`, title: S.team,
       body: head + body,
       bind() {
-        document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; render(); });
+        document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; S.attDate = null; render(); });
         document.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { S.sub = b.dataset.sub; render(); });
         bindRoster(S.team);
+        document.querySelectorAll('[data-date]').forEach(b => b.onclick = () => { S.attDate = b.dataset.date; render(); });
         document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
           const i = +b.dataset.p; a.has(i) ? a.delete(i) : a.add(i);
           API() && API().asistencia(i, date, a.has(i)).catch(() => { a.has(i) ? a.delete(i) : a.add(i); render(); say('No se ha podido guardar. Revisa la conexión.'); });
