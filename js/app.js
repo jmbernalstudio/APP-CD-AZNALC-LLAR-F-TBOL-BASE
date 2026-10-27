@@ -565,16 +565,19 @@ const COACH = {
     const stepper = `<div class="stepper" aria-hidden="true">${[1, 2, 3].map(i => `<span class="${i <= d.step ? 'on' : ''}"></span>`).join('')}</div>
       <p class="step-lbl">Paso ${d.step} de 3 · ${['¿Qué necesitas?', 'Cuéntanos', 'Revisa y envía'][d.step - 1]}</p>`;
     const back = d.step > 1 && d.step < 4 ? () => { d.step--; render(true); } : null;
-    const base = { kicker: 'Pedir o avisar', layout: 'narrow', back };
-    if (d.step === 1) return { ...base,
+    const mine = S.requests.filter(r => r.by === S.coach);
+    const side = card('h-rqs', 'Mis peticiones', mine.length ? mine.map(r => reqRow(r)).join('') : '<p class="muted" style="margin:0">Aún no has pedido nada. Aquí verás cómo avanza cada petición.</p>');
+    const base = { kicker: 'Pedir o avisar', back };
+    const duo = v => ({ ...v, body: `<div class="duo"><div class="stack">${v.body}</div>${side}</div>` });
+    if (d.step === 1) return duo({ ...base,
       title: '¿Qué necesitas?',
       body: `${stepper}<div class="opts">
         <button type="button" class="opt" data-k="material"><span class="ic">${ic('box')}</span><span><b>Pedir material</b><small>Balones, petos, conos, botiquín…</small></span><span class="go">${ic('chev')}</span></button>
         <button type="button" class="opt" data-k="roto"><span class="ic">${ic('wrench')}</span><span><b>Avisar de algo roto</b><small>Porterías, luces, vestuarios…</small></span><span class="go">${ic('chev')}</span></button>
         <button type="button" class="opt" data-k="otra"><span class="ic">${ic('talk')}</span><span><b>Otra cosa</b><small>Horarios, campos, dudas, propuestas</small></span><span class="go">${ic('chev')}</span></button></div>`,
       bind() { document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { d.kind = b.dataset.k; d.step = 2; render(true); }); }
-    };
-    if (d.step === 2) return { ...base,
+    });
+    if (d.step === 2) return duo({ ...base,
       title: kindName(d.kind),
       body: `${stepper}<form id="f" class="card stack" novalidate>
         <label class="f" for="t">${d.kind === 'roto' ? '¿Qué se ha roto?' : d.kind === 'material' ? '¿Qué necesitas?' : '¿Qué quieres decir a la junta?'}
@@ -594,8 +597,8 @@ const COACH = {
         if (ph) ph.onchange = () => { const f = ph.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { d.photo = r.result; sync(); render(); }; r.readAsDataURL(f); };
         $('#f').onsubmit = e => { e.preventDefault(); sync(); if (!d.text) { $('#err').hidden = false; $('#t').focus(); return; } d.step = 3; render(true); };
       }
-    };
-    if (d.step === 3) return { ...base,
+    });
+    if (d.step === 3) return duo({ ...base,
       title: 'Revisa y envía',
       body: `${stepper}<section class="card stack" aria-label="Resumen">
         <div class="rq" style="padding:0;border:0"><span class="ic ${kindCls(d.kind)}">${ic(kindIco(d.kind))}</span><div class="grow"><b>${esc(d.text)}</b><small>${kindName(d.kind)} · ${S.team}${d.where ? ' · ' + esc(d.where) : ''}</small></div>${d.urgent ? '<span class="pill red">Urgente</span>' : ''}</div>
@@ -609,19 +612,19 @@ const COACH = {
           d.step = 4; render(true);
         };
       }
-    };
-    return { ...base, back: null,
+    });
+    return duo({ ...base, back: null,
       title: 'Enviado a la junta',
       body: `<section class="card stack" style="align-items:flex-start"><span class="done-ic">${ic('check')}</span>
         <h2 style="margin:0">Ya lo tienen</h2><p class="muted" style="margin:0">Verás cómo avanza en Inicio, en “Mis peticiones”. Te avisaremos cuando esté resuelto.</p>
         <button type="button" class="btn blue block" data-go="home">Volver al inicio</button></section>`,
       bind() { S.draft = null; }
-    };
+    });
   },
   msg() {
     return {
-      kicker: 'Mensajes', title: 'Avisos del club', layout: 'narrow',
-      body: `<div class="stack">${S.notices.map(n => `<section class="card notice" aria-labelledby="m${n.id}">
+      kicker: 'Mensajes', title: 'Avisos del club',
+      body: `<div class="cards-grid">${S.notices.length ? '' : '<p class="card muted" style="margin:0">Todavía no hay avisos del club.</p>'}${S.notices.map(n => `<section class="card notice" aria-labelledby="m${n.id}">
           <div class="card-h" style="margin-bottom:6px"><span class="eyebrow">${esc(n.from)}</span>${n.read ? '<span class="pill">Leído</span>' : '<span class="pill gold">Nuevo</span>'}</div>
           <h3 id="m${n.id}">${esc(n.title)}</h3><p style="margin:6px 0 0">${esc(n.body)}</p>
           ${n.read ? '' : `<button type="button" class="btn blue block" style="margin-top:14px" data-read="${n.id}">${ic('check')} Entendido</button>`}</section>`).join('')}</div>`,
@@ -640,6 +643,10 @@ const teamsList = () => D.equipos.map(e => {
   return `<button type="button" class="tm tm-btn" data-eq="${esc(e.nombre)}"><span class="k">${r ? r.pos + 'º' : '–'}</span><div class="grow"><b>${e.nombre}</b><small>${r ? r.pts + ' pts · ' : ''}${n ? 'Próximo: ' + dayLbl(n.fecha) + ' vs ' + esc(nice(n.rival)) : 'Sin próximos partidos'}</small></div>
     ${l ? `<span class="res ${res}" title="Último: ${esc(nice(l.rival))}">${scoreTxt(l)}</span>` : ''}</button>`;
 }).join('');
+/* Un aviso enviado con cuántos entrenadores lo han leído */
+const sentRow = n => `<div class="rq"><span class="ic b">${ic('bell')}</span>
+  <div class="grow"><b>${esc(n.title)}</b><small>${esc(n.body)}</small><div class="meter" role="img" aria-label="Leído por ${n.readBy} de ${n.total}"><i style="width:${n.total ? n.readBy / n.total * 100 : 0}%"></i></div></div>
+  <span class="pill ${n.readBy === n.total ? '' : 'blue'}">${n.readBy} de ${n.total}</span></div>`;
 const coachCount = () => S.people.filter(p => p.rol === 'entrenador').length;
 const teamOf = id => (D.equipos.find(e => e.id === id) || {}).nombre || id;
 /* Entrenadores y junta con sus equipos; alta de cuentas nuevas */
@@ -654,9 +661,9 @@ function bindPeople() {
 }
 function claveForm(p) {
   return `<form id="cf" class="card stack" novalidate>
-    <p style="margin:0">Entra con “${esc(p.usuario)}”.</p>
-    ${photoField(p.foto, p.nombre)}
-    <label class="f" for="cp">Contraseña nueva<span class="hint">Déjala vacía para no cambiarla</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+    <div class="form2"><div class="stack"><h2 class="fh">Foto</h2><p style="margin:0">Entra con “${esc(p.usuario)}”.</p>
+    ${photoField(p.foto, p.nombre)}</div>
+    <div class="stack"><h2 class="fh">Contraseña</h2><label class="f" for="cp">Contraseña nueva<span class="hint">Déjala vacía para no cambiarla</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false"></label></div></div>
     <p id="cerr" class="err" role="alert" hidden></p>
     <button type="submit" class="btn blue block">${ic('check')} Guardar</button></form>`;
 }
@@ -677,14 +684,15 @@ function bindClave(p) {
 }
 function altaForm() {
   return `<form id="af" class="card stack" novalidate>
+    <div class="form2"><div class="stack"><h2 class="fh">Datos y acceso</h2>
     ${photoField(null, '')}
     <label class="f" for="an">Nombre y apellidos<input type="text" id="an" autocomplete="off" required></label>
     <label class="f" for="au">Usuario o correo<span class="hint">Sin correo: p. ej. manolo.alevin</span><input type="text" id="au" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
-    <label class="f" for="ap">Contraseña<span class="hint">Mínimo 8 caracteres</span><input type="text" id="ap" autocomplete="off" autocapitalize="none" spellcheck="false" required></label>
-    <fieldset class="f"><legend>Acceso</legend><div class="chips" role="radiogroup">
+    <label class="f" for="ap">Contraseña<span class="hint">Mínimo 8 caracteres</span><input type="text" id="ap" autocomplete="off" autocapitalize="none" spellcheck="false" required></label></div>
+    <div class="stack"><h2 class="fh">Permisos</h2><fieldset class="f"><legend>Acceso</legend><div class="chips" role="radiogroup">
       <label class="chip"><input type="radio" name="ar" value="entrenador" checked> Entrenador</label>
       <label class="chip"><input type="radio" name="ar" value="junta"> Junta</label></div></fieldset>
-    <fieldset class="f" id="aeq"><legend>Sus equipos</legend><div class="chips">${D.equipos.map(e => `<label class="chip"><input type="checkbox" value="${e.id}"> ${esc(e.nombre)}</label>`).join('')}</div></fieldset>
+    <fieldset class="f" id="aeq"><legend>Sus equipos</legend><div class="chips">${D.equipos.map(e => `<label class="chip"><input type="checkbox" value="${e.id}"> ${esc(e.nombre)}</label>`).join('')}</div></fieldset></div></div>
     <p id="aerr" class="err" role="alert" hidden></p>
     <button type="submit" class="btn blue block">${ic('check')} Dar de alta</button></form>`;
 }
@@ -733,10 +741,10 @@ const BOARD = {
     };
   },
   team() {
-    if (S.sub === 'alta') return { kicker: 'Equipos · Accesos', title: 'Dar de alta', layout: 'narrow', back: () => go('team'), body: altaForm(), bind: bindAlta };
+    if (S.sub === 'alta') return { kicker: 'Equipos · Accesos', title: 'Dar de alta', back: () => go('team'), body: altaForm(), bind: bindAlta };
     if (S.sub && S.sub.startsWith('pw:')) {
       const p = S.people.find(x => x.id === S.sub.slice(3));
-      return { kicker: 'Equipos · Accesos', title: esc(p.nombre), layout: 'narrow', back: () => go('team'), body: claveForm(p), bind: () => bindClave(p) };
+      return { kicker: 'Equipos · Accesos', title: esc(p.nombre), back: () => go('team'), body: claveForm(p), bind: () => bindClave(p) };
     }
     if (S.sub && S.sub.startsWith('eq:')) {
       const team = S.sub.slice(3);
@@ -762,14 +770,15 @@ const BOARD = {
   },
   ask() {
     return {
-      kicker: 'Comunicación', title: 'Enviar un aviso', layout: 'narrow',
-      body: `<form id="nf" class="card stack" novalidate>
+      kicker: 'Comunicación', title: 'Enviar un aviso',
+      body: `<div class="duo"><form id="nf" class="card stack" novalidate>
         ${S.live ? `<p class="muted" style="margin:0">Lo recibirán todos los entrenadores (${coachCount()}).</p>`
           : `<label class="f" for="to">¿A quién?<select id="to"><option>Todos los entrenadores (24)</option><option>Fútbol base (14)</option><option>Categoría alevín (4)</option><option>Solo a Paco Martín</option></select></label>`}
         <label class="f" for="nt">Título<input type="text" id="nt" ${S.live ? 'placeholder="Por ejemplo: Reunión de entrenadores"' : 'value="Reunión de entrenadores"'}></label>
         <label class="f" for="nb">Mensaje<textarea id="nb">${S.live ? '' : 'El jueves 29 a las 20:30 en la sede. Hablaremos del torneo de Navidad.'}</textarea></label>
         <p id="nerr" class="err" role="alert" hidden>Escribe el mensaje.</p>
-        <button type="submit" class="btn gold block">${ic('send')} Enviar aviso</button></form>`,
+        <button type="submit" class="btn gold block">${ic('send')} Enviar aviso</button></form>
+        ${card('h-last', 'Últimos avisos enviados', S.notices.length ? S.notices.slice(0, 4).map(sentRow).join('') : '<p class="muted" style="margin:0">Aún no has enviado avisos.</p>', '', S.notices.length > 4 ? '<button type="button" class="more" data-go="msg">Ver todos</button>' : '')}</div>`,
       bind() { $('#nf').onsubmit = async e => { e.preventDefault();
         const n = { id: Date.now(), from: 'Junta directiva', title: $('#nt').value.trim() || 'Aviso', body: $('#nb').value.trim(), read: false, readBy: 0, total: S.live ? coachCount() : 24 };
         if (!n.body) { $('#nerr').hidden = false; $('#nb').focus(); return; }
@@ -780,10 +789,9 @@ const BOARD = {
   },
   msg() {
     return {
-      kicker: 'Comunicación', title: 'Avisos enviados', layout: 'narrow',
-      body: card('h-env', 'Quién los ha leído', S.notices.length ? S.notices.map(n => `<div class="rq"><span class="ic b">${ic('bell')}</span>
-        <div class="grow"><b>${esc(n.title)}</b><small>${esc(n.body)}</small><div class="meter" role="img" aria-label="Leído por ${n.readBy} de ${n.total}"><i style="width:${n.total ? n.readBy / n.total * 100 : 0}%"></i></div></div>
-        <span class="pill ${n.readBy === n.total ? '' : 'blue'}">${n.readBy} de ${n.total}</span></div>`).join('') : '<p class="muted" style="margin:0">Aún no has enviado avisos.</p>')
+      kicker: 'Comunicación', title: 'Avisos enviados',
+      body: S.notices.length ? `<div class="cards-grid">${S.notices.map(n => `<section class="card sent" aria-label="${esc(n.title)}">${sentRow(n)}</section>`).join('')}</div>`
+        : '<p class="card muted" style="margin:0">Aún no has enviado avisos.</p>'
     };
   }
 };

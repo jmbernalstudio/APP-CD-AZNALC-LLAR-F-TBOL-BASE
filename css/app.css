@@ -480,3 +480,11 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
   .team-top > .card { display: flex; flex-direction: column; }
   .team-top > .add-pl > button[type=submit] { margin-top: auto; }
 }
+
+/* Pantallas de formulario y avisos: sin huecos a los lados en escritorio */
+.duo, .form2 { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+.cards-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); align-items: stretch; }
+.fh { margin: 0; font-size: 1.05rem; font-weight: 700; }
+.card.sent .rq { padding: 0; border: 0; } .card.sent .rq small { white-space: normal; overflow: visible; display: block; margin: 2px 0 6px; }
+@media (min-width: 900px) { .form2 { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; } }
+@media (min-width: 1080px) { .duo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
