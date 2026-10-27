@@ -50,8 +50,10 @@ const nice = n => n === n.toUpperCase()
 const abbr = n => { const m = /(\d)º/.exec(n); return n.slice(0, m ? 1 : 2) + (m ? m[1] : ''); };
 const crestOf = (e, name) => e.escudos[name] || null;
 const usName = e => (e.tabla.find(r => US.test(r.equipo)) || {}).equipo || Object.keys(e.escudos).find(n => US.test(n));
-const nextMatch = e => e.partidos.find(p => !p.descansa && !p.goles && p.fecha >= TODAY) || null;
-const played = e => e.partidos.filter(p => p.goles);
+/* Por fecha y no por jornada: un partido aplazado (p. ej. la J7 del Senior, el 30 nov) no tapa a los siguientes */
+const byDate = (a, b) => (a.fecha || '').localeCompare(b.fecha || '') || (a.hora || '99').localeCompare(b.hora || '99') || a.j - b.j;
+const nextMatch = e => e.partidos.filter(p => !p.descansa && !p.goles && p.fecha >= TODAY).sort(byDate)[0] || null;
+const played = e => e.partidos.filter(p => p.goles).sort(byDate);
 const lastMatch = e => played(e).slice(-1)[0] || null;
 const outcome = p => { const [a, b] = p.casa ? p.goles : [p.goles[1], p.goles[0]]; return a > b ? 'G' : a < b ? 'P' : 'E'; };
 const scoreTxt = p => `${p.goles[0]}–${p.goles[1]}`;
@@ -1074,7 +1076,7 @@ const COACH = {
     if (sub === 'games') body = `<div class="stack"><div class="seg g-scope gm-seg" role="group" aria-label="Qué partidos ver">
         <button type="button" data-gmv="mine" aria-pressed="${gv === 'mine'}">Mis partidos</button>
         <button type="button" data-gmv="group" aria-pressed="${gv === 'group'}">Partidos del grupo</button></div>
-      ${gv === 'group' ? groupView(e) : card('h-gm', `Temporada · ${e.partidos.length} jornadas`, e.partidos.map(p => matchRow(e, p)).join(''), '', `<span class="tag src">${e.fuente}</span>`)}</div>`;
+      ${gv === 'group' ? groupView(e) : card('h-gm', `Temporada · ${e.partidos.length} jornadas`, [...e.partidos].sort(byDate).map(p => matchRow(e, p)).join(''), '', `<span class="tag src">${e.fuente}</span>`)}</div>`;
     if (sub === 'table') body = card('h-tb', e.cat, tableHTML(e), '', `<span class="tag src">${e.fuente}</span>`);
     return {
       kicker: `Mi equipo · ${EQ[S.team] ? EQ[S.team].cat : t.cat}`, title: S.team,
