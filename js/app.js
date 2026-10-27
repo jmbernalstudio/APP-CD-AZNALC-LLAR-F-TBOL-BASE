@@ -613,12 +613,6 @@ function convList(players, c) {
   if (dorsales) return { dorsales, rows: list.sort((a, b) => a.dorsal - b.dorsal).map(x => ({ num: x.dorsal, n: x.n })) };
   return { dorsales, rows: list.sort((a, b) => a.n.localeCompare(b.n, 'es')).map((x, i) => ({ num: i + 1, n: x.n })) };
 }
-function convText(team, p, c, players) {
-  const names = convList(players, c).rows.map(x => `${x.num}. ${x.n}`);
-  return [`*Convocatoria ${team}*`, `${dateLbl(p.fecha)}${p.hora ? ' - ' + p.hora : ''} - vs ${nice(p.rival)}`,
-    placeOf(p) ? `Campo: ${placeOf(p).replace(/ · /g, ' - ')}` : '', c.hora || c.lugar ? `Citación${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
-    c.nota || '', '', ...names].filter((l, i, a) => l || (i > 0 && a[i - 1])).join('\n');
-}
 /* Cartel de la convocatoria: se dibuja en el propio móvil (sin servicios externos) con los escudos y los datos reales */
 const loadImg = src => new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
 async function convPoster(team, p, c, players) {
@@ -674,7 +668,6 @@ async function convPoster(team, p, c, players) {
   return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
 }
 async function sharePoster(team, p, c, players) {
-  const txt = convText(team, p, c, players);
   const m = modal(`<h2 id="mdl-t">Cartel de la convocatoria</h2><p id="pst-w">Preparando el cartel…</p><div id="pst"></div>`, 'dialog', () => { if (url) URL.revokeObjectURL(url); });
   let url = null;
   const blob = await convPoster(team, p, c, players);
@@ -683,15 +676,14 @@ async function sharePoster(team, p, c, players) {
   const file = new File([blob], name, { type: 'image/png' });
   const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
   url = URL.createObjectURL(blob);
-  $('#pst-w').textContent = canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : 'Descarga el cartel y mándalo por WhatsApp junto al texto.';
+  $('#pst-w').textContent = canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : 'Descarga el cartel y mándalo por WhatsApp.';
   $('#pst').outerHTML = `<img class="pst-img" src="${url}" alt="Cartel: convocatoria del ${esc(team)} contra ${esc(nice(p.rival))}, ${c.ids.length} convocados">
     ${canShare ? `<button type="button" class="btn blue block" id="pst-sh">${ic('send')} Compartir</button>`
-      : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} Descargar cartel</button><button type="button" class="btn ghost block" id="pst-wa">${ic('send')} Enviar el texto por WhatsApp</button>`}
+      : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} Descargar cartel</button>`}
     <button type="button" class="btn ghost block" data-v="0">Cerrar</button>`;
-  const sh = $('#pst-sh'), dl = $('#pst-dl'), wa = $('#pst-wa');
-  if (sh) { sh.focus(); sh.onclick = () => navigator.share({ files: [file], text: `*CONVOCATORIA vs ${nice(p.rival)}* 💙` }).catch(() => {}); }
+  const sh = $('#pst-sh'), dl = $('#pst-dl');
+  if (sh) { sh.focus(); sh.onclick = () => navigator.share({ files: [file] }).catch(() => {}); }
   if (dl) { dl.focus(); dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); }; }
-  if (wa) wa.onclick = () => open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
 }
 function convScreen() {
   const team = S.team, t = S.teams[team], e = EQ[team], p = e && nextMatch(e);
