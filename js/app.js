@@ -583,8 +583,8 @@ const COACH = {
       <p class="muted" style="margin:0">Toca a cada jugador que ha venido. Se guarda solo.</p>
       ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
       <ul class="players">${t.players.map((p, i) => `<li><button type="button" class="player" data-p="${p.id}" aria-pressed="${a.has(p.id)}">
-        <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${p.dorsal || i + 1}</span><span class="pname">${esc(p.n)}</span>
-        <span class="pstate">${a.has(p.id) ? 'Ha venido' : 'Sin marcar'}</span></button></li>`).join('')}</ul></div>
+        <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${p.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(p.n)}">${esc(p.n)}</span>
+        <span class="pstate">${a.has(p.id) ? 'Ha venido' : 'Sin marcar'}</span></span></button></li>`).join('')}</ul></div>
       ${attendanceCard(S.team, 'h-at2')}</div>`;
     if (sub === 'roster') body = `<div class="stack">${addPlayerCard(S.team)}${rosterCard(S.team)}</div>`;
     const e = EQ[S.team];
