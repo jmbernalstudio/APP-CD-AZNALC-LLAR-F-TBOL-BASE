@@ -24,6 +24,8 @@
 html { font-size: var(--base); background: var(--canvas); }
 html.big { --base: 21px; }
 * { box-sizing: border-box; }
+/* iPhone como app: franja sólida bajo la hora y la batería, para que el contenido no se vea difuminado al pasar por debajo */
+body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0px); background: var(--canvas); z-index: 60; pointer-events: none; }
 body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font); font-size: 1rem; line-height: 1.45; }
 button, input, textarea, select { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--club); outline-offset: 2px; border-radius: 10px; }
@@ -107,6 +109,16 @@ i.dm { background: var(--gold); } i.dt { background: var(--ink); }
 .vs-time { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; line-height: 1; font-variant-numeric: tabular-nums; }
 .vs-time + small { display: block; margin-top: 6px; }
 .match-btns { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 16px; }
+/* Carrusel del próximo partido (entrenador con varios equipos) */
+.mwrap { display: flex; flex-direction: column; min-width: 0; }
+.mcar { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; cursor: grab; }
+.mcar::-webkit-scrollbar { display: none; }
+.mcar.drag { scroll-snap-type: none; cursor: grabbing; user-select: none; }
+.mslide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; }
+.mdots { display: flex; justify-content: center; gap: 4px; padding-top: 6px; }
+.mdots button { width: 28px; height: 24px; border: 0; padding: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.mdots button::before { content: ""; width: 8px; height: 8px; border-radius: 4px; background: var(--club); opacity: .3; transition: width .2s, opacity .2s; }
+.mdots button[aria-current]::before { width: 22px; opacity: 1; }
 
 /* Botones */
 .btn { min-height: 52px; border-radius: 16px; border: 0; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 20px;
@@ -612,6 +624,9 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 @media (min-width: 1080px) {
   .coach-home > .a-match, .coach-home > .a-hero, .coach-home > .a-attend { align-self: stretch; }
   .coach-home > .a-match, .coach-home > .a-attend { display: flex; flex-direction: column; }
+  .coach-home > .a-match > .match, .coach-home > .a-match .mcar { flex: 1; display: flex; flex-direction: column; }
+  .coach-home > .a-match .mcar { flex-direction: row; }
+  .coach-home > .a-match .mslide { display: flex; flex-direction: column; }
   .coach-home > .a-match .score { flex: 1; align-items: center; align-content: center; }
   .coach-home > .a-match .match-btns { margin-top: 0; padding-top: 16px; }
   .coach-home > .a-attend .last { margin-top: auto; }
