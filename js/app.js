@@ -342,6 +342,7 @@ function render(focus) {
   $('#main').innerHTML = v.body;
   v.bind && v.bind();
   bindPush();
+  bindMatches();
   bindGo();
   if (v.back) $('[data-back]').onclick = v.back;
   if (focus) { $('#title').setAttribute('tabindex', '-1'); $('#title').focus({ preventScroll: true }); window.scrollTo(0, 0); }
@@ -457,9 +458,54 @@ function gameCard(e, p, mine) {
   const res = p.goles ? outcome(p) : null;
   const mid = res ? `<span class="res ${res}" aria-label="${res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado'} ${scoreTxt(p)}">${scoreTxt(p)}</span>`
     : p.estado ? `<span class="pill red">${esc(p.estado)}</span>` : p.hora ? `<span class="gtime">${p.hora}</span>` : '<span class="gtime tbd">Hora por<br>confirmar</span>';
-  return `<article class="gm"><div class="gm-h"><span class="pill ${mine ? 'gold' : 'blue'}">${esc(e.nombre)}${mine ? '<span class="sr"> (tu equipo)</span>' : ''}</span><small>${dateLbl(p.fecha)}${p.hora && res ? ' · ' + p.hora : ''} · J${p.j}</small></div>
+  return `<article class="gm" data-match="${e.id}|${p.j}" role="button" tabindex="0" aria-label="Ver el partido contra ${esc(nice(p.rival))}"><div class="gm-h"><span class="pill ${mine ? 'gold' : 'blue'}">${esc(e.nombre)}${mine ? '<span class="sr"> (tu equipo)</span>' : ''}</span><small>${dateLbl(p.fecha)}${p.hora && res ? ' · ' + p.hora : ''} · J${p.j}</small></div>
     <div class="gm-s">${p.casa ? us : them}${mid}${p.casa ? them : us}</div>
     <small class="where">${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></article>`;
+}
+/* ---------- Ficha de un partido (ventana centrada al tocarlo) ---------- */
+const WDL = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+const MESL = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const longDate = iso => { const d = toDate(iso); return `${WDL[d.getDay()]} ${d.getDate()} de ${MESL[d.getMonth()]}`; };
+/* Nombre del color (como lo escribe la federación) -> muestra de color; "Negra y amarilla" da dos franjas */
+const KIT = [['azul marino', '#1B2A4A'], ['azul celeste', '#7EC8F2'], ['celeste', '#7EC8F2'], ['granate', '#7A1E2C'], ['burdeos', '#6D1A2A'], ['blanc', '#FFFFFF'],
+  ['negr', '#111111'], ['roj', '#D7262E'], ['azul', '#1F4FD8'], ['amarill', '#F6C800'], ['verde', '#1E9A4B'], ['morad', '#6B2FA0'], ['violeta', '#6B2FA0'],
+  ['naranja', '#F28C1B'], ['gris', '#9AA0A6'], ['rosa', '#F06BA8'], ['plat', '#C0C4CA'], ['dorad', '#C9A227'], ['marr', '#7A4B2A']];
+function kitColors(txt) {
+  const t = (txt || '').toLowerCase(); let rest = t; const out = [];
+  for (const [k, c] of KIT) if (rest.includes(k)) { out.push([t.indexOf(k), c]); rest = rest.split(k).join('#'.repeat(k.length)); }
+  return out.sort((a, b) => a[0] - b[0]).map(x => x[1]).slice(0, 3);
+}
+const swatch = txt => { const cs = kitColors(txt); return `<span class="sw" aria-hidden="true">${(cs.length ? cs : ['#E3E6EE']).map(c => `<i style="background:${c}"></i>`).join('')}</span>`; };
+function openMatch(e, p) {
+  const res = p.goles ? outcome(p) : null, src = crestOf(e, p.rival), rv = nice(p.rival);
+  const us = `<div class="mx-t">${crestImg('mx-cr')}<b>Aznalcóllar</b></div>`;
+  const them = `<div class="mx-t">${src ? `<img class="mx-cr" src="${src}" alt="">` : `<span class="mx-cr rv" aria-hidden="true">${initials(rv.replace(/^[A-Z.]+\s/, '').replace(/"/g, ''))}</span>`}<b title="${esc(rv)}">${esc(rv)}</b></div>`;
+  const mid = res ? `<div class="mx-m"><span class="res ${res}">${scoreTxt(p)}</span><small>${res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado'}</small></div>`
+    : `<div class="mx-m"><b class="mx-h">${p.estado ? esc(p.estado) : p.hora || '--:--'}</b><small>${p.estado ? '' : p.hora ? 'Hora' : 'Hora por confirmar'}</small></div>`;
+  const k = p.equipacion;
+  const kit = k ? `<div class="kit">${[['Camiseta', k.camiseta], ['Pantalón', k.pantalon], ['Medias', k.medias]].filter(x => x[1]).map(([l, v]) =>
+      `<div class="kit-r">${swatch(v)}<span class="kit-l">${l}</span><b>${esc(v)}</b></div>`).join('')}</div>`
+    : `<p class="muted" style="margin:0">${e.fuente === 'RFAF' ? 'La federación no tiene registrados los colores de este equipo.' : 'La Liga Educa no publica los colores de los equipos.'}</p>`;
+  const m = modal(`<div class="rqd-h"><span class="pill ${S.teams[e.nombre] && S.role === 'coach' ? 'gold' : 'blue'}">${esc(e.nombre)}</span><div class="grow"><small>Jornada ${p.j}</small></div>
+      <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+    <h2 id="mdl-t" class="sr">${p.casa ? 'Aznalcóllar contra ' + esc(rv) : esc(rv) + ' contra Aznalcóllar'}</h2>
+    <div class="mx-s">${p.casa ? us : them}${mid}${p.casa ? them : us}</div>
+    <dl class="facts mx-f"><div class="wide"><dt>Fecha</dt><dd>${longDate(p.fecha)}${p.hora && res ? ` · ${p.hora}` : ''}</dd></div>
+      <div><dt>Jugamos</dt><dd>${p.casa ? 'De local' : 'De visitante'}</dd></div><div><dt>Césped</dt><dd>${p.superficie ? esc(/artificial/i.test(p.superficie) ? 'Artificial' : /natural/i.test(p.superficie) ? 'Natural' : p.superficie) : 'Sin datos'}</dd></div>
+      <div class="wide"><dt>Rival</dt><dd>${esc(rv)}</dd></div>
+      <div class="wide"><dt>Campo</dt><dd>${placeOf(p) ? esc(placeOf(p)) : 'Por confirmar'}</dd></div>
+      <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
+    <section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>
+    ${p.campo ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}`, 'dialog', () => {});
+  m.el.classList.add('rqd', 'mx');
+  m.el.querySelector('[data-v="0"]').focus();
+}
+function bindMatches() {
+  document.querySelectorAll('#main [data-match]').forEach(el => {
+    const go = () => { const [id, j] = el.dataset.match.split('|'), e = D.equipos.find(x => x.id === id), p = e && e.partidos.find(x => String(x.j) === j); if (p) openMatch(e, p); };
+    el.onclick = go;
+    el.onkeydown = ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); go(); } };
+  });
 }
 function gamesView() {
   /* Entrenadores: sus equipos o todo el club; la junta ve siempre todo */
@@ -502,7 +548,7 @@ function matchRow(e, p) {
   const res = p.goles ? outcome(p) : null;
   const right = res ? `<span class="res ${res}" aria-label="${res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado'} ${scoreTxt(p)}">${scoreTxt(p)}</span>`
     : p.estado ? `<span class="pill red">${p.estado}</span>` : `<span class="pill ${p.hora ? 'blue' : 'grey'}" ${p.hora ? '' : 'title="Hora por confirmar"'}>${p.hora || 'Sin hora'}</span>`;
-  return `<div class="mt ${p.fecha === (nextMatch(e) || {}).fecha ? 'next' : ''}"><div class="cal-d"><span>J${p.j}</span><b>${toDate(p.fecha).getDate()}</b></div>${crestBadge(e, p.rival)}
+  return `<div class="mt ${p.fecha === (nextMatch(e) || {}).fecha ? 'next' : ''}" data-match="${e.id}|${p.j}" role="button" tabindex="0" aria-label="Ver el partido contra ${esc(nice(p.rival))}"><div class="cal-d"><span>J${p.j}</span><b>${toDate(p.fecha).getDate()}</b></div>${crestBadge(e, p.rival)}
     <div class="grow"><b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b><small>${dateLbl(p.fecha)} · ${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></div>${right}</div>`;
 }
 function tableHTML(e) {

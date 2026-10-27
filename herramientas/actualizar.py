@@ -129,7 +129,9 @@ def jornada_rfaf(eq, n):
         def lado(td):
             h4 = td.find('h4')
             img = td.find('img')
-            return dict(nombre=limpio(h4.get_text()) if h4 else '', escudo=img.get('src') if img else None)
+            a = td.select_one('a[href*="Codigo_Equipo="]')
+            cod = re.search(r'Codigo_Equipo=(\d+)', a['href']) if a else None
+            return dict(nombre=limpio(h4.get_text()) if h4 else '', escudo=img.get('src') if img else None, cod=cod[1] if cod else None)
 
         marc = [cifra_visible(x) for x in tds[1].select('.wid2_resultado_cerrada')]
         hor = [limpio(x.get_text()) for x in tds[1].select('.horario')]
@@ -146,6 +148,31 @@ def jornada_rfaf(eq, n):
                           goles=[int(marc[0]), int(marc[1])] if len(marc) == 2 and marc[0] and marc[1] else None,
                           fecha=hor[0] if hor else None, hora=hor[1] if len(hor) > 1 else None, campo=campo, superficie=sup))
     return filas
+
+
+EQUIPACIONES = {}
+
+
+def equipacion_rfaf(cod):
+    """Colores de la equipación que el equipo tiene registrados en la RFAF (camiseta, pantalón y medias).
+    Solo se leen esos tres datos de la ficha: nada de jugadores ni personas."""
+    if not cod:
+        return None
+    if cod not in EQUIPACIONES:
+        try:
+            html = bajar(f'{RFAF}NFG_VisEquipos?cod_primaria=1000119&Codigo_Equipo={cod}', minimo=5000)
+            col = {}
+            for h5 in BeautifulSoup(html, 'html.parser').find_all('h5'):
+                st = h5.find('strong')
+                k = limpio(st.get_text()).rstrip(':').lower() if st else ''
+                if k in ('camiseta', 'pantalón', 'medias'):
+                    v = limpio(h5.get_text()[len(st.get_text()):])
+                    if v:
+                        col['pantalon' if k == 'pantalón' else k] = v.capitalize()
+            EQUIPACIONES[cod] = col or None
+        except Exception:
+            EQUIPACIONES[cod] = None
+    return EQUIPACIONES[cod]
 
 
 def equipo_rfaf(eq, pool):
@@ -174,6 +201,9 @@ def equipo_rfaf(eq, pool):
             continue
         partidos.append(dict(j=n, fecha=fecha_iso(m['fecha']) or fecha, hora=m['hora'], casa=casa, rival=otro['nombre'],
                              campo=m['campo'], superficie=m['superficie'], goles=m['goles']))
+        equip = equipacion_rfaf(otro.get('cod'))
+        if equip:
+            partidos[-1]['equipacion'] = equip
 
     html = bajar(minimo=20000, url=f'{RFAF}NFG_VisClasificacion?cod_primaria=1000120&codcompeticion={eq["comp"]}&codgrupo={eq["grupo"]}&cod_agrupacion=1')
     tabla = []
