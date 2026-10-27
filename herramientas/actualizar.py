@@ -395,6 +395,22 @@ def bajar_escudo(args):
     return nombre, f'icons/escudos/{destino.name}'
 
 
+CORRECCIONES = json.loads((RAIZ / 'herramientas' / 'correcciones.json').read_text(encoding='utf-8'))
+
+
+def corregir(eq, partidos, grupo):
+    """Arreglos a mano (herramientas/correcciones.json) de fechas u horas mal puestas en la web, solo mientras siga el error"""
+    for j, c in CORRECCIONES.get(eq['id'], {}).items():
+        p = next((x for x in partidos if str(x['j']) == j and not x.get('descansa')), None)
+        if not p or any(p.get(k) != v for k, v in c['si_web'].items()):
+            continue
+        p.update({k: c[k] for k in ('fecha', 'hora') if k in c})
+        for jr in grupo:
+            for m in jr['partidos'] if jr['j'] == int(j) else []:
+                if NOSOTROS.search(m['l']) or NOSOTROS.search(m['v']):
+                    m.update({'f': c.get('fecha', m.get('f')), 'h': c.get('hora', m.get('h'))})
+
+
 def main():
     DIR_ESCUDOS.mkdir(parents=True, exist_ok=True)
     salida = dict(actualizado=datetime.now(timezone.utc).isoformat(timespec='seconds'), equipos=[])
@@ -414,6 +430,7 @@ def main():
                 continue
             t = time.time()
             partidos, tabla, escudos, grupo = (equipo_rfaf if eq['web'] == 'rfaf' else equipo_educa)(eq, pool)
+            corregir(eq, partidos, grupo)
             locales = dict(pool.map(bajar_escudo, [(k, v if v.startswith('http') else 'https://www.rfaf.es' + v, eq['web'])
                                                     for k, v in escudos.items()]))
             if len(partidos) != eq['jornadas']:
