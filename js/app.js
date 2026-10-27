@@ -1191,7 +1191,7 @@ function bindGo() {
 
 document.addEventListener('click', e => { const b = e.target.closest('[data-tab]'); if (b) go(b.dataset.tab); });
 if (window.SERVIDOR_ON) window.startServer();
-else { load(); render(); }
+else { load(); render(); window.splashOff && splashOff(); }
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
