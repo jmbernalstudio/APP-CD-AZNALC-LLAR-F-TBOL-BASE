@@ -323,6 +323,7 @@ html.big .act { flex-direction: row; justify-content: flex-start; min-height: 66
   .board-home { grid-template-areas: "kpis kpis" "inbox inbox" "teams notice"; }
   .actions { grid-template-columns: 1fr; } .act { flex-direction: row; justify-content: flex-start; min-height: 66px; padding: 10px 14px; }
   .ev { grid-template-columns: 62px minmax(0, 1fr) auto; } .ev .ev-act { display: inline-flex; }
+  .ev-tm:not(.on) { display: none; }
   .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .players { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .bottom { left: 50%; right: auto; transform: translateX(-50%); width: min(600px, calc(100% - 32px)); bottom: 12px; border-radius: 26px; }
