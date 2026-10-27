@@ -154,8 +154,8 @@ drop policy if exists "junta cambia estado" on public.peticiones;
 create policy "junta cambia estado" on public.peticiones for update to authenticated using (public.es_junta());
 
 alter table public.convocatorias enable row level security;
-drop policy if exists "convocatorias de mis equipos" on public.convocatorias;
-create policy "convocatorias de mis equipos" on public.convocatorias for all to authenticated
+drop policy if exists conv_mis_equipos on public.convocatorias;
+create policy conv_mis_equipos on public.convocatorias for all to authenticated
   using (public.es_junta() or public.entrena(equipo)) with check (public.es_junta() or public.entrena(equipo));
 
 drop policy if exists "ver avisos" on public.avisos;
