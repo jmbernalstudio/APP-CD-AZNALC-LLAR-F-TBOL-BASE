@@ -307,7 +307,7 @@ function agendaRow(e, withAct) {
   let what;
   if (e.kind === 'match') {
     const p = e.p;
-    what = `<span class="vsl"><span class="pill gold">vs</span>${crestBadge(e.e, p.rival)}<span class="nm">${esc(nice(p.rival))}</span></span><span class="where">${p.casa ? 'En casa' : 'Fuera'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</span>`;
+    what = `<span class="vsl"><span class="pill gold">vs</span>${crestBadge(e.e, p.rival)}<span class="nm">${esc(nice(p.rival))}</span></span><span class="where">${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</span>`;
   } else if (e.kind === 'club') what = `<span class="t">${e.title}</span><span class="where">${e.where}</span>`;
   else what = `<span class="t">Entreno · ${e.team}</span>${e.today ? '<span class="pill">Hoy</span>' : ''}<span class="where">${e.where}</span>`;
   const act = withAct && e.today && e.kind === 'train'
@@ -334,7 +334,7 @@ function gameCard(e, p, mine) {
     : p.estado ? `<span class="pill red">${esc(p.estado)}</span>` : p.hora ? `<span class="gtime">${p.hora}</span>` : '<span class="gtime tbd">Hora por<br>confirmar</span>';
   return `<article class="gm"><div class="gm-h"><span class="pill ${mine ? 'gold' : 'blue'}">${esc(e.nombre)}${mine ? '<span class="sr"> (tu equipo)</span>' : ''}</span><small>${dateLbl(p.fecha)}${p.hora && res ? ' · ' + p.hora : ''} · J${p.j}</small></div>
     <div class="gm-s">${p.casa ? us : them}${mid}${p.casa ? them : us}</div>
-    <small class="where">${p.casa ? 'En casa' : 'Fuera'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></article>`;
+    <small class="where">${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></article>`;
 }
 function gamesView() {
   /* Entrenadores: sus equipos o todo el club; la junta ve siempre todo */
@@ -345,28 +345,32 @@ function gamesView() {
   const now = weekOf(TODAY);
   const wk = S.wk || weeks.find(w => w >= now) || weeks[weeks.length - 1] || now;
   const i = weeks.indexOf(wk), prev = weeks.filter(w => w < wk).pop(), next = weeks.find(w => w > wk);
-  const list = all.filter(g => g.wk === wk && !g.p.descansa)
+  const venue = S.gvenue || 'all';
+  const week = all.filter(g => g.wk === wk && !g.p.descansa);
+  const list = week.filter(g => venue === 'all' || (venue === 'home') === !!g.p.casa)
     .sort((a, b) => a.p.fecha.localeCompare(b.p.fecha) || (a.p.hora || '99').localeCompare(b.p.hora || '99') || ORDEN.indexOf(a.e.id) - ORDEN.indexOf(b.e.id));
-  const playing = new Set(list.map(g => g.e.id));
+  const playing = new Set(week.map(g => g.e.id));
   const off = D.equipos.filter(e => (!mineOnly || own(e)) && !playing.has(e.id)).sort((a, b) => ORDEN.indexOf(a.id) - ORDEN.indexOf(b.id));
   const done = list.filter(g => g.p.goles), cnt = k => done.filter(g => outcome(g.p) === k).length;
   const nav = `<div class="wk-nav card">
       <button type="button" class="iconbtn" data-wk="${prev || ''}" ${prev ? '' : 'disabled'} aria-label="Fin de semana anterior">${ic('back')}</button>
-      <div class="wk-t"><small>${wk === now ? 'Este fin de semana' : wk < now ? 'Ya jugado' : 'Próximamente'}</small><b>${weekLbl(wk, list.length ? list[0].p.fecha : null)}</b></div>
+      <div class="wk-t"><small>${wk === now ? 'Este fin de semana' : wk < now ? 'Ya jugado' : 'Próximamente'}</small><b>${weekLbl(wk, week.length ? week.map(g => g.p.fecha).sort()[0] : null)}</b></div>
       <button type="button" class="iconbtn" data-wk="${next || ''}" ${next ? '' : 'disabled'} aria-label="Fin de semana siguiente">${ic('chev')}</button>
       ${wk !== now && weeks.includes(now) ? `<button type="button" class="more wk-now" data-wk="${now}">Volver a este fin de semana</button>` : ''}</div>`;
   const stats = `<div class="kpis wk-k">
       <div class="kpi dark"><small>Partidos</small><b>${list.length}</b></div>
       ${done.length ? `<div class="kpi"><small>Ganados</small><b class="ok">${cnt('G')}</b></div><div class="kpi"><small>Empatados</small><b>${cnt('E')}</b></div><div class="kpi"><small>Perdidos</small><b class="bad">${cnt('P')}</b></div>`
-        : `<div class="kpi"><small>En casa</small><b>${list.filter(g => g.p.casa).length}</b></div><div class="kpi"><small>Fuera</small><b>${list.filter(g => !g.p.casa).length}</b></div><div class="kpi"><small>Sin partido</small><b>${off.length}</b></div>`}</div>`;
+        : `<div class="kpi"><small>De local</small><b>${week.filter(g => g.p.casa).length}</b></div><div class="kpi"><small>De visitante</small><b>${week.filter(g => !g.p.casa).length}</b></div><div class="kpi"><small>Sin partido</small><b>${off.length}</b></div>`}</div>`;
   const body = list.length ? `<div class="games">${list.map(g => gameCard(g.e, g.p, own(g.e))).join('')}</div>`
-    : '<section class="card empty"><b>No hay partidos este fin de semana</b></section>';
+    : `<section class="card empty"><b>No hay partidos${venue === 'home' ? ' de local' : venue === 'away' ? ' de visitante' : ''} este fin de semana</b></section>`;
   const rest = off.length ? `<p class="off"><b>Sin partido:</b> ${off.map(e => esc(e.nombre)).join(' · ')}</p>` : '';
   const n = Object.keys(S.teams).length;
   const scope = coach ? `<div class="seg g-scope" role="group" aria-label="Qué partidos ver">
       <button type="button" data-gs="mine" aria-pressed="${mineOnly}">${n === 1 ? 'Mi equipo' : 'Mis equipos'}</button>
       <button type="button" data-gs="all" aria-pressed="${!mineOnly}">Todo el club</button></div>` : '';
-  return `<div class="stack">${scope}${nav}${stats}${body}${rest}</div>`;
+  const venueSeg = `<div class="seg g-scope" role="group" aria-label="Local o visitante">${[['all', 'Todos'], ['home', 'Local'], ['away', 'Visitante']].map(([k, l]) =>
+      `<button type="button" data-gv="${k}" aria-pressed="${venue === k}">${l}</button>`).join('')}</div>`;
+  return `<div class="stack"><div class="g-filters">${scope}${venueSeg}</div>${nav}${stats}${body}${rest}</div>`;
 }
 /* Un partido de la temporada: fecha, rival con escudo, resultado o hora */
 function matchRow(e, p) {
@@ -375,7 +379,7 @@ function matchRow(e, p) {
   const right = res ? `<span class="res ${res}" aria-label="${res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado'} ${scoreTxt(p)}">${scoreTxt(p)}</span>`
     : p.estado ? `<span class="pill red">${p.estado}</span>` : `<span class="pill ${p.hora ? 'blue' : 'grey'}" ${p.hora ? '' : 'title="Hora por confirmar"'}>${p.hora || 'Sin hora'}</span>`;
   return `<div class="mt ${p.fecha === (nextMatch(e) || {}).fecha ? 'next' : ''}"><div class="cal-d"><span>J${p.j}</span><b>${toDate(p.fecha).getDate()}</b></div>${crestBadge(e, p.rival)}
-    <div class="grow"><b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b><small>${dateLbl(p.fecha)} · ${p.casa ? 'En casa' : 'Fuera'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></div>${right}</div>`;
+    <div class="grow"><b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b><small>${dateLbl(p.fecha)} · ${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</small></div>${right}</div>`;
 }
 function tableHTML(e) {
   const gd = r => r.gf != null ? r.gf - r.gc : r.dif;
@@ -775,6 +779,7 @@ function gamesScreen() {
     bind() {
       document.querySelectorAll('[data-wk]').forEach(b => b.onclick = () => { if (b.dataset.wk) { S.wk = b.dataset.wk; render(); } });
       document.querySelectorAll('[data-gs]').forEach(b => b.onclick = () => { S.gscope = b.dataset.gs; S.wk = null; render(); });
+      document.querySelectorAll('[data-gv]').forEach(b => b.onclick = () => { S.gvenue = b.dataset.gv; render(); });
     } };
 }
 const BOARD = {
