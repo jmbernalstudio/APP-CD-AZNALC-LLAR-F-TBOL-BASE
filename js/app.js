@@ -496,9 +496,103 @@ function openMatch(e, p) {
       <div class="wide"><dt>Campo</dt><dd>${placeOf(p) ? esc(placeOf(p)) : 'Por confirmar'}</dd></div>
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
     ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
-    ${p.campo ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}`, 'dialog', () => {});
+    ${p.campo ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}
+    <button type="button" class="btn ghost block" id="mx-wa">${ic('send')} Enviar por WhatsApp</button>`, 'dialog', () => {});
   m.el.classList.add('rqd', 'mx');
+  m.el.querySelector('#mx-wa').onclick = () => { m.close(false); shareMatch(e, p); };
   m.el.querySelector('[data-v="0"]').focus();
+}
+/* Imagen del partido para mandar por WhatsApp: la tarjeta con escudos y hora, los datos y, de visitante, la equipación del rival */
+async function matchPoster(e, p) {
+  await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
+  const W = 1080, BLUE = '#0034DF', GOLD = '#FDCB2B', INK = '#0B0B0B', MUTED = '#5B6475', BG = '#F3F5FA';
+  const cv = document.createElement('canvas'), x = cv.getContext('2d');
+  const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
+  const text = (t, tx, y, w, px, color, maxW = W - 192, align = 'center') => {
+    x.font = font(w, px); while (px > 14 && x.measureText(t).width > maxW) x.font = font(w, --px);
+    x.fillStyle = color; x.textAlign = align; x.textBaseline = 'middle'; x.fillText(t, tx, y);
+  };
+  /* Texto largo (el campo): en dos líneas como mucho */
+  const lines = (t, w, px, maxW) => { x.font = font(w, px); const out = ['']; for (const wd of t.split(' ')) { const tr = (out[out.length - 1] + ' ' + wd).trim();
+    if (x.measureText(tr).width > maxW && out[out.length - 1]) out.push(wd); else out[out.length - 1] = tr; } return out.length > 2 ? [out[0], out.slice(1).join(' ')] : out; };
+  const rr = (rx, ry, rw, rh, rad, color) => { x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad);
+    x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); x.fillStyle = color; x.fill(); };
+  const fitImg = (img, cx, cy, box) => { const k = Math.min(box / img.width, box / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); };
+  const res = p.goles ? outcome(p) : null, rv = nice(p.rival), kit = !p.casa && p.equipacion;
+  const campo = placeOf(p) ? placeOf(p).replace(/ · /g, ' - ') : 'Por confirmar';
+  x.font = font(700, 36); const campoL = lines(campo, 700, 36, W - 192);
+  const facts = [['Fecha', longDate(p.fecha)], ['Hora', p.hora || 'Por confirmar'], ['Jugamos', p.casa ? 'De local' : 'De visitante'], ['Campo', campoL], ['Competición', e.cat]];
+  const factsH = 60 + facts.reduce((a, f) => a + (Array.isArray(f[1]) ? 64 + 44 * f[1].length : 108), 0);
+  const kitRows = kit ? [['Camiseta', kit.camiseta], ['Pantalón', kit.pantalon], ['Medias', kit.medias]].filter(r => r[1]) : [];
+  const kitH = kitRows.length ? 130 + kitRows.length * 96 : 0;
+  const H = 48 + 430 + 24 + factsH + (kitH ? 24 + kitH : 0) + 48;
+  cv.width = W; cv.height = H;
+  x.fillStyle = BG; x.fillRect(0, 0, W, H);
+  /* Tarjeta del partido */
+  rr(48, 48, W - 96, 430, 40, '#FFFFFF');
+  x.font = font(700, 30); const pw = Math.min(x.measureText(e.nombre).width + 44, 560);
+  rr(96, 92, pw, 56, 28, GOLD); text(e.nombre, 96 + pw / 2, 121, 700, 30, INK, pw - 44);
+  text(`Jornada ${p.j}`, W - 96, 121, 500, 30, MUTED, 380, 'right');
+  const src = crestOf(e, p.rival), [ours, theirs] = await Promise.all([loadImg('icons/escudo.png'), src ? loadImg(src) : null]);
+  const side = (img, name, mine, cx) => {
+    if (img) fitImg(img, cx, 260, 150);
+    else { x.beginPath(); x.arc(cx, 260, 70, 0, Math.PI * 2); x.fillStyle = BLUE; x.fill(); text(initials(name.replace(/^[A-Z.]+\s/, '').replace(/"/g, '')), cx, 262, 800, 48, '#FFFFFF'); }
+    text(mine ? 'Aznalcóllar' : name, cx, 385, 700, 34, INK, 360);
+  };
+  const us = [ours, 'Aznalcóllar', true], them = [theirs, rv, false];
+  side(...(p.casa ? us : them), 270); side(...(p.casa ? them : us), 810);
+  if (res) text(scoreTxt(p), W / 2, 265, 800, 76, INK, 240);
+  else if (p.hora) text(p.hora, W / 2, 265, 800, 76, INK, 240);
+  else { text('Hora por', W / 2, 245, 600, 32, MUTED, 220); text('confirmar', W / 2, 283, 600, 32, MUTED, 220); }
+  text(p.casa ? 'Local' : 'Visitante', W / 2, 440, 600, 30, BLUE);
+  /* Datos */
+  let y = 48 + 430 + 24;
+  rr(48, y, W - 96, factsH, 40, '#FFFFFF');
+  y += 30;
+  for (const [l, v] of facts) {
+    text(l, 96, y + 26, 500, 28, MUTED, 400, 'left');
+    if (Array.isArray(v)) { v.forEach((ln, i) => text(ln, 96, y + 70 + i * 44, 700, 36, INK, W - 192, 'left')); y += 64 + 44 * v.length; }
+    else { text(v, 96, y + 70, 700, 36, INK, W - 192, 'left'); y += 108; }
+  }
+  /* Equipación del rival (solo de visitante) */
+  if (kitH) {
+    y = 48 + 430 + 24 + factsH + 24;
+    rr(48, y, W - 96, kitH, 40, '#FFFFFF');
+    text('Equipación del rival', 96, y + 66, 800, 38, INK, W - 192, 'left');
+    kitRows.forEach(([l, v], i) => {
+      const ry = y + 110 + i * 96;
+      rr(80, ry, W - 160, 80, 24, BG);
+      const cs = kitColors(v), cols = cs.length ? cs : ['#E3E6EE'];
+      x.save(); x.beginPath(); x.roundRect ? x.roundRect(104, ry + 12, 56, 56, 14) : x.rect(104, ry + 12, 56, 56); x.clip();
+      cols.forEach((c, k) => { x.fillStyle = c; x.fillRect(104 + k * 56 / cols.length, ry + 12, 56 / cols.length + 1, 56); }); x.restore();
+      x.strokeStyle = 'rgba(0,0,0,.18)'; x.lineWidth = 2; x.beginPath(); x.roundRect ? x.roundRect(104, ry + 12, 56, 56, 14) : x.rect(104, ry + 12, 56, 56); x.stroke();
+      text(l, 190, ry + 40, 500, 30, MUTED, 200, 'left');
+      text(v, 400, ry + 40, 700, 34, INK, W - 400 - 112, 'left');
+    });
+  }
+  return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
+}
+async function shareMatch(e, p) {
+  const maps = p.campo ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}` : '';
+  const msg = maps ? `Cómo llegar y ubicación del partido: ${maps}` : '';
+  let url = null;
+  const m = modal(`<h2 id="mdl-t">Enviar el partido</h2><p id="pst-w">Preparando la imagen…</p><div id="pst"></div>`, 'dialog', () => { if (url) URL.revokeObjectURL(url); });
+  const blob = await matchPoster(e, p);
+  if (!document.body.contains(m.el)) return;
+  const name = `partido-${e.nombre}-${p.fecha}.png`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9.-]+/g, '-');
+  const file = new File([blob], name, { type: 'image/png' });
+  const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+  url = URL.createObjectURL(blob);
+  $('#pst-w').textContent = canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : 'Descarga la imagen y mándala por WhatsApp junto con el enlace.';
+  $('#pst').outerHTML = `<img class="pst-img" src="${url}" alt="Partido del ${esc(e.nombre)} contra ${esc(nice(p.rival))}, ${longDate(p.fecha)}">
+    ${canShare ? `<button type="button" class="btn blue block" id="pst-sh">${ic('send')} Compartir</button>`
+      : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} Descargar imagen</button>`}
+    ${msg ? `<button type="button" class="btn ghost block" id="pst-cp">${ic('pin')} Copiar enlace de ubicación</button>` : ''}
+    <button type="button" class="btn ghost block" data-v="0">Cerrar</button>`;
+  const sh = $('#pst-sh'), dl = $('#pst-dl'), cp = $('#pst-cp');
+  if (sh) { sh.focus(); sh.onclick = () => navigator.share(msg ? { files: [file], text: msg } : { files: [file] }).catch(() => {}); }
+  if (dl) { dl.focus(); dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); }; }
+  if (cp) cp.onclick = () => navigator.clipboard.writeText(msg).then(() => say('Enlace copiado. Pégalo en WhatsApp debajo de la imagen.'), () => say(msg));
 }
 function bindMatches() {
   document.querySelectorAll('#main [data-match]').forEach(el => {
