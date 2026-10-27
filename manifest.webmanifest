@@ -1,7 +1,7 @@
 {
-  "name": "C.D. Aznalcóllar Fútbol Base",
+  "name": "APP Gestión Interna - C.D. AZNALCÓLLAR FÚTBOL BASE",
   "short_name": "C.D. Aznalcóllar",
-  "description": "App interna para entrenadores y junta directiva.",
+  "description": "App de gestión interna del C.D. Aznalcóllar Fútbol Base para entrenadores y junta directiva.",
   "lang": "es",
   "start_url": "./",
   "scope": "./",
