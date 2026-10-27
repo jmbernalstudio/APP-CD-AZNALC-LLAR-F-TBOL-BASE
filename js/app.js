@@ -261,7 +261,7 @@ function render(focus) {
     ${v.back ? `<button type="button" class="back" data-back aria-label="Volver">${ic('back')}</button>` : crestImg('logo')}
     <div class="title"><small>${v.kicker}</small><h1 id="title">${v.title}</h1></div>
     <div class="me-wrap"><button type="button" class="me" id="me" aria-haspopup="true" aria-expanded="false" aria-controls="me-menu" aria-label="Tu cuenta: ${esc(myName())}">
-      <span class="me-t"><small>${roleName()}</small><b>${esc(myName())}</b></span>${avatar(myPerson(), 'av')}</button>
+      ${S.tab === 'home' ? `<span class="me-t"><small>${roleName()}</small></span>` : `<span class="me-t"><small>${roleName()}</small><b>${esc(myName())}</b></span>`}${avatar(myPerson(), 'av')}</button>
       <div class="me-menu card" id="me-menu" hidden>${avatar(myPerson(), 'av big')}<b>${esc(myName())}</b><small>${roleName()}</small>
         ${S.live ? `<button type="button" class="btn out block" id="logout">Salir</button>`
           : `<div class="stack" style="width:100%;gap:8px"><small>Demostración · ver como</small>
