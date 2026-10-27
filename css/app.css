@@ -113,6 +113,7 @@ i.dm { background: var(--gold); } i.dt { background: var(--ink); }
 .btn.gold { background: var(--gold); color: var(--gold-ink); }
 .btn.blue { background: var(--club); color: #fff; }
 .btn.glass { background: rgba(255, 255, 255, .14); color: #fff; }
+.btn.white { background: #fff; color: var(--club); }
 .btn.block { width: 100%; min-height: 58px; font-size: 1.05rem; }
 .btn.sm { min-height: 42px; padding: 0 14px; border-radius: 12px; font-size: .9rem; }
 
@@ -269,6 +270,7 @@ textarea { min-height: 120px; resize: vertical; }
 .stepper span { height: 6px; border-radius: 3px; background: #D5DCE8; } .stepper span.on { background: var(--club); }
 .step-lbl { margin: 0 0 14px; font-size: .85rem; font-weight: 600; color: var(--muted); }
 .err { color: var(--bad-ink); font-weight: 600; margin: 0; }
+.f [aria-invalid="true"] { border-color: var(--bad); }
 .done-ic { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: var(--ok); color: #fff; box-shadow: 0 0 0 12px var(--ok-soft); margin: 10px 0 8px; }
 .done-ic .i { width: 44px; height: 44px; stroke-width: 3; }
 

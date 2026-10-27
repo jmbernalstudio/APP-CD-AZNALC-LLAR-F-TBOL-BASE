@@ -617,7 +617,7 @@ function convScreen() {
   const back = () => go('home');
   if (!p) return { kicker: 'Convocatoria', title: esc(team), back, body: emptyPage('cal', 'No hay próximo partido', 'Cuando haya un partido en el calendario podrás hacer la convocatoria.') };
   const k = convKey(team, p), saved = S.conv[k];
-  const c = S.convDraft && S.convDraft.k === k ? S.convDraft : (S.convDraft = { k, ids: saved ? [...saved.ids] : t.players.map(x => x.id), hora: saved ? saved.hora : '', lugar: saved ? saved.lugar : '', nota: saved ? saved.nota : '' });
+  const c = S.convDraft && S.convDraft.k === k ? S.convDraft : (S.convDraft = { k, ids: saved ? [...saved.ids] : [], hora: saved ? saved.hora : '', lugar: saved ? saved.lugar : '', nota: saved ? saved.nota : '' });
   const row = (x, i) => `<li><button type="button" class="player" data-cv="${x.id}" aria-pressed="${c.ids.includes(x.id)}">
     <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${x.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(x.n)}">${esc(x.n)}</span>
     <span class="pstate">${c.ids.includes(x.id) ? 'Convocado' : 'No va'}</span></span></button></li>`;
@@ -632,8 +632,8 @@ function convScreen() {
       ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
       <ul class="players">${t.players.map(row).join('')}</ul></div>
       <form id="cvf" class="card stack" novalidate aria-labelledby="h-cv"><h2 id="h-cv" style="margin:0;font-size:1.1rem">Quedada</h2>
-        <div class="row2"><label class="f" for="cvh">Hora<input type="time" id="cvh" value="${esc(c.hora || '')}"></label>
-        <label class="f" for="cvl">Sitio<input type="text" id="cvl" maxlength="60" placeholder="P. ej. puerta del campo" value="${esc(c.lugar || '')}"></label></div>
+        <div class="row2"><label class="f" for="cvh">Hora<input type="time" id="cvh" required aria-required="true" value="${esc(c.hora || '')}"></label>
+        <label class="f" for="cvl">Sitio<input type="text" id="cvl" required aria-required="true" maxlength="60" placeholder="P. ej. puerta del campo" value="${esc(c.lugar || '')}"></label></div>
         <label class="f" for="cvo">Nota (opcional)<textarea id="cvo" maxlength="300" placeholder="P. ej. traed la 2ª equipación">${esc(c.nota || '')}</textarea></label>
         <p id="cverr" class="err" role="alert" hidden></p>
         <button type="submit" class="btn blue block">${ic('check')} Guardar convocatoria</button>
@@ -647,9 +647,17 @@ function convScreen() {
       document.querySelectorAll('[data-cv]').forEach(b => b.onclick = () => { const id = +b.dataset.cv; c.ids = c.ids.includes(id) ? c.ids.filter(x => x !== id) : [...c.ids, id]; paint(b); sync(); });
       $('#cvall').onclick = () => { c.ids = t.players.map(x => x.id); document.querySelectorAll('[data-cv]').forEach(paint); sync(); };
       ['#cvh', '#cvl', '#cvo'].forEach(s => $(s).oninput = sync);
+      const check = () => {
+        sync(); $('#cvh').removeAttribute('aria-invalid'); $('#cvl').removeAttribute('aria-invalid');
+        const bad = !c.ids.length ? ['Elige al menos a un jugador convocado.', null] : !c.hora ? ['Pon la hora de la quedada.', '#cvh'] : !c.lugar ? ['Pon el sitio de la quedada.', '#cvl'] : null;
+        $('#cverr').hidden = !bad; if (!bad) return true;
+        $('#cverr').textContent = bad[0]; if (bad[1]) { $(bad[1]).setAttribute('aria-invalid', 'true'); $(bad[1]).focus(); }
+        return false;
+      };
+      $('#cvwa').onclick = ev => { if (!check()) ev.preventDefault(); };
       $('#cvf').onsubmit = async ev => {
-        ev.preventDefault(); sync();
-        if (!c.ids.length) { $('#cverr').textContent = 'Convoca al menos a un jugador.'; $('#cverr').hidden = false; return; }
+        ev.preventDefault();
+        if (!check()) return;
         const val = { ids: [...c.ids], hora: c.hora, lugar: c.lugar, nota: c.nota };
         try { API() && await API().convocatoria(team, p.fecha, val); } catch (_) { $('#cverr').textContent = 'No se ha podido guardar. Revisa la conexión.'; $('#cverr').hidden = false; return; }
         S.conv[k] = val; S.convDraft = null; go('home'); say(`Convocatoria guardada: ${val.ids.length} jugadores. Para mandarla por WhatsApp, vuelve a abrir la convocatoria.`);
@@ -677,7 +685,7 @@ const COACH = {
         <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
       <div class="grid coach-home">
         ${card('h-m', 'Próximo partido', `${scoreHTML(S.team)}
-          <div class="match-btns">${nm ? `<button type="button" class="btn ${(S.conv[convKey(S.team, nm)] || {}).ids ? 'glass' : 'gold'}" data-go="team:conv">${ic('list')} ${(S.conv[convKey(S.team, nm)] || {}).ids ? `Convocatoria · ${S.conv[convKey(S.team, nm)].ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.campo ? `<a class="btn gold" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`,
+          <div class="match-btns">${nm ? `<button type="button" class="btn ${(S.conv[convKey(S.team, nm)] || {}).ids ? 'glass' : 'gold'}" data-go="team:conv">${ic('list')} ${(S.conv[convKey(S.team, nm)] || {}).ids ? `Convocatoria · ${S.conv[convKey(S.team, nm)].ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`,
           'match a-match', nm ? `<span class="tag gold">${dateLbl(nm.fecha)}</span>` : '')}
         <section class="hero a-hero" aria-labelledby="h-hero">
           <span class="kick">${tt ? `Hoy · ${esc(trainLbl(tt))}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>
