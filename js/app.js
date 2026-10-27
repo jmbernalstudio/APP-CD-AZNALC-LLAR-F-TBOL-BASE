@@ -430,7 +430,7 @@ function gamesView() {
   const now = weekOf(TODAY);
   const wk = S.wk || weeks.find(w => w >= now) || weeks[weeks.length - 1] || now;
   const i = weeks.indexOf(wk), prev = weeks.filter(w => w < wk).pop(), next = weeks.find(w => w > wk);
-  const venue = S.gvenue || 'all';
+  const venue = S.gvenue || 'all', VENUES = [['all', 'Todos'], ['home', 'Local'], ['away', 'Visitante']];
   const week = all.filter(g => g.wk === wk && !g.p.descansa);
   const list = week.filter(g => venue === 'all' || (venue === 'home') === !!g.p.casa)
     .sort((a, b) => a.p.fecha.localeCompare(b.p.fecha) || (a.p.hora || '99').localeCompare(b.p.hora || '99') || ORDEN.indexOf(a.e.id) - ORDEN.indexOf(b.e.id));
@@ -439,6 +439,8 @@ function gamesView() {
       <button type="button" class="iconbtn" data-wk="${prev || ''}" ${prev ? '' : 'disabled'} aria-label="Fin de semana anterior">${ic('back')}</button>
       <div class="wk-t"><small>${wk === now ? 'Este fin de semana' : wk < now ? 'Ya jugado' : 'Próximamente'}</small><b>${weekLbl(wk, week.length ? week.map(g => g.p.fecha).sort()[0] : null)}</b></div>
       <button type="button" class="iconbtn" data-wk="${next || ''}" ${next ? '' : 'disabled'} aria-label="Fin de semana siguiente">${ic('chev')}</button>
+      <div class="wk-v" role="group" aria-label="Local o visitante">${VENUES.map(([k, l]) =>
+        `<button type="button" data-gv="${k}" aria-pressed="${venue === k}">${l}</button>`).join('')}</div>
       ${wk !== now && weeks.includes(now) ? `<button type="button" class="more wk-now" data-wk="${now}">Volver a este fin de semana</button>` : ''}</div>`;
   const stats = `<div class="kpis wk-k ${done.length ? '' : 'k3'}">
       <div class="kpi dark blue"><small>Partidos</small><b>${list.length}</b></div>
@@ -450,9 +452,9 @@ function gamesView() {
   const scope = coach ? `<div class="seg g-scope" role="group" aria-label="Qué partidos ver">
       <button type="button" data-gs="mine" aria-pressed="${mineOnly}">${n === 1 ? 'Mi equipo' : 'Mis equipos'}</button>
       <button type="button" data-gs="all" aria-pressed="${!mineOnly}">Todo el club</button></div>` : '';
-  const venueSeg = `<div class="seg g-scope" role="group" aria-label="Local o visitante">${[['all', 'Todos'], ['home', 'Local'], ['away', 'Visitante']].map(([k, l]) =>
+  const venueSeg = `<div class="seg g-scope g-venue" role="group" aria-label="Local o visitante">${VENUES.map(([k, l]) =>
       `<button type="button" data-gv="${k}" aria-pressed="${venue === k}">${l}</button>`).join('')}</div>`;
-  return `<div class="stack"><div class="g-filters">${scope}${venueSeg}</div>${nav}${stats}${body}</div>`;
+  return `<div class="stack"><div class="g-filters ${coach ? '' : 'only-v'}">${scope}${venueSeg}</div>${nav}${stats}${body}</div>`;
 }
 /* Un partido de la temporada: fecha, rival con escudo, resultado o hora */
 function matchRow(e, p) {
