@@ -499,7 +499,7 @@ function openMatch(e, p) {
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
     ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
     ${p.campo && !p.casa ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}
-    <button type="button" class="btn ghost block" id="mx-wa">${ic('send')} Enviar por WhatsApp</button>`, 'dialog', () => {});
+    <button type="button" class="btn outline block" id="mx-wa">${ic('send')} Enviar por WhatsApp</button>`, 'dialog', () => {});
   m.el.classList.add('rqd', 'mx');
   m.el.querySelector('#mx-wa').onclick = () => { m.close(false); shareMatch(e, p); };
   m.el.querySelector('[data-v="0"]').focus();
@@ -945,7 +945,7 @@ function convScreen() {
         <label class="f" for="cvo">Nota (opcional)<textarea id="cvo" maxlength="300" placeholder="P. ej. traed la 2ª equipación">${esc(c.nota || '')}</textarea></label>
         <p id="cverr" class="err" role="alert" hidden></p>
         <button type="submit" class="btn blue block">${ic('check')} Guardar convocatoria</button>
-        <button type="button" class="btn ghost block" id="cvwa">${ic('send')} Enviar por WhatsApp</button>
+        <button type="button" class="btn outline block" id="cvwa">${ic('send')} Enviar por WhatsApp</button>
       </form></div>`,
     bind() {
       const sync = () => { c.hora = $('#cvh').value; c.lugar = $('#cvl').value.trim(); c.nota = $('#cvo').value.trim();
