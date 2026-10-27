@@ -612,6 +612,83 @@ function convText(team, p, c, players) {
     placeOf(p) ? `Campo: ${placeOf(p)}` : '', c.hora || c.lugar ? `Quedamos${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
     c.nota || '', '', ...names].filter((l, i, a) => l || (i > 0 && a[i - 1])).join('\n');
 }
+/* Cartel de la convocatoria: se dibuja en el propio móvil (sin servicios externos) con los escudos y los datos reales */
+const loadImg = src => new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
+async function convPoster(team, p, c, players) {
+  await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
+  const e = EQ[team], list = players.filter(q => c.ids.includes(q.id)), W = 1080, ROW = 68;
+  const tableY = 744, rowsY = tableY + 150, notaH = c.nota ? 70 : 0, H = rowsY + list.length * ROW + 30 + notaH + 48;
+  const cv = document.createElement('canvas'), x = cv.getContext('2d');
+  cv.width = W; cv.height = H;
+  const BLUE = '#0034DF', GOLD = '#FDCB2B', INK = '#0B0B0B', MUTED = '#5B6475', BG = '#F3F5FA';
+  const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
+  // Texto en una línea: reduce la letra hasta que quepa en el ancho
+  const text = (t, tx, y, w, px, color, maxW = W - 192, align = 'center') => {
+    x.font = font(w, px); while (px > 14 && x.measureText(t).width > maxW) x.font = font(w, --px);
+    x.fillStyle = color; x.textAlign = align; x.textBaseline = 'middle'; x.fillText(t, tx, y); return x.measureText(t).width;
+  };
+  const rr = (rx, ry, rw, rh, rad, color) => { x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad);
+    x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); x.fillStyle = color; x.fill(); };
+  const fitImg = (img, cx, cy, box) => { const k = Math.min(box / img.width, box / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); };
+  const src = crestOf(e, p.rival), [ours, theirs] = await Promise.all([loadImg('icons/escudo.png'), src ? loadImg(src) : null]);
+  x.fillStyle = BG; x.fillRect(0, 0, W, H);
+  // Cabecera
+  if (ours) fitImg(ours, 88, 92, 92);
+  text('Convocatoria', 152, 74, 800, 54, INK, 800, 'left');
+  text('C.D. Aznalcóllar Fútbol Base', 152, 122, 500, 28, MUTED, 800, 'left');
+  // Tarjeta del partido (como en "Partidos")
+  rr(48, 170, W - 96, 430, 40, '#FFFFFF');
+  x.font = font(700, 30); const pw = Math.min(x.measureText(team).width + 44, 560);
+  rr(96, 214, pw, 56, 28, GOLD); text(team, 96 + pw / 2, 243, 700, 30, INK, pw - 44);
+  text(`${dateLbl(p.fecha)} · J${p.j}`, W - 96, 243, 500, 30, MUTED, 380, 'right');
+  const side = (img, name, mine, cx) => {
+    if (img) fitImg(img, cx, 375, 150);
+    else { x.beginPath(); x.arc(cx, 375, 70, 0, Math.PI * 2); x.fillStyle = '#C8102E'; x.fill(); text(initials(name.replace(/^[A-Z.]+\s/, '').replace(/"/g, '')), cx, 377, 800, 48, '#FFFFFF'); }
+    text(mine ? 'Aznalcóllar' : name, cx, 495, 700, 34, INK, 360);
+  };
+  const us = [ours, 'Aznalcóllar', true], them = [theirs, nice(p.rival), false];
+  side(...(p.casa ? us : them), 270); side(...(p.casa ? them : us), 810);
+  if (p.hora) text(p.hora, W / 2, 385, 800, 76, INK, 240);
+  else { text('Hora por', W / 2, 365, 600, 32, MUTED, 220); text('confirmar', W / 2, 403, 600, 32, MUTED, 220); }
+  text(`${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + placeOf(p) : ''}`, W / 2, 558, 500, 30, MUTED);
+  // Quedada
+  rr(48, 624, W - 96, 96, 32, BLUE);
+  text(`Quedada: ${[c.hora, c.lugar].filter(Boolean).join(' · ')}`, W / 2, 673, 700, 36, '#FFFFFF');
+  // Tabla de convocados
+  rr(48, tableY, W - 96, H - tableY - 48, 40, '#FFFFFF');
+  text('Convocados', 96, tableY + 60, 800, 40, INK, 500, 'left');
+  text(list.length === 1 ? '1 jugador' : `${list.length} jugadores`, W - 96, tableY + 60, 500, 30, MUTED, 300, 'right');
+  text('Dorsal', 140, tableY + 122, 600, 26, MUTED, 120);
+  text('Jugador', 240, tableY + 122, 600, 26, MUTED, 300, 'left');
+  list.forEach((q, i) => {
+    const y = rowsY + i * ROW;
+    if (i % 2 === 0) rr(72, y, W - 144, ROW, 18, BG);
+    text(q.dorsal ? String(q.dorsal) : '–', 140, y + ROW / 2, 800, 34, BLUE, 120);
+    text(q.n, 240, y + ROW / 2, 500, 34, INK, W - 240 - 96, 'left');
+  });
+  if (c.nota) text(`Nota: ${c.nota}`, 96, rowsY + list.length * ROW + 30 + 30, 500, 30, MUTED, W - 192, 'left');
+  return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
+}
+async function sharePoster(team, p, c, players) {
+  const txt = convText(team, p, c, players);
+  const m = modal(`<h2 id="mdl-t">Cartel de la convocatoria</h2><p id="pst-w">Preparando el cartel…</p><div id="pst"></div>`, 'dialog', () => { if (url) URL.revokeObjectURL(url); });
+  let url = null;
+  const blob = await convPoster(team, p, c, players);
+  if (!document.body.contains(m.el)) return;
+  const name = `convocatoria-${team}-${p.fecha}.png`.toLowerCase().replace(/[^a-z0-9.-]+/g, '-');
+  const file = new File([blob], name, { type: 'image/png' });
+  const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
+  url = URL.createObjectURL(blob);
+  $('#pst-w').textContent = canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : 'Descarga el cartel y mándalo por WhatsApp junto al texto.';
+  $('#pst').outerHTML = `<img class="pst-img" src="${url}" alt="Cartel: convocatoria del ${esc(team)} contra ${esc(nice(p.rival))}, ${c.ids.length} convocados">
+    ${canShare ? `<button type="button" class="btn blue block" id="pst-sh">${ic('send')} Compartir</button>`
+      : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} Descargar cartel</button><button type="button" class="btn ghost block" id="pst-wa">${ic('send')} Enviar el texto por WhatsApp</button>`}
+    <button type="button" class="btn ghost block" data-v="0">Cerrar</button>`;
+  const sh = $('#pst-sh'), dl = $('#pst-dl'), wa = $('#pst-wa');
+  if (sh) { sh.focus(); sh.onclick = () => navigator.share({ files: [file], text: txt }).catch(() => {}); }
+  if (dl) { dl.focus(); dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); }; }
+  if (wa) wa.onclick = () => open('https://wa.me/?text=' + encodeURIComponent(txt), '_blank', 'noopener');
+}
 function convScreen() {
   const team = S.team, t = S.teams[team], e = EQ[team], p = e && nextMatch(e);
   const back = () => go('home');
@@ -637,11 +714,10 @@ function convScreen() {
         <label class="f" for="cvo">Nota (opcional)<textarea id="cvo" maxlength="300" placeholder="P. ej. traed la 2ª equipación">${esc(c.nota || '')}</textarea></label>
         <p id="cverr" class="err" role="alert" hidden></p>
         <button type="submit" class="btn blue block">${ic('check')} Guardar convocatoria</button>
-        <a class="btn ghost block" id="cvwa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(convText(team, p, c, t.players))}">${ic('send')} Enviar por WhatsApp</a>
+        <button type="button" class="btn ghost block" id="cvwa">${ic('send')} Enviar por WhatsApp</button>
       </form></div>`,
     bind() {
       const sync = () => { c.hora = $('#cvh').value; c.lugar = $('#cvl').value.trim(); c.nota = $('#cvo').value.trim();
-        $('#cvwa').href = 'https://wa.me/?text=' + encodeURIComponent(convText(team, p, c, t.players));
         $('#cvn').innerHTML = `${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; };
       const paint = b => { const on = c.ids.includes(+b.dataset.cv); b.setAttribute('aria-pressed', on); b.querySelector('.pstate').textContent = on ? 'Convocado' : 'No va'; };
       document.querySelectorAll('[data-cv]').forEach(b => b.onclick = () => { const id = +b.dataset.cv; c.ids = c.ids.includes(id) ? c.ids.filter(x => x !== id) : [...c.ids, id]; paint(b); sync(); });
@@ -654,7 +730,7 @@ function convScreen() {
         $('#cverr').textContent = bad[0]; if (bad[1]) { $(bad[1]).setAttribute('aria-invalid', 'true'); $(bad[1]).focus(); }
         return false;
       };
-      $('#cvwa').onclick = ev => { if (!check()) ev.preventDefault(); };
+      $('#cvwa').onclick = () => { if (check()) sharePoster(team, p, c, t.players); };
       $('#cvf').onsubmit = async ev => {
         ev.preventDefault();
         if (!check()) return;
