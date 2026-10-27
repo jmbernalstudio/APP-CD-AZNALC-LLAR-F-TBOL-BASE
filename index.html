@@ -26,6 +26,23 @@
 <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
+<div id="splash" class="splash" role="status" aria-label="Cargando la app">
+  <img src="icons/escudo-160.png" alt="" width="120" height="120">
+  <b>C.D. Aznalcóllar Fútbol Base</b>
+  <small>Gestión interna</small>
+  <span class="splash-bar" aria-hidden="true"><i></i></span>
+</div>
+<script>
+/* Pantalla de carga: se quita cuando la app está lista (mínimo 1 s para que no parpadee) */
+(function () {
+  var t0 = Date.now(), done = false;
+  window.splashOff = function () {
+    if (done) return; done = true;
+    setTimeout(function () { var s = document.getElementById('splash'); if (!s) return; s.classList.add('out'); setTimeout(function () { s.remove(); }, 400); }, Math.max(0, 1000 - (Date.now() - t0)));
+  };
+  setTimeout(window.splashOff, 10000);
+})();
+</script>
 <div class="app">
   <nav class="rail" aria-label="Secciones"><img class="cr logo" src="icons/escudo-160.png" alt="C.D. Aznalcóllar Fútbol Base"><ul id="rail-tabs"></ul></nav>
   <div class="content">

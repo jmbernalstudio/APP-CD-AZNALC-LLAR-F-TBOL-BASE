@@ -62,6 +62,7 @@
   /* ---------- Pantalla de entrada ---------- */
   function pantallaEntrada(msg) {
     document.body.classList.add('sin-sesion');
+    window.splashOff && splashOff();
     let box = $('#login');
     if (!box) { box = document.createElement('div'); box.id = 'login'; box.className = 'login'; document.body.prepend(box); }
     box.hidden = false;
@@ -154,6 +155,7 @@
     } catch (_) {
       return pantallaEntrada('No se han podido cargar los datos. Revisa la conexión y vuelve a entrar.');
     }
+    window.splashOff && splashOff();
     document.body.classList.remove('sin-sesion');
     if ($('#login')) $('#login').hidden = true;
     if (S.role === 'coach' && !S.team) {
