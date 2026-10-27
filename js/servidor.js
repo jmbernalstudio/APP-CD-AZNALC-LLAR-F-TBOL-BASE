@@ -22,7 +22,7 @@
       ok(presente ? await sb.from('asistencia').upsert({ jugador, fecha }, { ignoreDuplicates: true }) : await sb.from('asistencia').delete().match({ jugador, fecha }));
     },
     async jugador(team, p) {
-      return ok(await sb.from('jugadores').insert({ equipo: idEq(team), nombre: p.n, dorsal: p.dorsal, nacimiento: p.nac }).select('id').single()).id;
+      return ok(await sb.from('jugadores').insert({ equipo: idEq(team), nombre: p.n, dorsal: p.dorsal }).select('id').single()).id;
     },
     async quitarJugador(id, activo) { ok(await sb.from('jugadores').update({ activo }).eq('id', id)); },
     async peticion(r) {
@@ -79,7 +79,7 @@
     const mios = junta ? D.equipos.map(e => e.id) : asig.filter(a => a.perfil === yo.id).map(a => a.equipo);
     const desde = new Date(); desde.setDate(desde.getDate() - 60);
     const [jug, asis, pet, avi, lei, gente] = await Promise.all([
-      sb.from('jugadores').select('id, equipo, nombre, apellidos, dorsal, nacimiento').eq('activo', true).order('dorsal', { nullsFirst: false }),
+      sb.from('jugadores').select('id, equipo, nombre, apellidos, dorsal').eq('activo', true).order('dorsal', { nullsFirst: false }),
       sb.from('asistencia').select('jugador, fecha').gte('fecha', ISO(desde)),
       sb.from('peticiones').select('*, perfiles(nombre)').order('creada', { ascending: false }),
       sb.from('avisos').select('*').order('creado', { ascending: false }).limit(50),
@@ -101,7 +101,7 @@
     for (const j of jug) {
       equipoDe[j.id] = nombreEq(j.equipo);
       const t = S.teams[equipoDe[j.id]];
-      if (t) t.players.push({ id: j.id, n: `${j.nombre} ${j.apellidos}`.trim(), dorsal: j.dorsal, nac: j.nacimiento });
+      if (t) t.players.push({ id: j.id, n: `${j.nombre} ${j.apellidos}`.trim(), dorsal: j.dorsal });
     }
     S.attend = {};
     for (const a of asis) {
