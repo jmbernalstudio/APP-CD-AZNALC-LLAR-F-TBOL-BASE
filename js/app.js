@@ -283,7 +283,7 @@ function tabsFor() {
   const unread = S.notices.filter(n => !n.read).length;
   const open = S.requests.filter(r => r.st < 3).length;
   return S.role === 'coach'
-    ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team', '', pendingAll().length], ['ask', 'Pedir', 'plus', 'plus'], ['games', 'Partidos', 'cal'], ['msg', 'Mensajes', 'chat', '', unread]]
+    ? [['home', 'Inicio', 'home'], ['team', 'Mi equipo', 'team', '', pendingAll().length], ['ask', 'Solicitar', 'plus', 'plus'], ['games', 'Partidos', 'cal'], ['msg', 'Mensajes', 'chat', '', unread]]
     : [['home', 'Bandeja', 'inbox', '', open], ['team', 'Equipos', 'team'], ['ask', 'Aviso', 'send', 'plus'], ['games', 'Partidos', 'cal'], ['msg', 'Enviados', 'chat']];
 }
 
@@ -622,7 +622,7 @@ const COACH = {
         <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
       <div class="grid coach-home">
         ${card('h-m', 'Próximo partido', `${scoreHTML(S.team)}
-          <div class="match-btns"><button type="button" class="btn gold" data-say="La convocatoria llegará en la próxima versión.">Convocatoria</button>${nm && nm.campo ? `<a class="btn glass" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" data-say="Campo por confirmar">${ic('pin')}Cómo llegar</button>`}</div>`,
+          <div class="match-btns">${nm && nm.campo ? `<a class="btn gold" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`,
           'match a-match', nm ? `<span class="tag gold">${dateLbl(nm.fecha)}</span>` : '')}
         <section class="hero a-hero" aria-labelledby="h-hero">
           <span class="kick">${tt ? `Hoy · ${esc(trainLbl(tt))}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>

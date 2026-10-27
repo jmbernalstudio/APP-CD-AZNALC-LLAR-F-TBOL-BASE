@@ -105,7 +105,7 @@ i.dm { background: var(--gold); } i.dt { background: var(--ink); }
 .score small { opacity: .8; font-size: .78rem; }
 .vs-time { font-size: 2.6rem; font-weight: 800; letter-spacing: -1px; line-height: 1; font-variant-numeric: tabular-nums; }
 .vs-time + small { display: block; margin-top: 6px; }
-.match-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+.match-btns { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 16px; }
 
 /* Botones */
 .btn { min-height: 52px; border-radius: 16px; border: 0; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 20px;
@@ -273,14 +273,18 @@ textarea { min-height: 120px; resize: vertical; }
 .done-ic .i { width: 44px; height: 44px; stroke-width: 3; }
 
 /* Navegación inferior (móvil) */
-.bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 5; padding: 8px max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
-  background: var(--card); border-radius: 26px 26px 0 0; box-shadow: 0 -10px 30px -20px rgba(0, 0, 0, .4); }
+/* Flotante: separada de los bordes, con las mismas esquinas que las tarjetas */
+.bottom { position: fixed; left: 0; right: 0; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); z-index: 5; margin: 0 auto; padding: 6px;
+  width: min(600px, calc(100% - 24px - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px)));
+  background: var(--card); border-radius: 24px; box-shadow: 0 14px 34px -12px rgba(0, 0, 0, .35), 0 0 0 1px rgba(0, 0, 0, .04); }
 .bottom ul { list-style: none; margin: 0 auto; padding: 0; max-width: 560px; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 .bottom button { width: 100%; border: 0; background: none; display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: .75rem; font-weight: 600; color: var(--muted);
-  min-height: 58px; justify-content: center; cursor: pointer; position: relative; }
+  min-height: 60px; justify-content: center; cursor: pointer; position: relative; border-radius: 18px; }
 .bottom button[aria-current="page"] { color: var(--club); }
-.bottom button[aria-current="page"]::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--club); }
-.bottom .plus .ic { width: 48px; height: 48px; border-radius: 16px; background: var(--gold); color: var(--gold-ink); display: grid; place-items: center; margin-top: -24px; box-shadow: 0 10px 20px -8px rgba(253, 203, 43, .8); }
+.bottom button[aria-current="page"] { background: var(--club-soft); }
+/* Solicitar / Aviso: dentro del menú, a la misma altura que el resto, solo con el icono en dorado */
+.bottom .plus .ic { width: 30px; height: 26px; border-radius: 9px; background: var(--gold); color: var(--gold-ink); display: grid; place-items: center; }
+.bottom .plus .ic .i { width: 20px; height: 20px; }
 .badge { position: absolute; top: 4px; right: calc(50% - 22px); min-width: 20px; height: 20px; border-radius: 10px; background: var(--bad); color: #fff; font-size: .7rem; display: grid; place-items: center; padding: 0 5px; }
 
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(100px + env(safe-area-inset-bottom, 0px)); z-index: 6; background: var(--ink); color: #fff; padding: 12px 16px;
@@ -327,7 +331,6 @@ html.big .act { flex-direction: row; justify-content: flex-start; min-height: 66
   .ev-tm:not(.on) { display: none; }
   .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .players { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .bottom { left: 50%; right: auto; transform: translateX(-50%); width: min(600px, calc(100% - 32px)); bottom: 12px; border-radius: 26px; }
 }
 
 /* ---------- Escritorio ---------- */
@@ -635,3 +638,15 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .seg-x::-webkit-scrollbar { display: none; }
 .seg-x button { flex: none; display: inline-flex; align-items: center; gap: 8px; }
 .seg button[aria-pressed="true"] .pdot { box-shadow: 0 0 0 2px #fff; }
+
+/* Pestañas (Pasar lista · Partidos · Clasificación · Plantilla): en móvil caben siempre, repartidas a lo ancho */
+@media (max-width: 560px) {
+  .tabs[aria-label="Vista"] { justify-content: space-between; gap: 8px; overflow: visible; }
+  .tabs[aria-label="Vista"] button { min-width: 0; }
+}
+@media (max-width: 360px) { .tabs[aria-label="Vista"] button { font-size: .86rem; } }
+/* Título de la barra superior: se reduce en móvil para que quepa entero */
+@media (max-width: 480px) { .topbar h1 { font-size: min(1.4rem, 5vw); } }
+
+/* Botón sin acción posible todavía (p. ej. campo por confirmar): se ve apagado y no engaña */
+.btn:disabled { opacity: .65; cursor: not-allowed; }
