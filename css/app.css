@@ -551,9 +551,23 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .off b { color: var(--ink); }
 .g-scope { align-self: flex-start; max-width: 100%; }
 .g-scope button { min-height: 44px; padding: .4rem 1.1rem; }
-/* Entrenamientos: días a lo ancho; hora y campo debajo */
-.facts.tr { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.facts.tr > div:first-child { grid-column: 1 / -1; }
+/* Entrenamientos: un renglón por día con su hora y su campo */
+.trs { display: grid; gap: 8px; }
+.trs-r { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr) minmax(0, 1.1fr); gap: 10px; align-items: center; background: var(--shell); border-radius: 16px; padding: 12px 14px; }
+.trs-r > * { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trs-r span { color: var(--ink); font-weight: 600; } .trs-r span:last-child { text-align: right; color: var(--club); }
+.trf { display: grid; gap: 10px; }
+.trf:not(:has(.trf-r:not([hidden]))) { display: none; }
+.trf-r { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr) minmax(0, 1.3fr); gap: 10px; align-items: center; }
+.trf-r[hidden] { display: none; }
+.trf-r > b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.trf-r label.f { min-width: 0; } .trf-r input, .trf-r select { min-width: 0; }
+@media (max-width: 560px) {
+  .trf-r { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 6px 10px; }
+  .trf-r > b { grid-column: 1 / -1; }
+}
+@media (max-width: 400px) { .trf-r { grid-template-columns: minmax(0, 1fr); } }
+
 /* Móvil estrecho: "Dar de alta" baja a su propia línea para no cortar el título */
 @media (max-width: 440px) { .a-people > .card-h { flex-wrap: wrap; } .a-people > .card-h .btn { width: 100%; } }
 .card.sent > .rq { padding: 0; border-bottom: 0; }

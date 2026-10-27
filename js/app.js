@@ -232,11 +232,15 @@ const crestImg = (cls = '') => `<img class="cr ${cls}" src="${CREST}" alt="">`;
 
 /* Días de entreno: 1 = lunes … 7 = domingo (los elige la junta en cada equipo) */
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+const DIAS_D = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const DIAS_L = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados', 'domingos'];
 const dow = iso => (toDate(iso).getDay() + 6) % 7 + 1;
 const addDays = (iso, n) => { const d = toDate(iso); d.setDate(d.getDate() + n); return ISO(d); };
 const trainOf = team => S.teams[team] && S.teams[team].train && S.teams[team].train.dias.length ? S.teams[team].train : null;
 const trainsOn = (team, iso) => { const t = trainOf(team); return !!t && t.dias.includes(dow(iso)); };
+/* Cada día de entreno lleva su hora y su campo (p. ej. lunes Campo 1, miércoles Campo 2) */
+const sesiones = t => t ? (t.ses && t.ses.length ? t.ses : t.dias.map(d => ({ d, h: t.h || '', where: t.where || '' }))) : [];
+const trainAt = (team, iso) => { const t = trainOf(team); if (!t || !t.dias.includes(dow(iso))) return null; return sesiones(t).find(x => x.d === dow(iso)) || { d: dow(iso), h: t.h || '', where: t.where || '' }; };
 const trainLbl = t => ['Entrenamiento', t.h, t.where].filter(Boolean).join(' · ');
 /* Solo se pasa lista en días de entreno: hoy si toca, o uno de las dos últimas semanas que se olvidó */
 const LOOKBACK = 14;
@@ -251,8 +255,8 @@ const MONWEEK = [...Array(7)].map((_, i) => addDays(TODAY, i - dow(TODAY) + 1));
 function buildAgenda() {
   const ev = [];
   for (const team of Object.keys(S.teams)) WEEK.forEach((iso, i) => {
-    if (!trainsOn(team, iso)) return;
-    const t = trainOf(team);
+    const t = trainAt(team, iso);
+    if (!t) return;
     ev.push({ iso, day: i === 0 ? 'Hoy' : dayLbl(iso), h: t.h || '--:--', kind: 'train', team, where: t.where || '', today: i === 0 });
   });
   for (const e of D.equipos) for (const p of e.partidos)
@@ -463,25 +467,37 @@ function noticeCard(n, cls = '') {
 /* Días, hora y campo de entreno de un equipo (lo edita la junta) */
 const CAMPOS = ['Campo entero', 'Campo 1', 'Campo 2'];
 function trainCard(team) {
-  const t = trainOf(team) || { dias: [], h: '', where: '' };
-  /* Ya guardado: se muestra como ficha, con botón para editar */
-  if (trainOf(team) && S.editTrain !== team) return card('h-tr', 'Entrenamientos', `<dl class="facts tr">
-      <div><dt>Días</dt><dd>${t.dias.map(d => DIAS[d - 1]).join(' · ')}</dd></div>
-      <div><dt>Hora</dt><dd>${esc(t.h || 'Sin hora')}</dd></div>
-      <div><dt>Campo</dt><dd>${esc(t.where || 'Sin campo')}</dd></div></dl>`, '', '<button type="button" class="more" id="tedit">Editar</button>');
+  const t = trainOf(team), ses = sesiones(t);
+  /* Ya guardado: se muestra como ficha, un renglón por día, con botón para editar */
+  if (t && S.editTrain !== team) return card('h-tr', 'Entrenamientos', `<div class="trs">${ses.map(x => `<div class="trs-r"><b>${DIAS_D[x.d - 1]}</b><span>${esc(x.h || 'Sin hora')}</span><span>${esc(x.where || 'Sin campo')}</span></div>`).join('')}</div>`,
+    '', '<button type="button" class="more" id="tedit">Editar</button>');
+  const last = ses[ses.length - 1] || {};
   return `<form id="tf" class="card stack" novalidate aria-labelledby="h-tr"><h2 id="h-tr" style="margin:0;font-size:1.1rem">Entrenamientos</h2>
-    <fieldset class="f"><legend>Días</legend><div class="chips">${DIAS.map((d, i) => `<label class="chip"><input type="checkbox" value="${i + 1}" ${t.dias.includes(i + 1) ? 'checked' : ''}> <span aria-hidden="true">${d}</span><span class="sr">${DIAS_L[i]}</span></label>`).join('')}</div></fieldset>
-    <div class="row2"><label class="f" for="th">Hora<input type="time" id="th" value="${esc(t.h || '')}"></label>
-    <label class="f" for="tw">Campo<select id="tw">${[...new Set([...CAMPOS, ...(t.where ? [t.where] : [])])].map(c => `<option ${(t.where || 'Campo entero') === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label></div>
-    <div class="btn-row">${trainOf(team) ? '<button type="button" class="btn ghost" id="tcancel">Cancelar</button>' : ''}<button type="submit" class="btn blue block">${ic('check')} Guardar</button></div></form>`;
+        <fieldset class="f"><legend>Días</legend><div class="chips">${DIAS.map((d, i) => `<label class="chip"><input type="checkbox" value="${i + 1}" ${ses.some(z => z.d === i + 1) ? 'checked' : ''}> <span aria-hidden="true">${d}</span><span class="sr">${DIAS_D[i]}</span></label>`).join('')}</div></fieldset>
+    <div class="trf">${DIAS_D.map((dn, i) => { const x = ses.find(z => z.d === i + 1), on = !!x, v = x || last;
+      return `<div class="trf-r" data-d="${i + 1}" ${on ? '' : 'hidden'}><b>${dn}</b>
+        <label class="f"><span class="sr">Hora del ${dn.toLowerCase()}</span><input type="time" value="${esc(v.h || '')}"></label>
+        <label class="f"><span class="sr">Campo del ${dn.toLowerCase()}</span><select>${[...new Set([...CAMPOS, ...(v.where ? [v.where] : [])])].map(c => `<option ${(v.where || 'Campo entero') === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></label></div>`; }).join('')}</div>
+    <p id="terr" class="err" role="alert" hidden></p>
+    <div class="btn-row">${t ? '<button type="button" class="btn ghost" id="tcancel">Cancelar</button>' : ''}<button type="submit" class="btn blue block">${ic('check')} Guardar</button></div></form>`;
 }
 function bindTrain(team) {
   if ($('#tedit')) { $('#tedit').onclick = () => { S.editTrain = team; render(); $('#tf input') && $('#tf input').focus(); }; return; }
   if ($('#tcancel')) $('#tcancel').onclick = () => { S.editTrain = null; render(); };
+  const rows = [...document.querySelectorAll('#tf .trf-r')];
+  /* Al marcar un día nuevo, copia la hora y el campo del último día marcado para no repetirlos */
+  document.querySelectorAll('#tf .chips input').forEach(cb => cb.onchange = () => {
+    const r = rows.find(o => o.dataset.d === cb.value);
+    if (cb.checked) { const prev = rows.filter(o => o !== r && !o.hidden).pop();
+      if (prev) { r.querySelector('input[type=time]').value = prev.querySelector('input[type=time]').value; r.querySelector('select').value = prev.querySelector('select').value; } }
+    r.hidden = !cb.checked;
+  });
   $('#tf').onsubmit = async e => {
     e.preventDefault();
-    const tr = { dias: [...document.querySelectorAll('#tf input[type=checkbox]:checked')].map(x => +x.value), h: $('#th').value, where: $('#tw').value };
-    try { API() && await API().entreno(team, tr); } catch (_) { say('No se ha podido guardar. Revisa la conexión.'); return; }
+    const ses = rows.filter(r => !r.hidden).map(r => ({ d: +r.dataset.d, h: r.querySelector('input[type=time]').value, where: r.querySelector('select').value }));
+    if (ses.some(x => !x.h)) { $('#terr').textContent = 'Pon la hora de cada día marcado.'; $('#terr').hidden = false; return; }
+    const tr = { dias: ses.map(x => x.d), h: (ses[0] || {}).h || '', where: (ses[0] || {}).where || '', ses };
+    try { API() && await API().entreno(team, tr); } catch (_) { $('#terr').textContent = 'No se ha podido guardar. Revisa la conexión.'; $('#terr').hidden = false; return; }
     S.teams[team].train = tr; S.editTrain = null; AGENDA = buildAgenda(); render();
     say(tr.dias.length ? `${team} entrena los ${tr.dias.map(d => DIAS_L[d - 1]).join(', ').replace(/, ([^,]*)$/, ' y $1')}` : `${team} sin días de entreno`);
   };
@@ -550,7 +566,7 @@ const COACH = {
     const notice = S.notices.find(n => !n.read) || S.notices[0];
     const nm = EQ[S.team] && nextMatch(EQ[S.team]);
     const mine2 = new Set(AGENDA.filter(x => x.kind === 'match' && S.teams[x.team]).map(x => x.iso));
-    const pend = pendingAll(), tt = trainsOn(S.team, TODAY) && trainOf(S.team);
+    const pend = pendingAll(), tt = trainAt(S.team, TODAY);
     return {
       kicker: `${greet()},`, title: esc(myName()), layout: '',
       body: `
@@ -597,10 +613,10 @@ const COACH = {
     const date = S.attDate, isToday = date === TODAY;
     const nextTrain = [1, 2, 3, 4, 5, 6, 7].map(i => addDays(TODAY, i)).find(d => trainsOn(S.team, d));
     const noTrainMsg = !trainOf(S.team) ? 'La junta aún no ha puesto los días de entreno de este equipo.'
-      : `Hoy no hay entreno, así que no se pasa lista.${nextTrain ? ` El próximo es el ${dateLbl(nextTrain).toLowerCase()}${trainOf(S.team).h ? ' a las ' + trainOf(S.team).h : ''}.` : ''}`;
+      : `Hoy no hay entreno, así que no se pasa lista.${nextTrain ? ` El próximo es el ${dateLbl(nextTrain).toLowerCase()}${trainAt(S.team, nextTrain).h ? ' a las ' + trainAt(S.team, nextTrain).h : ''}${trainAt(S.team, nextTrain).where ? ' en el ' + trainAt(S.team, nextTrain).where : ''}.` : ''}`;
     const key = `${S.team} ${date}`;
     const a = S.attend[key] || (S.attend[key] = new Set());
-    const tt = trainsOn(S.team, date) && trainOf(S.team);
+    const tt = date && trainAt(S.team, date);
     const pct = () => t.players.length ? Math.round(a.size / t.players.length * 100) : 0;
     const head = `<div class="stack" style="margin-bottom:16px">
       <div class="chips" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n => `<button type="button" class="chip" data-team="${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>
