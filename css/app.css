@@ -794,3 +794,15 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .gr-rest { margin: 10px 0 0; color: var(--muted); font-size: .88rem; }
 .gm-seg { display: flex; } .gm-seg button { flex: 1 1 auto; white-space: nowrap; }
 @media (max-width: 360px) { .gm-seg button { padding-left: .7rem; padding-right: .7rem; font-size: .9rem; } .gr { grid-template-columns: 3.9rem minmax(0, 1fr); gap: 8px; } }
+
+/* Asistencia de cada jugador (convocatoria, plantilla y su ficha) */
+.pcard .ppct { flex: none; }
+.ppct { font-size: .74rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.ppct.hi { background: var(--ok-soft); color: var(--ok-ink); } .ppct.mid { background: var(--gold-soft); color: var(--warn-ink); } .ppct.lo { background: var(--bad-soft); color: var(--bad-ink); }
+.patt { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+.patt-g { display: flex; align-items: center; gap: 14px; min-width: 0; } .patt-g .bignum { flex: none; } .patt-g small { color: var(--muted); font-size: .86rem; min-width: 0; }
+.patt .bignum.hi { color: var(--ok-ink); } .patt .bignum.mid { color: var(--warn-ink); } .patt .bignum.lo { color: var(--bad-ink); }
+.patt .bars { height: 96px; margin-top: 14px; }
+.pweeks { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+.pweeks div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; border-radius: 12px; background: var(--shell); font-size: .9rem; }
+.pweeks span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; } .pweeks b { white-space: nowrap; }
