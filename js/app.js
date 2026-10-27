@@ -624,7 +624,7 @@ const loadImg = src => new Promise(ok => { const i = new Image(); i.onload = () 
 async function convPoster(team, p, c, players) {
   await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
   const e = EQ[team], { dorsales, rows: list } = convList(players, c), W = 1080, ROW = 68;
-  const tableY = 744, rowsY = tableY + 150, notaH = c.nota ? 70 : 0, H = rowsY + list.length * ROW + 30 + notaH + 48;
+  const tableY = 744, rowsY = tableY + 150, notaH = c.nota ? 70 : 0, TOP = 122, H = rowsY + list.length * ROW + 30 + notaH + 48 - TOP;
   const cv = document.createElement('canvas'), x = cv.getContext('2d');
   cv.width = W; cv.height = H;
   const BLUE = '#0034DF', GOLD = '#FDCB2B', INK = '#0B0B0B', MUTED = '#5B6475', BG = '#F3F5FA';
@@ -639,10 +639,7 @@ async function convPoster(team, p, c, players) {
   const fitImg = (img, cx, cy, box) => { const k = Math.min(box / img.width, box / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); };
   const src = crestOf(e, p.rival), [ours, theirs] = await Promise.all([loadImg('icons/escudo.png'), src ? loadImg(src) : null]);
   x.fillStyle = BG; x.fillRect(0, 0, W, H);
-  // Cabecera
-  if (ours) fitImg(ours, 88, 92, 92);
-  text('Convocatoria', 152, 74, 800, 54, INK, 800, 'left');
-  text('C.D. Aznalcóllar Fútbol Base', 152, 122, 500, 28, MUTED, 800, 'left');
+  x.translate(0, -TOP); // sin cabecera: la tarjeta del partido empieza arriba
   // Tarjeta del partido (como en "Partidos")
   rr(48, 170, W - 96, 430, 40, '#FFFFFF');
   x.font = font(700, 30); const pw = Math.min(x.measureText(team).width + 44, 560);
@@ -662,7 +659,7 @@ async function convPoster(team, p, c, players) {
   rr(48, 624, W - 96, 96, 32, BLUE);
   text(`Citación: ${[c.hora, c.lugar].filter(Boolean).join(' - ')}`, W / 2, 673, 700, 36, '#FFFFFF');
   // Tabla de convocados
-  rr(48, tableY, W - 96, H - tableY - 48, 40, '#FFFFFF');
+  rr(48, tableY, W - 96, H + TOP - tableY - 48, 40, '#FFFFFF');
   text('Convocados', 96, tableY + 60, 800, 40, INK, 500, 'left');
   text(list.length === 1 ? '1 jugador' : `${list.length} jugadores`, W - 96, tableY + 60, 500, 30, MUTED, 300, 'right');
   text(dorsales ? 'Dorsal' : 'Número', 140, tableY + 122, 600, 26, MUTED, 120);
