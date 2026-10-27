@@ -152,6 +152,9 @@ create policy "crear peticiones" on public.peticiones for insert to authenticate
   with check (autor = auth.uid() and (equipo is null or public.es_junta() or public.entrena(equipo)));
 drop policy if exists "junta cambia estado" on public.peticiones;
 create policy "junta cambia estado" on public.peticiones for update to authenticated using (public.es_junta());
+-- Borrar: la junta, cualquiera; el entrenador, solo la suya mientras siga en "Enviada" (estado 0)
+drop policy if exists borrar_peticiones on public.peticiones;
+create policy borrar_peticiones on public.peticiones for delete to authenticated using (public.es_junta() or (autor = auth.uid() and estado = 0));
 
 alter table public.convocatorias enable row level security;
 drop policy if exists conv_mis_equipos on public.convocatorias;
