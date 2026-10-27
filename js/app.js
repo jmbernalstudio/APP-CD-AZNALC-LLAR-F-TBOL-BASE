@@ -666,13 +666,48 @@ function convScreen() {
   };
 }
 
+/* Próximo partido de cada equipo del entrenador: con varios equipos es un carrusel (arrastrar o puntos) */
+function matchSlide(team) {
+  const nm = EQ[team] && nextMatch(EQ[team]), cv = nm && S.conv[convKey(team, nm)];
+  return `${scoreHTML(team)}
+    <div class="match-btns">${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
+}
+function matchTag(team) { const nm = EQ[team] && nextMatch(EQ[team]); return nm ? dateLbl(nm.fecha) : ''; }
+function matchCarousel() {
+  const teams = Object.keys(S.teams), many = teams.length > 1, at = Math.max(0, teams.indexOf(S.team)), tag = matchTag(teams[at] || S.team);
+  const head = `<div class="card-h"><h2 id="h-m">Próximo partido</h2><span class="tag gold" id="mtag"${tag ? '' : ' hidden'}>${tag}</span></div>`;
+  if (!many) return `<div class="a-match mwrap"><section class="card match" aria-labelledby="h-m">${head}<div class="mslide">${matchSlide(S.team)}</div></section></div>`;
+  return `<div class="a-match mwrap"><section class="card match" aria-labelledby="h-m" aria-roledescription="carrusel">${head}
+    <div class="mcar" id="mcar" data-at="${at}">${teams.map((t, i) => `<div class="mslide" role="group" aria-roledescription="partido" aria-label="${esc(t)}, ${i + 1} de ${teams.length}"${i === at ? '' : ' inert'}>${matchSlide(t)}</div>`).join('')}</div></section>
+    <div class="mdots" role="group" aria-label="Elegir equipo">${teams.map((t, i) => `<button type="button" data-dot="${i}" aria-label="Próximo partido del ${esc(t)}"${i === at ? ' aria-current="true"' : ''}></button>`).join('')}</div></div>`;
+}
+function bindCarousel() {
+  document.querySelectorAll('[data-conv-team]').forEach(b => b.onclick = () => { S.team = b.dataset.convTeam; go('team', 'conv'); });
+  const car = $('#mcar'); if (!car) return;
+  const teams = Object.keys(S.teams), slides = [...car.children], dots = [...document.querySelectorAll('[data-dot]')];
+  let cur = +car.dataset.at;
+  const show = i => { cur = i; slides.forEach((s, k) => s.inert = k !== i); dots.forEach((d, k) => d.toggleAttribute('aria-current', k === i));
+    const tg = matchTag(teams[i]); $('#mtag').textContent = tg; $('#mtag').hidden = !tg; };
+  const to = (i, smooth = true) => car.scrollTo({ left: i * car.clientWidth, behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
+  requestAnimationFrame(() => to(cur, false));
+  car.addEventListener('scroll', () => { const i = Math.round(car.scrollLeft / car.clientWidth); if (i !== cur && slides[i]) show(i); }, { passive: true });
+  dots.forEach(d => d.onclick = () => { show(+d.dataset.dot); to(+d.dataset.dot); });
+  // Arrastrar con el ratón (en pantallas táctiles ya se desliza con el dedo)
+  let x0 = null, l0 = 0, moved = false;
+  car.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' || e.button) return; x0 = e.clientX; l0 = car.scrollLeft; moved = false; });
+  addEventListener('pointermove', e => { if (x0 === null) return; const dx = e.clientX - x0; if (Math.abs(dx) > 5 && !moved) { moved = true; car.classList.add('drag'); } if (moved) car.scrollLeft = l0 - dx; });
+  addEventListener('pointerup', e => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (!moved) return;
+    car.classList.remove('drag'); const i = Math.min(slides.length - 1, Math.max(0, Math.abs(dx) > car.clientWidth / 5 ? cur + (dx < 0 ? 1 : -1) : cur)); show(i); to(i); });
+  car.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
+  car.addEventListener('dragstart', e => e.preventDefault());
+}
+
 /* ---------- ENTRENADOR ---------- */
 const COACH = {
   home() {
     const t = S.teams[S.team];
     const mine = S.requests.filter(r => r.by === S.coach && r.st < 3);
     const notice = S.notices.find(n => !n.read) || S.notices[0];
-    const nm = EQ[S.team] && nextMatch(EQ[S.team]);
     const mine2 = new Set(AGENDA.filter(x => x.kind === 'match' && S.teams[x.team]).map(x => x.iso));
     const pend = pendingAll(), tt = trainAt(S.team, TODAY);
     return {
@@ -684,9 +719,7 @@ const COACH = {
       ${pend.length ? `<section class="card pend" aria-labelledby="h-pend"><div class="card-h"><h2 id="h-pend">${pend.length === 1 ? 'Tienes 1 lista sin pasar' : `Tienes ${pend.length} listas sin pasar`}</h2></div>
         <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
       <div class="grid coach-home">
-        ${card('h-m', 'Próximo partido', `${scoreHTML(S.team)}
-          <div class="match-btns">${nm ? `<button type="button" class="btn ${(S.conv[convKey(S.team, nm)] || {}).ids ? 'glass' : 'gold'}" data-go="team:conv">${ic('list')} ${(S.conv[convKey(S.team, nm)] || {}).ids ? `Convocatoria · ${S.conv[convKey(S.team, nm)].ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`,
-          'match a-match', nm ? `<span class="tag gold">${dateLbl(nm.fecha)}</span>` : '')}
+        ${matchCarousel()}
         <section class="hero a-hero" aria-labelledby="h-hero">
           <span class="kick">${tt ? `Hoy · ${esc(trainLbl(tt))}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>
           <h2 id="h-hero">Semana de partido para el ${S.team}</h2>
@@ -706,7 +739,7 @@ const COACH = {
           <span class="k">${abbr(n)}</span><span class="grow"><b>${n}</b><small>${EQ[n] ? EQ[n].cat : x.cat}</small></span>${ourRow(EQ[n]) ? `<span class="pill blue">${ourRow(EQ[n]).pos}º</span>` : ''}</button>`).join(''), 'a-teams')}
       </div>`,
       bind() {
-        bindAgenda();
+        bindAgenda(); bindCarousel();
         document.querySelectorAll('[data-att]').forEach(b => b.onclick = () => { S.team = b.dataset.attTeam; S.attDate = b.dataset.att; go('team', 'list'); });
         document.querySelectorAll('[data-say]').forEach(b => b.onclick = () => say(b.dataset.say));
       }
