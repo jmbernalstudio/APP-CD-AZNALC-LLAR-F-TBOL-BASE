@@ -565,3 +565,15 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
   .empty-page { min-height: max(300px, calc(100vh - 144px)); }
   .empty-page.g { min-height: max(260px, calc(100vh - 470px)); }
 }
+/* Pedir: selector "Hacer una petición / Mis peticiones" */
+.ask-seg button { display: inline-flex; align-items: center; gap: 8px; }
+.ask-seg .i { width: 18px; height: 18px; }
+.seg-n { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--club-soft); color: var(--club); font-size: .78rem; font-weight: 800; display: inline-grid; place-items: center; }
+.seg button[aria-pressed="true"] .seg-n { background: #fff; color: var(--ink); }
+.rq-cards .rq { padding: 0; border: 0; }
+@media (min-width: 1080px) { .empty-page.ask-empty { min-height: max(300px, calc(100vh - 208px)); } }
+@media (max-width: 600px) {
+  .ask-seg { width: 100%; } .ask-seg button { flex: 1; justify-content: center; padding-left: .4rem; padding-right: .4rem; gap: 6px; }
+  .ask-seg .i { display: none; }
+}
+@media (max-width: 380px) { .ask-seg button { font-size: .86rem; } .seg-n { min-width: 20px; height: 20px; } }
