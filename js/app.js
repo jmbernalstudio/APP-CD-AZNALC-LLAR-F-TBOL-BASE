@@ -693,6 +693,7 @@ function convScreen() {
   if (!p) return { kicker: 'Convocatoria', title: esc(team), back, body: emptyPage('cal', 'No hay próximo partido', 'Cuando haya un partido en el calendario podrás hacer la convocatoria.') };
   const k = convKey(team, p), saved = S.conv[k];
   const c = S.convDraft && S.convDraft.k === k ? S.convDraft : (S.convDraft = { k, ids: saved ? [...saved.ids] : [], hora: saved ? saved.hora : '', lugar: saved ? saved.lugar : '', nota: saved ? saved.nota : '' });
+  const allBtn = on => on ? `${ic('x')} Quitar a todos` : `${ic('check')} Convocar a todos`;
   const row = (x, i) => `<li><button type="button" class="player" data-cv="${x.id}" aria-pressed="${c.ids.includes(x.id)}">
     <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${x.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(x.n)}">${esc(x.n)}</span>
     <span class="pstate">${c.ids.includes(x.id) ? 'Convocado' : 'No va'}</span></span></button></li>`;
@@ -701,7 +702,7 @@ function convScreen() {
     body: `<div class="split"><div class="stack">
       <section class="card match" aria-label="Partido"><div class="att-top">
         <div><span class="tag">${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ' · Hora por confirmar'} · ${p.casa ? 'Local' : 'Visitante'}</span><div class="vs-time" style="margin-top:10px" id="cvn">${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>convocados</small></div>
-        <button type="button" class="btn gold" id="cvall">${ic('check')} Convocar a todos</button></div>
+        <button type="button" class="btn gold" id="cvall"${t.players.length ? '' : ' disabled'}>${allBtn(t.players.length && t.players.every(x => c.ids.includes(x.id)))}</button></div>
         ${placeOf(p) ? `<small class="cv-place">${ic('pin')} ${esc(placeOf(p))}</small>` : ''}</section>
       <p class="muted" style="margin:0">Toca a cada jugador para convocarlo o quitarlo.</p>
       ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
@@ -716,10 +717,12 @@ function convScreen() {
       </form></div>`,
     bind() {
       const sync = () => { c.hora = $('#cvh').value; c.lugar = $('#cvl').value.trim(); c.nota = $('#cvo').value.trim();
-        $('#cvn').innerHTML = `${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; };
+        $('#cvn').innerHTML = `${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`;
+        $('#cvall').innerHTML = allBtn(allOn()); };
+      const allOn = () => t.players.length > 0 && t.players.every(x => c.ids.includes(x.id));
       const paint = b => { const on = c.ids.includes(+b.dataset.cv); b.setAttribute('aria-pressed', on); b.querySelector('.pstate').textContent = on ? 'Convocado' : 'No va'; };
       document.querySelectorAll('[data-cv]').forEach(b => b.onclick = () => { const id = +b.dataset.cv; c.ids = c.ids.includes(id) ? c.ids.filter(x => x !== id) : [...c.ids, id]; paint(b); sync(); });
-      $('#cvall').onclick = () => { c.ids = t.players.map(x => x.id); document.querySelectorAll('[data-cv]').forEach(paint); sync(); };
+      $('#cvall').onclick = () => { c.ids = allOn() ? [] : t.players.map(x => x.id); document.querySelectorAll('[data-cv]').forEach(paint); sync(); };
       ['#cvh', '#cvl', '#cvo'].forEach(s => $(s).oninput = sync);
       const check = () => {
         sync(); $('#cvh').removeAttribute('aria-invalid'); $('#cvl').removeAttribute('aria-invalid');
@@ -834,6 +837,8 @@ const COACH = {
     const a = S.attend[key] || (S.attend[key] = new Set());
     const tt = date && trainAt(S.team, date);
     const pct = () => t.players.length ? Math.round(a.size / t.players.length * 100) : 0;
+    const allIn = () => t.players.length > 0 && t.players.every(p => a.has(p.id));
+    const allLbl = () => allIn() ? `${ic('x')} Quitar a todos` : `${ic('check')} Marcar a todos`;
     const head = `<div class="stack" style="margin-bottom:16px">
       <div class="seg g-scope seg-x" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n => `<button type="button" data-team="${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>
       <div class="tabs" role="group" aria-label="Vista">${[['list', 'Pasar lista'], ['games', 'Partidos'], ['table', 'Clasificación'], ['roster', 'Plantilla']].map(([k, l]) =>
@@ -846,7 +851,7 @@ const COACH = {
       ${dates.length > 1 || !dates.includes(TODAY) ? `<div class="seg g-scope seg-x" role="group" aria-label="Elige el entreno">${dates.map(d => `<button type="button" data-date="${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
       <section class="card match" aria-label="Resumen de asistencia"><div class="att-top">
         <div><span class="tag">${isToday ? 'Hoy' : dateLbl(date)}${tt ? ` · ${esc([tt.h, tt.where].filter(Boolean).join(' · '))}` : ''}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
-        <button type="button" class="btn gold" id="all">${ic('check')} Marcar a todos</button></div>
+        <button type="button" class="btn gold" id="all"${t.players.length ? '' : ' disabled'}>${allLbl()}</button></div>
         <div class="progress" aria-hidden="true"><i id="bar" style="width:${pct()}%"></i></div></section>
       <p class="muted" style="margin:0">Toca a cada jugador que ha venido. Se guarda solo.</p>
       ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
@@ -873,13 +878,19 @@ const COACH = {
           API() && API().asistencia(i, date, a.has(i)).catch(() => { a.has(i) ? a.delete(i) : a.add(i); render(); say('No se ha podido guardar. Revisa la conexión.'); });
           b.setAttribute('aria-pressed', a.has(i));
           b.querySelector('.pstate').textContent = a.has(i) ? 'Ha venido' : 'Sin marcar';
-          $('#cnt').innerHTML = `${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; $('#bar').style.width = pct() + '%';
+          $('#cnt').innerHTML = `${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; $('#bar').style.width = pct() + '%'; $('#all').innerHTML = allLbl();
           const ac = document.querySelector('.a-attend'); if (ac) ac.outerHTML = attendanceCard(S.team, ac.getAttribute('aria-labelledby'));
           save();
           $('#live').textContent = `${t.players.find(p => p.id === i).n}: ${a.has(i) ? 'ha venido' : 'sin marcar'}. ${a.size} de ${t.players.length}.`;
         });
         const all = $('#all');
         if (all) all.onclick = () => {
+          if (allIn()) {
+            const prev = new Set(a), gone = [...a];
+            a.clear(); render();
+            API() && Promise.all(gone.map(i => API().asistencia(i, date, false))).catch(() => say('No se ha podido guardar. Revisa la conexión.'));
+            return say('Lista vaciada', () => { S.attend[key] = prev; API() && gone.forEach(i => API().asistencia(i, date, true)); });
+          }
           const prev = new Set(a), added = t.players.filter(p => !a.has(p.id)).map(p => p.id);
           added.forEach(i => a.add(i)); render();
           API() && Promise.all(added.map(i => API().asistencia(i, date, true))).catch(() => say('No se ha podido guardar. Revisa la conexión.'));
