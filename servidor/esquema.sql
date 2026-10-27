@@ -204,7 +204,17 @@ begin
   update auth.users set encrypted_password = extensions.crypt(p_clave, extensions.gen_salt('bf')), updated_at = now() where id = p_perfil;
 end $$;
 
+-- Cada persona cambia SOLO su propio nombre (no puede tocar su rol ni nada más)
+create or replace function public.cambiar_nombre(p_nombre text) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if length(trim(coalesce(p_nombre, ''))) = 0 then raise exception 'Escribe un nombre'; end if;
+  update public.perfiles set nombre = left(trim(p_nombre), 60) where id = auth.uid();
+end $$;
+
 revoke all on function public.crear_usuario(text, text, text, text, text[]) from public, anon;
 revoke all on function public.cambiar_clave(uuid, text) from public, anon;
+revoke all on function public.cambiar_nombre(text) from public, anon;
 grant execute on function public.crear_usuario(text, text, text, text, text[]) to authenticated;
 grant execute on function public.cambiar_clave(uuid, text) to authenticated;
+grant execute on function public.cambiar_nombre(text) to authenticated;

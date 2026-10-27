@@ -2,6 +2,8 @@ const I = {
   home: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
   team: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><circle cx="17" cy="9" r="2.6"/><path d="M16.5 14.6c2.7.2 4.4 1.9 5 4.9"/>',
   plus: '<path d="M12 5v14M5 12h14"/>',
+  pen: '<path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/>',
+  out: '<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
@@ -176,7 +178,29 @@ function bindMe() {
   m.onkeydown = e => { if (e.key === 'Escape') { close(); b.focus(); } };
   document.onclick = close;
   if ($('#logout')) $('#logout').onclick = () => window.logout && window.logout();
+  $('#rename').onclick = () => { close(); renameMe(); };
   m.querySelectorAll('[data-role]').forEach(x => x.onclick = () => { S.role = x.dataset.role; go('home'); });
+}
+/* Ventana para cambiar el nombre que sale junto a la foto */
+function renameMe() {
+  const m = modal(`<h2 id="mdl-t">Cambiar mi nombre</h2>
+    <form id="nf" class="stack" novalidate>
+      <label class="f" for="nn">Tu nombre<span class="hint">Sale junto a tu foto</span><input type="text" id="nn" autocomplete="name" maxlength="60" value="${esc(myName())}"></label>
+      <p id="nerr" class="err" role="alert" hidden>Escribe tu nombre.</p>
+      <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="submit" class="btn blue">${ic('check')} Guardar</button></div>
+    </form>`, 'dialog', () => {});
+  $('#nn').focus(); $('#nn').select();
+  $('#nf').onsubmit = async e => {
+    e.preventDefault();
+    const n = $('#nn').value.trim().replace(/\s+/g, ' ');
+    if (!n) { $('#nerr').hidden = false; $('#nn').focus(); return; }
+    try { API() && await API().nombre(n); } catch (_) { $('#nerr').textContent = 'No se ha podido guardar. Revisa la conexión.'; $('#nerr').hidden = false; return; }
+    const old = myName();
+    S.requests.forEach(r => { if (r.by === old) r.by = n; });
+    const yo = S.people.find(p => p.id && p.id === S.me.id); if (yo) yo.nombre = n;
+    if (S.live || S.role === 'coach') { S.me.nombre = n; S.coach = n; } else S.board = n;
+    m.close(); render(); say('Nombre cambiado.');
+  };
 }
 /* Reduce la foto a 192 px (JPEG) para guardarla junto al perfil */
 function readPhoto(file) {
@@ -263,7 +287,8 @@ function render(focus) {
     <div class="me-wrap"><button type="button" class="me" id="me" aria-haspopup="true" aria-expanded="false" aria-controls="me-menu" aria-label="Tu cuenta: ${esc(myName())}">
       ${S.tab === 'home' ? `<span class="me-t"><small>${roleName()}</small></span>` : `<span class="me-t"><small>${roleName()}</small><b>${esc(myName())}</b></span>`}${avatar(myPerson(), 'av')}</button>
       <div class="me-menu card" id="me-menu" hidden>${avatar(myPerson(), 'av big')}<b>${esc(myName())}</b><small>${roleName()}</small>
-        ${S.live ? `<button type="button" class="btn out block" id="logout">Salir</button>`
+        <button type="button" class="btn ghost block" id="rename">${ic('pen')} Cambiar mi nombre</button>
+        ${S.live ? `<button type="button" class="btn red block" id="logout">${ic('out')} Cerrar sesión</button>`
           : `<div class="stack" style="width:100%;gap:8px"><small>Demostración · ver como</small>
             <button type="button" class="btn ${S.role === 'coach' ? 'blue' : 'out'} block" data-role="coach">Entrenador</button>
             <button type="button" class="btn ${S.role === 'board' ? 'blue' : 'out'} block" data-role="board">Junta</button></div>`}</div></div>
@@ -736,7 +761,7 @@ const teamOf = id => (D.equipos.find(e => e.id === id) || {}).nombre || id;
 function peopleCard() {
   return card('h-pp', `Entrenadores y accesos · ${S.people.length}`, (S.people.length ? S.people.map(p => `<div class="tm">${avatar(p, 'av')}
     <div class="grow"><b title="${esc(p.nombre)}">${esc(p.nombre)}</b><small title="${esc(p.usuario)}">${p.rol === 'junta' ? 'Junta directiva' : p.equipos.length ? p.equipos.map(teamOf).join(', ') : 'Sin equipo asignado'} · ${esc(p.usuario)}</small></div>
-    <button type="button" class="more" data-pw="${p.id}" aria-label="Cambiar foto o contraseña de ${esc(p.nombre)}">Editar</button></div>`).join('') : '<p class="muted" style="margin:0">Aún no hay nadie dado de alta.</p>'),
+    <button type="button" class="more" data-pw="${p.id}" aria-label="Editar a ${esc(p.nombre)}">Editar</button></div>`).join('') : '<p class="muted" style="margin:0">Aún no hay nadie dado de alta.</p>'),
     'a-people', `<button type="button" class="btn blue sm" data-go="team:alta">${ic('plus')} Dar de alta</button>`);
 }
 function bindPeople() {
@@ -746,7 +771,8 @@ function claveForm(p) {
   return `<form id="cf" class="card stack" novalidate>
     <div class="form2"><div class="stack"><h2 class="fh">Foto</h2><p style="margin:0">Entra con “${esc(p.usuario)}”.</p>
     ${photoField(p.foto, p.nombre)}</div>
-    <div class="stack"><h2 class="fh">Contraseña</h2><label class="f" for="cp">Contraseña nueva<span class="hint">Déjala vacía para no cambiarla</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false"></label></div></div>
+    <div class="stack"><h2 class="fh">${p.rol === 'entrenador' ? 'Contraseña y equipos' : 'Contraseña'}</h2><label class="f" for="cp">Contraseña nueva<span class="hint">Déjala vacía para no cambiarla</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
+    ${p.rol === 'entrenador' ? `<fieldset class="f" id="ceq"><legend>Sus equipos</legend><div class="chips">${D.equipos.map(e => `<label class="chip"><input type="checkbox" value="${e.id}"${p.equipos.includes(e.id) ? ' checked' : ''}> ${esc(e.nombre)}</label>`).join('')}</div></fieldset>` : ''}</div></div>
     <p id="cerr" class="err" role="alert" hidden></p>
     <button type="submit" class="btn blue block">${ic('check')} Guardar</button></form>`;
 }
@@ -757,11 +783,15 @@ function bindClave(p) {
     e.preventDefault();
     const pw = $('#cp').value, err = m => { $('#cerr').textContent = m; $('#cerr').hidden = false; };
     if (pw && pw.length < 8) return err('La contraseña debe tener al menos 8 caracteres.');
+    const eqs = $('#ceq') ? [...document.querySelectorAll('#ceq input:checked')].map(x => x.value) : p.equipos;
+    if ($('#ceq') && !eqs.length) return err('Marca al menos un equipo.');
+    const cambiaEq = [...eqs].sort().join() !== [...p.equipos].sort().join();
     try {
       if (pw && API()) await API().clave(p.id, pw);
       if (st.foto !== p.foto && API()) await API().foto(p.id, st.foto);
+      if (cambiaEq && API()) await API().equipos(p.id, eqs);
     } catch (_) { return err('No se ha podido guardar. Revisa la conexión.'); }
-    p.foto = st.foto; if (p.id === S.me.id) S.me.foto = st.foto;
+    p.foto = st.foto; p.equipos = eqs; if (p.id === S.me.id) S.me.foto = st.foto;
     go('team'); say(pw ? `Guardado. Dale la contraseña nueva a ${p.nombre.split(' ')[0]}.` : 'Guardado.');
   };
 }
