@@ -64,7 +64,7 @@ function crestBadge(e, name, cls = 'mini') {
     : `<span class="${cls}" style="background:var(--navy)" aria-hidden="true">${initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, ''))}</span>`;
 }
 const S = {
-  role: 'coach', tab: 'home', sub: null,
+  role: 'coach', tab: 'home', sub: null, conv: {},
   /* live = true cuando hay sesión iniciada en el servidor del club (js/servidor.js) */
   live: false, me: { id: null, nombre: 'Paco Martín' }, board: 'Ana Ruiz',
   coach: 'Paco', team: 'Alevín 2º año',
@@ -603,6 +603,61 @@ function editPlayer(team, p) {
   };
 }
 
+/* ---------- CONVOCATORIA ---------- */
+/* El entrenador elige quién va al próximo partido, la hora y el sitio de quedada, y puede mandarla por WhatsApp */
+const convKey = (team, p) => `${team} ${p.fecha}`;
+function convText(team, p, c, players) {
+  const names = players.filter(x => c.ids.includes(x.id)).map(x => `${x.dorsal ? x.dorsal + '. ' : '• '}${x.n}`);
+  return [`*Convocatoria ${team}*`, `${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${p.casa ? 'Local' : 'Visitante'} vs ${nice(p.rival)}`,
+    placeOf(p) ? `Campo: ${placeOf(p)}` : '', c.hora || c.lugar ? `Quedamos${c.hora ? ' a las ' + c.hora : ''}${c.lugar ? ' en ' + c.lugar : ''}` : '',
+    c.nota || '', '', ...names].filter((l, i, a) => l || (i > 0 && a[i - 1])).join('\n');
+}
+function convScreen() {
+  const team = S.team, t = S.teams[team], e = EQ[team], p = e && nextMatch(e);
+  const back = () => go('home');
+  if (!p) return { kicker: 'Convocatoria', title: esc(team), back, body: emptyPage('cal', 'No hay próximo partido', 'Cuando haya un partido en el calendario podrás hacer la convocatoria.') };
+  const k = convKey(team, p), saved = S.conv[k];
+  const c = S.convDraft && S.convDraft.k === k ? S.convDraft : (S.convDraft = { k, ids: saved ? [...saved.ids] : t.players.map(x => x.id), hora: saved ? saved.hora : '', lugar: saved ? saved.lugar : '', nota: saved ? saved.nota : '' });
+  const row = (x, i) => `<li><button type="button" class="player" data-cv="${x.id}" aria-pressed="${c.ids.includes(x.id)}">
+    <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${x.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(x.n)}">${esc(x.n)}</span>
+    <span class="pstate">${c.ids.includes(x.id) ? 'Convocado' : 'No va'}</span></span></button></li>`;
+  return {
+    kicker: `Convocatoria · ${esc(team)}`, title: `vs ${esc(nice(p.rival))}`, back,
+    body: `<div class="split"><div class="stack">
+      <section class="card match" aria-label="Partido"><div class="att-top">
+        <div><span class="tag">${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ' · Hora por confirmar'} · ${p.casa ? 'Local' : 'Visitante'}</span><div class="vs-time" style="margin-top:10px" id="cvn">${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>convocados</small></div>
+        <button type="button" class="btn gold" id="cvall">${ic('check')} Convocar a todos</button></div>
+        ${placeOf(p) ? `<small class="cv-place">${ic('pin')} ${esc(placeOf(p))}</small>` : ''}</section>
+      <p class="muted" style="margin:0">Toca a cada jugador para convocarlo o quitarlo.</p>
+      ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
+      <ul class="players">${t.players.map(row).join('')}</ul></div>
+      <form id="cvf" class="card stack" novalidate aria-labelledby="h-cv"><h2 id="h-cv" style="margin:0;font-size:1.1rem">Quedada</h2>
+        <div class="row2"><label class="f" for="cvh">Hora<input type="time" id="cvh" value="${esc(c.hora || '')}"></label>
+        <label class="f" for="cvl">Sitio<input type="text" id="cvl" maxlength="60" placeholder="P. ej. puerta del campo" value="${esc(c.lugar || '')}"></label></div>
+        <label class="f" for="cvo">Nota (opcional)<textarea id="cvo" maxlength="300" placeholder="P. ej. traed la 2ª equipación">${esc(c.nota || '')}</textarea></label>
+        <p id="cverr" class="err" role="alert" hidden></p>
+        <button type="submit" class="btn blue block">${ic('check')} Guardar convocatoria</button>
+        <a class="btn ghost block" id="cvwa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(convText(team, p, c, t.players))}">${ic('send')} Enviar por WhatsApp</a>
+      </form></div>`,
+    bind() {
+      const sync = () => { c.hora = $('#cvh').value; c.lugar = $('#cvl').value.trim(); c.nota = $('#cvo').value.trim();
+        $('#cvwa').href = 'https://wa.me/?text=' + encodeURIComponent(convText(team, p, c, t.players));
+        $('#cvn').innerHTML = `${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; };
+      const paint = b => { const on = c.ids.includes(+b.dataset.cv); b.setAttribute('aria-pressed', on); b.querySelector('.pstate').textContent = on ? 'Convocado' : 'No va'; };
+      document.querySelectorAll('[data-cv]').forEach(b => b.onclick = () => { const id = +b.dataset.cv; c.ids = c.ids.includes(id) ? c.ids.filter(x => x !== id) : [...c.ids, id]; paint(b); sync(); });
+      $('#cvall').onclick = () => { c.ids = t.players.map(x => x.id); document.querySelectorAll('[data-cv]').forEach(paint); sync(); };
+      ['#cvh', '#cvl', '#cvo'].forEach(s => $(s).oninput = sync);
+      $('#cvf').onsubmit = async ev => {
+        ev.preventDefault(); sync();
+        if (!c.ids.length) { $('#cverr').textContent = 'Convoca al menos a un jugador.'; $('#cverr').hidden = false; return; }
+        const val = { ids: [...c.ids], hora: c.hora, lugar: c.lugar, nota: c.nota };
+        try { API() && await API().convocatoria(team, p.fecha, val); } catch (_) { $('#cverr').textContent = 'No se ha podido guardar. Revisa la conexión.'; $('#cverr').hidden = false; return; }
+        S.conv[k] = val; S.convDraft = null; go('home'); say(`Convocatoria guardada: ${val.ids.length} jugadores. Para mandarla por WhatsApp, vuelve a abrir la convocatoria.`);
+      };
+    }
+  };
+}
+
 /* ---------- ENTRENADOR ---------- */
 const COACH = {
   home() {
@@ -622,7 +677,7 @@ const COACH = {
         <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
       <div class="grid coach-home">
         ${card('h-m', 'Próximo partido', `${scoreHTML(S.team)}
-          <div class="match-btns">${nm && nm.campo ? `<a class="btn gold" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`,
+          <div class="match-btns">${nm ? `<button type="button" class="btn ${(S.conv[convKey(S.team, nm)] || {}).ids ? 'glass' : 'gold'}" data-go="team:conv">${ic('list')} ${(S.conv[convKey(S.team, nm)] || {}).ids ? `Convocatoria · ${S.conv[convKey(S.team, nm)].ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.campo ? `<a class="btn gold" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`,
           'match a-match', nm ? `<span class="tag gold">${dateLbl(nm.fecha)}</span>` : '')}
         <section class="hero a-hero" aria-labelledby="h-hero">
           <span class="kick">${tt ? `Hoy · ${esc(trainLbl(tt))}` : esc(EQ[S.team] ? EQ[S.team].cat : t.cat || '')}</span>
@@ -650,6 +705,7 @@ const COACH = {
     };
   },
   team() {
+    if (S.sub === 'conv') return convScreen();
     const t = S.teams[S.team];
     const sub = S.sub || 'list';
     const pend = pendingLists(S.team);

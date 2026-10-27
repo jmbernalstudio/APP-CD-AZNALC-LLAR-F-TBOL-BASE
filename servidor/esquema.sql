@@ -82,6 +82,18 @@ create table if not exists public.avisos_leidos (
   primary key (aviso, perfil)
 );
 
+-- Convocatoria de cada partido: qué jugadores van, hora y sitio de quedada
+create table if not exists public.convocatorias (
+  equipo    text not null references public.equipos on delete cascade,
+  fecha     date not null,
+  jugadores bigint[] not null default array[]::bigint[],
+  hora      text not null default '',
+  lugar     text not null default '',
+  nota      text not null default '',
+  autor     uuid default auth.uid() references public.perfiles on delete set null,
+  primary key (equipo, fecha)
+);
+
 insert into public.equipos (id, nombre) values
   ('senior', 'Senior'), ('juvenil', 'Juvenil'), ('cadete', 'Cadete F-7'), ('infantil', 'Infantil'),
   ('alevin2', 'Alevín 2º año'), ('alevin1', 'Alevín 1º año'), ('benjamin2', 'Benjamín 2º año'),
@@ -140,6 +152,11 @@ create policy "crear peticiones" on public.peticiones for insert to authenticate
   with check (autor = auth.uid() and (equipo is null or public.es_junta() or public.entrena(equipo)));
 drop policy if exists "junta cambia estado" on public.peticiones;
 create policy "junta cambia estado" on public.peticiones for update to authenticated using (public.es_junta());
+
+alter table public.convocatorias enable row level security;
+drop policy if exists conv_mis_equipos on public.convocatorias;
+create policy conv_mis_equipos on public.convocatorias for all to authenticated
+  using (public.es_junta() or public.entrena(equipo)) with check (public.es_junta() or public.entrena(equipo));
 
 drop policy if exists "ver avisos" on public.avisos;
 create policy "ver avisos" on public.avisos for select to authenticated using (true);
