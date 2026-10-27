@@ -316,7 +316,11 @@ function agendaRow(e, withAct) {
     const p = e.p;
     what = `<span class="vsl"><span class="pill gold">vs</span>${crestBadge(e.e, p.rival)}<span class="nm">${esc(nice(p.rival))}</span></span><span class="where">${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</span>`;
   } else if (e.kind === 'club') what = `<span class="t">${e.title}</span><span class="where">${e.where}</span>`;
-  else what = `<span class="t">Entreno · ${e.team}</span>${e.today ? '<span class="pill">Hoy</span>' : ''}<span class="where">${e.where}</span>`;
+  else {
+    // El equipo va en la etiqueta de la derecha; en el móvil (sin etiqueta) o con el botón de pasar lista, va junto al campo
+    const btn = withAct && e.today;
+    what = `<span class="t">Entrenamiento</span>${e.today ? '<span class="pill">Hoy</span>' : ''}<span class="where"><span class="ev-tm${btn ? ' on' : ''}">${e.team}${e.where ? ' · ' : ''}</span>${e.where}</span>`;
+  }
   const act = withAct && e.today && e.kind === 'train'
     ? `<button type="button" class="btn gold sm ev-act" data-team-go="${e.team}">Pasar lista</button>`
     : `<span class="pill ${e.kind === 'match' ? 'gold' : e.kind === 'club' ? 'grey' : 'blue'} ev-act">${e.kind === 'club' ? 'Club' : e.team}</span>`;
