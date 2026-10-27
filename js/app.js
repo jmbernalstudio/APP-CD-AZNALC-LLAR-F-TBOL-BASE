@@ -498,7 +498,7 @@ function openMatch(e, p) {
       <div class="wide"><dt>Campo</dt><dd>${placeOf(p) ? esc(placeOf(p)) : 'Por confirmar'}</dd></div>
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
     ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
-    ${p.campo ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}
+    ${p.campo && !p.casa ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}
     <button type="button" class="btn ghost block" id="mx-wa">${ic('send')} Enviar por WhatsApp</button>`, 'dialog', () => {});
   m.el.classList.add('rqd', 'mx');
   m.el.querySelector('#mx-wa').onclick = () => { m.close(false); shareMatch(e, p); };
@@ -575,7 +575,8 @@ async function matchPoster(e, p) {
   return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
 }
 async function shareMatch(e, p) {
-  const maps = p.campo ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}` : '';
+  /* De local jugamos en nuestro campo: sin "Cómo llegar" */
+  const maps = p.campo && !p.casa ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}` : '';
   const msg = maps ? `*Cómo llegar y ubicación del partido:*\n\n📍 ${maps}` : '';
   let url = null;
   const m = modal(`<h2 id="mdl-t">Enviar el partido</h2><p id="pst-w">Preparando la imagen…</p><div id="pst"></div>`, 'dialog', () => { if (url) URL.revokeObjectURL(url); });
@@ -585,7 +586,7 @@ async function shareMatch(e, p) {
   const file = new File([blob], name, { type: 'image/png' });
   const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
   url = URL.createObjectURL(blob);
-  $('#pst-w').textContent = canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : 'Descarga la imagen y mándala por WhatsApp junto con el enlace.';
+  $('#pst-w').textContent = canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : `Descarga la imagen y mándala por WhatsApp${msg ? ' junto con el enlace' : ''}.`;
   $('#pst').outerHTML = `<img class="pst-img" src="${url}" alt="Partido del ${esc(e.nombre)} contra ${esc(nice(p.rival))}, ${longDate(p.fecha)}">
     ${canShare ? `<button type="button" class="btn blue block" id="pst-sh">${ic('send')} Compartir</button>`
       : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} Descargar imagen</button>`}
@@ -978,7 +979,7 @@ function convScreen() {
 function matchSlide(team) {
   const nm = EQ[team] && nextMatch(EQ[team]), cv = nm && S.conv[convKey(team, nm)];
   return `${scoreHTML(team)}
-    <div class="match-btns">${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
+    <div class="match-btns">${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.casa ? '' : nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
 }
 function matchTag(team) { const nm = EQ[team] && nextMatch(EQ[team]); return nm ? dateLbl(nm.fecha) : ''; }
 function matchCarousel() {
