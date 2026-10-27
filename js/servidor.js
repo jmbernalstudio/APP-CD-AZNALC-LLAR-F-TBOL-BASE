@@ -37,6 +37,7 @@
     async entreno(team, t) { ok(await sb.from('equipos').update({ dias: t.dias, hora: t.h, lugar: t.where }).eq('id', idEq(team))); },
     async foto(perfil, foto) { ok(await sb.from('perfiles').update({ foto }).eq('id', perfil)); },
     async clave(perfil, clave) { ok(await sb.rpc('cambiar_clave', { p_perfil: perfil, p_clave: clave })); },
+    async nombre(nombre) { ok(await sb.rpc('cambiar_nombre', { p_nombre: nombre })); },
     async equipos(perfil, ids) {
       ok(await sb.from('entrenador_equipo').delete().eq('perfil', perfil).not('equipo', 'in', `(${ids.join(',')})`));
       ok(await sb.from('entrenador_equipo').upsert(ids.map(equipo => ({ perfil, equipo })), { ignoreDuplicates: true }));
