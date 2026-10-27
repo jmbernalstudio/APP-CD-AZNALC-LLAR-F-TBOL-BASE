@@ -68,7 +68,12 @@ main.narrow { max-width: 680px; }
 .days span { display: flex; flex-direction: column; padding: 8px 0; border-radius: 16px; font-size: .78rem; color: var(--muted); font-weight: 500; }
 .days span b { font-size: 1.05rem; color: var(--ink); font-weight: 700; }
 .days span.today { background: var(--club); color: #fff; } .days span.today b { color: #fff; }
-.days span.has-match::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); margin: 3px auto 0; }
+.days .dots { display: flex; justify-content: center; gap: 4px; height: 6px; margin-top: 3px; }
+.dots i, .days-key i { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+i.dm { background: var(--gold); } i.dt { background: var(--ink); }
+.days span.today i.dt { background: #fff; }
+.days-key { display: flex; justify-content: center; gap: 16px; margin: -8px 0 14px; font-size: .78rem; color: var(--muted); }
+.days-key span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 
 /* Rejilla de inicio */
 .grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
@@ -374,8 +379,10 @@ a.btn { text-decoration: none; }
 .tm-btn { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: none; cursor: pointer; text-align: left; font: inherit; color: inherit; }
 .tm-btn:last-child { border-bottom: 0; }
 .tm .av { width: 44px; height: 44px; border-radius: 14px; background: var(--club); color: #fff; font-weight: 700; display: grid; place-items: center; flex: none; font-size: .9rem; }
-.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.row2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9.5rem), 1fr)); gap: 12px; }
 .row2 label.f { min-width: 0; }
+.row2 input { min-width: 0; max-width: 100%; }
+input[type=time] { display: block; -webkit-appearance: none; appearance: none; text-align: left; }
 fieldset.f { border: 0; padding: 0; margin: 0; min-width: 0; }
 fieldset.f legend { font-weight: 600; padding: 0; margin-bottom: 8px; }
 label.chip { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
@@ -423,4 +430,8 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .pend .chip { display: inline-flex; align-items: center; gap: 8px; }
 .pdot { width: 9px; height: 9px; border-radius: 50%; background: var(--bad); display: inline-block; flex: none; }
 .chip { display: inline-flex; align-items: center; gap: 8px; }
-.days span.has-train:not(.today) b { color: var(--club); }
+.notrain { flex-direction: row; align-items: center; gap: 14px; }
+.notrain .ic { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; background: var(--club-soft); color: var(--club); flex: none; }
+@media (min-width: 1080px) { .days-key { display: none; } }
+.chips.scroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+.chips.scroll .chip { flex: none; }

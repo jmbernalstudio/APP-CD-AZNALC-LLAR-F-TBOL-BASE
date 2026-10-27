@@ -186,12 +186,12 @@ const addDays = (iso, n) => { const d = toDate(iso); d.setDate(d.getDate() + n);
 const trainOf = team => S.teams[team] && S.teams[team].train && S.teams[team].train.dias.length ? S.teams[team].train : null;
 const trainsOn = (team, iso) => { const t = trainOf(team); return !!t && t.dias.includes(dow(iso)); };
 const trainLbl = t => ['Entrenamiento', t.h, t.where].filter(Boolean).join(' · ');
-/* Entrenos de la última semana (hoy incluido) en los que aún no se ha pasado lista */
-const pendingLists = team => {
-  const t = S.teams[team];
-  if (!trainOf(team) || !t.players.length) return [];
-  return [6, 5, 4, 3, 2, 1, 0].map(i => addDays(TODAY, -i)).filter(iso => trainsOn(team, iso) && !(S.attend[`${team} ${iso}`] || { size: 0 }).size);
-};
+/* Solo se pasa lista en días de entreno: hoy si toca, o uno de las dos últimas semanas que se olvidó */
+const LOOKBACK = 14;
+const trainDates = team => [...Array(LOOKBACK)].map((_, i) => addDays(TODAY, i - LOOKBACK + 1)).filter(d => trainsOn(team, d));
+/* Cuentan como pendientes desde la primera lista pasada en la app (antes no se usaba) */
+const firstList = team => Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort()[0] || TODAY;
+const pendingLists = team => S.teams[team].players.length ? trainDates(team).filter(d => d >= firstList(team) && !(S.attend[`${team} ${d}`] || { size: 0 }).size) : [];
 const pendingAll = () => Object.keys(S.teams).flatMap(team => pendingLists(team).map(iso => ({ team, iso })));
 /* Agenda: entrenos y partidos reales de los próximos 7 días; tira de días de lunes a domingo */
 const WEEK = [...Array(7)].map((_, i) => addDays(TODAY, i));
@@ -362,12 +362,11 @@ function rosterCard(team) {
   const t = S.teams[team];
   const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n));
   return `<div class="stack">${card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? list.map(p => `<div class="tm"><span class="k">${p.dorsal || '–'}</span>
-      <div class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.nac ? 'Nacido en ' + p.nac : 'Sin año de nacimiento'}</small></div>
+      <div class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.dorsal ? 'Dorsal ' + p.dorsal : 'Sin dorsal'}</small></div>
       <button type="button" class="more" data-del="${p.id}" aria-label="Quitar a ${esc(p.n)} de la plantilla">Quitar</button></div>`).join('') : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>')}
     <form id="pf" class="card stack" novalidate aria-labelledby="h-add"><h2 id="h-add" style="margin:0;font-size:1.1rem">Añadir jugador</h2>
       <label class="f" for="pn">Nombre y apellidos<input type="text" id="pn" autocomplete="off" required></label>
-      <div class="row2"><label class="f" for="pd">Dorsal<input type="number" id="pd" inputmode="numeric" min="1" max="99"></label>
-      <label class="f" for="py">Año de nacimiento<input type="number" id="py" inputmode="numeric" min="1950" max="${new Date().getFullYear()}"></label></div>
+      <label class="f" for="pd">Dorsal (opcional)<input type="number" id="pd" inputmode="numeric" min="1" max="99"></label>
       <p id="perr" class="err" role="alert" hidden>Escribe el nombre del jugador.</p>
       <button type="submit" class="btn blue block">${ic('plus')} Añadir a ${esc(team)}</button></form></div>`;
 }
@@ -376,7 +375,7 @@ function bindRoster(team) {
   if (!f) return;
   f.onsubmit = async e => {
     e.preventDefault();
-    const p = { n: $('#pn').value.trim(), dorsal: +$('#pd').value || null, nac: +$('#py').value || null };
+    const p = { n: $('#pn').value.trim(), dorsal: +$('#pd').value || null };
     if (!p.n) { $('#perr').hidden = false; $('#pn').focus(); return; }
     try { p.id = API() ? await API().jugador(team, p) : Date.now(); } catch (_) { say('No se ha podido guardar. Revisa la conexión.'); return; }
     t.players.push(p); render(); say(`${p.n} añadido a ${team}`); $('#pn') && $('#pn').focus();
@@ -401,7 +400,9 @@ const COACH = {
     return {
       kicker: `${greet()},`, title: esc(myName()), layout: '',
       body: `
-      <div class="days" aria-label="Esta semana">${MONWEEK.map(iso => { const [w, n] = dayLbl(iso).split(' '); return `<span class="${iso === TODAY ? 'today' : ''} ${mine2.has(iso) ? 'has-match' : ''} ${Object.keys(S.teams).some(tm => trainsOn(tm, iso)) ? 'has-train' : ''}">${w}<b>${n}</b></span>`; }).join('')}</div>
+      <div class="days" aria-label="Esta semana">${MONWEEK.map(iso => { const [w, n] = dayLbl(iso).split(' '); const tr = Object.keys(S.teams).some(tm => trainsOn(tm, iso)), mt = mine2.has(iso);
+        return `<span class="${iso === TODAY ? 'today' : ''}" aria-label="${dateLbl(iso)}${tr ? ', entreno' : ''}${mt ? ', partido' : ''}">${w}<b>${n}</b><i class="dots" aria-hidden="true">${tr ? '<i class="dt"></i>' : ''}${mt ? '<i class="dm"></i>' : ''}</i></span>`; }).join('')}</div>
+      <p class="days-key" aria-hidden="true"><span><i class="dt"></i>Entreno</span><span><i class="dm"></i>Partido</span></p>
       ${pend.length ? `<section class="card pend" aria-labelledby="h-pend"><div class="card-h"><h2 id="h-pend">${pend.length === 1 ? 'Tienes 1 lista sin pasar' : `Tienes ${pend.length} listas sin pasar`}</h2></div>
         <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
       <div class="grid coach-home">
@@ -437,10 +438,12 @@ const COACH = {
     const t = S.teams[S.team];
     const sub = S.sub || 'list';
     const pend = pendingLists(S.team);
-    const recent = S.attDate && S.attDate <= TODAY && S.attDate >= addDays(TODAY, -6) ? [S.attDate] : [];
-    const dates = [...new Set([...pend, ...recent, TODAY])].sort();
-    if (!dates.includes(S.attDate)) S.attDate = trainsOn(S.team, TODAY) || !pend.length ? TODAY : pend[pend.length - 1];
+    const dates = trainDates(S.team);
+    if (!dates.includes(S.attDate)) S.attDate = dates.includes(TODAY) ? TODAY : pend[pend.length - 1] || dates[dates.length - 1] || null;
     const date = S.attDate, isToday = date === TODAY;
+    const nextTrain = [1, 2, 3, 4, 5, 6, 7].map(i => addDays(TODAY, i)).find(d => trainsOn(S.team, d));
+    const noTrainMsg = !trainOf(S.team) ? 'La junta aún no ha puesto los días de entreno de este equipo.'
+      : `Hoy no hay entreno, así que no se pasa lista.${nextTrain ? ` El próximo es el ${dateLbl(nextTrain).toLowerCase()}${trainOf(S.team).h ? ' a las ' + trainOf(S.team).h : ''}.` : ''}`;
     const key = `${S.team} ${date}`;
     const a = S.attend[key] || (S.attend[key] = new Set());
     const tt = trainsOn(S.team, date) && trainOf(S.team);
@@ -450,8 +453,11 @@ const COACH = {
       <div class="tabs" role="group" aria-label="Vista">${[['list', 'Pasar lista'], ['games', 'Partidos'], ['table', 'Clasificación'], ['roster', 'Plantilla']].map(([k, l]) =>
         `<button type="button" data-sub="${k}" aria-pressed="${sub === k}">${l}</button>`).join('')}</div></div>`;
     let body = '';
-    if (sub === 'list') body = `<div class="split"><div class="stack">
-      ${dates.length > 1 ? `<div class="chips" role="group" aria-label="Elige el entreno">${dates.map(d => `<button type="button" class="chip" data-date="${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
+    if (sub === 'list' && !date) body = `<div class="split"><section class="card stack notrain" aria-label="Pasar lista"><span class="ic">${ic('cal')}</span><p style="margin:0">${esc(noTrainMsg)}</p></section>
+      ${attendanceCard(S.team, 'h-at2')}</div>`;
+    else if (sub === 'list') body = `<div class="split"><div class="stack">
+      ${!dates.includes(TODAY) ? `<p class="card muted" style="margin:0">${esc(noTrainMsg)} Si se te olvidó alguna, puedes completarla aquí:</p>` : ''}
+      ${dates.length > 1 || !dates.includes(TODAY) ? `<div class="chips scroll" role="group" aria-label="Elige el entreno">${dates.map(d => `<button type="button" class="chip" data-date="${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
       <section class="card match" aria-label="Resumen de asistencia"><div class="att-top">
         <div><span class="tag">${isToday ? 'Hoy' : dateLbl(date)}${tt ? ` · ${esc([tt.h, tt.where].filter(Boolean).join(' · '))}` : ''}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
         <button type="button" class="btn gold" id="all">${ic('check')} Marcar a todos</button></div>
@@ -471,9 +477,9 @@ const COACH = {
       body: head + body,
       bind() {
         document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; S.attDate = null; render(); });
-        document.querySelectorAll('[data-date]').forEach(b => b.onclick = () => { S.attDate = b.dataset.date; render(); });
         document.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => { S.sub = b.dataset.sub; render(); });
         bindRoster(S.team);
+        document.querySelectorAll('[data-date]').forEach(b => b.onclick = () => { S.attDate = b.dataset.date; render(); });
         document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => {
           const i = +b.dataset.p; a.has(i) ? a.delete(i) : a.add(i);
           API() && API().asistencia(i, date, a.has(i)).catch(() => { a.has(i) ? a.delete(i) : a.add(i); render(); say('No se ha podido guardar. Revisa la conexión.'); });
