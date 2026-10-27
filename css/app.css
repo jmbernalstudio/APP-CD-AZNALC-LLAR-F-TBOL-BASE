@@ -595,3 +595,8 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
   .coach-home > .a-attend .last { margin-top: auto; }
   .coach-home > .a-attend .bars-key { margin-bottom: 14px; }
 }
+/* Desplegables: flecha propia, del mismo tamaño y a la misma distancia del borde que el reloj del campo de hora */
+:root { --chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111111' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
+select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-right: 46px; text-overflow: ellipsis;
+  background-image: var(--chev); background-repeat: no-repeat; background-position: right 16px center; background-size: 18px 18px; }
+.rq .ctl select { padding-right: 42px; background-position: right 14px center; }
