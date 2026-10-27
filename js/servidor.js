@@ -94,6 +94,7 @@
     S.role = junta ? 'board' : 'coach';
     S.teams = {};
     const eqs = ok(await sb.from('equipos').select('id, dias, hora, lugar'));
+    mios.sort((a, b) => ORDEN.indexOf(a) - ORDEN.indexOf(b));
     for (const id of mios) {
       const q = eqs.find(x => x.id === id) || {};
       S.teams[nombreEq(id)] = { cat: '', train: { dias: q.dias || [], h: q.hora || '', where: q.lugar || '' }, players: [] };
