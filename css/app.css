@@ -465,7 +465,14 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
   .board-home { height: max(640px, calc(100vh - 144px)); grid-template-rows: auto minmax(0, 1fr) auto; }
   .board-home > .a-inbox, .board-home > .a-teams { align-self: stretch; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
   .board-home > .a-notice { align-self: end; }
-  .board-home .scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin-right: -10px; padding-right: 10px; }
+  .board-home:not(:has(.a-notice)) { grid-template-areas: "kpis kpis kpis kpis" "inbox inbox inbox teams" "inbox inbox inbox teams"; }
+  .board-home .scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin-right: -8px; padding-right: 14px; scrollbar-gutter: stable; }
+  /* Barra de scroll siempre visible, con los colores del club */
+  .board-home .scroll::-webkit-scrollbar { width: 8px; }
+  .board-home .scroll::-webkit-scrollbar-track { background: var(--club-soft); border-radius: 8px; }
+  .board-home .scroll::-webkit-scrollbar-thumb { background: var(--club); border-radius: 8px; }
+  .board-home .scroll::-webkit-scrollbar-thumb:hover { background: var(--navy); }
+  @supports not selector(::-webkit-scrollbar) { .board-home .scroll { scrollbar-width: thin; scrollbar-color: var(--club) var(--club-soft); } }
   .board-home > .a-inbox .empty { height: 100%; min-height: 0; margin: 0; }
 }
 
