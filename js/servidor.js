@@ -69,9 +69,9 @@
     box.innerHTML = `<main class="card stack" aria-labelledby="lg-t">
       <img class="cr crest" src="${CREST}" alt="">
       <div><h1 id="lg-t">C.D. Aznalcóllar Fútbol Base</h1><p class="sub">Entrenadores y junta directiva</p></div>
-      <form id="lg" class="stack" novalidate>
-        <label class="f" for="lu">Usuario o correo<input type="text" id="lu" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
-        <label class="f" for="lp">Contraseña<span class="pw"><input type="password" id="lp" autocomplete="current-password" required>
+      <form id="lg" class="stack" method="post" action="#" novalidate>
+        <label class="f" for="lu">Usuario o correo<input type="text" id="lu" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>
+        <label class="f" for="lp">Contraseña<span class="pw"><input type="password" id="lp" name="password" autocomplete="current-password" required>
           <button type="button" id="ver" aria-pressed="false">Ver</button></span></label>
         <p id="lerr" class="err" role="alert" ${msg ? '' : 'hidden'}>${msg ? esc(msg) : ''}</p>
         <button type="submit" class="btn blue block" id="lgo">Entrar</button>
@@ -87,9 +87,13 @@
       $('#lgo').disabled = true; $('#lgo').textContent = 'Entrando…';
       const { error } = await sb.auth.signInWithPassword({ email: emailDe(u), password: p });
       if (error) return err(/invalid/i.test(error.message) ? 'Usuario o contraseña incorrectos.' : 'No hay conexión. Prueba otra vez en un momento.');
+      /* El móvil ofrece guardar el usuario y la contraseña; además recordamos el usuario para la próxima vez */
+      try { localStorage.setItem('ultimo-usuario', u.trim()); } catch (_) {}
+      try { if (window.PasswordCredential) await navigator.credentials.store(new PasswordCredential({ id: u.trim(), password: p, name: u.trim() })); } catch (_) {}
       entrar();
     };
-    $('#lu').focus();
+    let ultimo = ''; try { ultimo = localStorage.getItem('ultimo-usuario') || ''; } catch (_) {}
+    if (ultimo) { $('#lu').value = ultimo; $('#lp').focus(); } else $('#lu').focus();
   }
 
   /* ---------- Cargar los datos de la persona que entra ---------- */
@@ -157,7 +161,7 @@
     }
     window.splashOff && splashOff();
     document.body.classList.remove('sin-sesion');
-    if ($('#login')) $('#login').hidden = true;
+    if ($('#login')) $('#login').remove();
     if (S.role === 'coach' && !S.team) {
       $('#main').innerHTML = `<section class="card stack"><h1 style="margin:0">Hola, ${esc(S.me.nombre.split(' ')[0])}</h1>
         <p style="margin:0">Todavía no tienes ningún equipo asignado. Pide a la junta que te asigne el tuyo y vuelve a entrar.</p></section>`;
@@ -167,11 +171,29 @@
     render();
   }
 
-  /* Al volver a la app, traer lo último (peticiones nuevas, avisos, estados) */
-  document.addEventListener('visibilitychange', async () => {
-    if (document.visibilityState !== 'visible' || !S.live || S.draft || document.activeElement.matches('input, textarea, select')) return;
-    try { if (await cargar()) render(); } catch (_) {}
-  });
+  /* Traer lo último (peticiones nuevas, avisos, estados) sin tener que cerrar sesión:
+     al volver a la app y cada 30 segundos mientras está abierta. No se repinta si la persona
+     está escribiendo, rellenando una petición o con una ventana abierta, ni si nada ha cambiado. */
+  let refrescando = false;
+  async function refrescar() {
+    if (refrescando || document.visibilityState !== 'visible' || !S.live) return;
+    const ocupado = () => S.tab === 'team' || (S.tab === 'ask' && S.askView !== 'mine' && S.draft && S.draft.step > 1) || $('.modal') || ($('#me-menu') && !$('#me-menu').hidden) || document.activeElement.matches('input, textarea, select');
+    if (ocupado()) return;
+    refrescando = true;
+    try {
+      const antes = JSON.stringify([S.requests, S.notices, S.conv]);
+      const tab = S.tab, sub = S.sub, team = S.team, y = scrollY;
+      if (await cargar() && !ocupado() && JSON.stringify([S.requests, S.notices, S.conv]) !== antes) {
+        S.tab = tab; S.sub = sub; if (S.teams[team]) S.team = team;
+        render(); scrollTo(0, y);
+      }
+    } catch (_) {} finally { refrescando = false; }
+  }
+  document.addEventListener('visibilitychange', refrescar);
+  window.addEventListener('focus', refrescar);
+  window.addEventListener('online', refrescar);
+  setInterval(refrescar, 30000);
+  window.refrescar = refrescar;
 
   window.startServer = async () => {
     document.body.classList.add('sin-sesion');
