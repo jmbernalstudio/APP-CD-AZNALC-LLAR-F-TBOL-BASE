@@ -349,28 +349,25 @@ function gamesView() {
   const week = all.filter(g => g.wk === wk && !g.p.descansa);
   const list = week.filter(g => venue === 'all' || (venue === 'home') === !!g.p.casa)
     .sort((a, b) => a.p.fecha.localeCompare(b.p.fecha) || (a.p.hora || '99').localeCompare(b.p.hora || '99') || ORDEN.indexOf(a.e.id) - ORDEN.indexOf(b.e.id));
-  const playing = new Set(week.map(g => g.e.id));
-  const off = D.equipos.filter(e => (!mineOnly || own(e)) && !playing.has(e.id)).sort((a, b) => ORDEN.indexOf(a.id) - ORDEN.indexOf(b.id));
   const done = list.filter(g => g.p.goles), cnt = k => done.filter(g => outcome(g.p) === k).length;
   const nav = `<div class="wk-nav card">
       <button type="button" class="iconbtn" data-wk="${prev || ''}" ${prev ? '' : 'disabled'} aria-label="Fin de semana anterior">${ic('back')}</button>
       <div class="wk-t"><small>${wk === now ? 'Este fin de semana' : wk < now ? 'Ya jugado' : 'Próximamente'}</small><b>${weekLbl(wk, week.length ? week.map(g => g.p.fecha).sort()[0] : null)}</b></div>
       <button type="button" class="iconbtn" data-wk="${next || ''}" ${next ? '' : 'disabled'} aria-label="Fin de semana siguiente">${ic('chev')}</button>
       ${wk !== now && weeks.includes(now) ? `<button type="button" class="more wk-now" data-wk="${now}">Volver a este fin de semana</button>` : ''}</div>`;
-  const stats = `<div class="kpis wk-k">
+  const stats = `<div class="kpis wk-k ${done.length ? '' : 'k3'}">
       <div class="kpi dark"><small>Partidos</small><b>${list.length}</b></div>
       ${done.length ? `<div class="kpi"><small>Ganados</small><b class="ok">${cnt('G')}</b></div><div class="kpi"><small>Empatados</small><b>${cnt('E')}</b></div><div class="kpi"><small>Perdidos</small><b class="bad">${cnt('P')}</b></div>`
-        : `<div class="kpi"><small>De local</small><b>${week.filter(g => g.p.casa).length}</b></div><div class="kpi"><small>De visitante</small><b>${week.filter(g => !g.p.casa).length}</b></div><div class="kpi"><small>Sin partido</small><b>${off.length}</b></div>`}</div>`;
+        : `<div class="kpi"><small>De local</small><b>${week.filter(g => g.p.casa).length}</b></div><div class="kpi"><small>De visitante</small><b>${week.filter(g => !g.p.casa).length}</b></div>`}</div>`;
   const body = list.length ? `<div class="games">${list.map(g => gameCard(g.e, g.p, own(g.e))).join('')}</div>`
     : `<section class="card empty"><b>No hay partidos${venue === 'home' ? ' de local' : venue === 'away' ? ' de visitante' : ''} este fin de semana</b></section>`;
-  const rest = off.length ? `<p class="off"><b>Sin partido:</b> ${off.map(e => esc(e.nombre)).join(' · ')}</p>` : '';
   const n = Object.keys(S.teams).length;
   const scope = coach ? `<div class="seg g-scope" role="group" aria-label="Qué partidos ver">
       <button type="button" data-gs="mine" aria-pressed="${mineOnly}">${n === 1 ? 'Mi equipo' : 'Mis equipos'}</button>
       <button type="button" data-gs="all" aria-pressed="${!mineOnly}">Todo el club</button></div>` : '';
   const venueSeg = `<div class="seg g-scope" role="group" aria-label="Local o visitante">${[['all', 'Todos'], ['home', 'Local'], ['away', 'Visitante']].map(([k, l]) =>
       `<button type="button" data-gv="${k}" aria-pressed="${venue === k}">${l}</button>`).join('')}</div>`;
-  return `<div class="stack"><div class="g-filters">${scope}${venueSeg}</div>${nav}${stats}${body}${rest}</div>`;
+  return `<div class="stack"><div class="g-filters">${scope}${venueSeg}</div>${nav}${stats}${body}</div>`;
 }
 /* Un partido de la temporada: fecha, rival con escudo, resultado o hora */
 function matchRow(e, p) {

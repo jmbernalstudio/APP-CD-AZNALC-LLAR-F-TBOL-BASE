@@ -528,3 +528,5 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .sent-f { margin-top: auto; padding-top: 10px; border-top: 1px solid var(--line); display: flex; justify-content: flex-end; }
 .g-filters { display: flex; flex-wrap: wrap; gap: 10px 12px; }
 @media (max-width: 440px) { .g-filters .seg { width: 100%; } .g-filters .seg button { flex: 1; padding-left: .5rem; padding-right: .5rem; } }
+.kpis.k3 > .kpi:first-child { grid-column: 1 / -1; }
+@media (min-width: 720px) { .kpis.k3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .kpis.k3 > .kpi:first-child { grid-column: auto; } }
