@@ -718,8 +718,9 @@ const BOARD = {
           <div class="kpi ${open.some(r => r.urgent) ? 'alert' : ''}"><small>Urgentes</small><b>${open.filter(r => r.urgent).length}</b></div>
           <div class="kpi"><small>Sin ver</small><b>${S.requests.filter(r => r.st === 0).length}</b></div>
           <div class="kpi"><small>Resueltas</small><b>${S.requests.filter(r => r.st === 3).length}</b></div></div>
-        ${card('h-in', 'Peticiones recibidas', order.map(r => reqRow(r, `<div class="ctl"><label for="s${r.id}">Estado</label>
-          <select id="s${r.id}" data-st="${r.id}">${STATES.map((s, i) => `<option value="${i}" ${i === r.st ? 'selected' : ''}>${s}</option>`).join('')}</select></div>`)).join(''), 'a-inbox')}
+        ${card('h-in', 'Peticiones recibidas', order.length ? order.map(r => reqRow(r, `<div class="ctl"><label for="s${r.id}">Estado</label>
+          <select id="s${r.id}" data-st="${r.id}">${STATES.map((s, i) => `<option value="${i}" ${i === r.st ? 'selected' : ''}>${s}</option>`).join('')}</select></div>`)).join('')
+          : `<div class="empty">${ic('inbox')}<b>No hay peticiones</b><small>Cuando un entrenador pida algo o avise de una incidencia, aparecerá aquí.</small></div>`, 'a-inbox')}
         ${card('h-tm', 'Nuestros equipos', teamsList(), 'a-teams', '<button type="button" class="more" data-go="team">Ver todos</button>')}
         ${noticeCard(S.notices[0], 'a-notice')}
       </div>`,

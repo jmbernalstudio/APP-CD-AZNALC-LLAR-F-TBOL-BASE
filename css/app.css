@@ -76,6 +76,10 @@ i.dm { background: var(--gold); } i.dt { background: var(--ink); }
 .days-key span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 
 /* Rejilla de inicio */
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; min-height: 260px; padding: 24px 16px; color: var(--muted); }
+.empty svg { width: 44px; height: 44px; color: var(--club); background: var(--club-soft); border-radius: 16px; padding: 10px; box-sizing: content-box; margin-bottom: 6px; }
+.empty b { color: var(--ink); font-size: 1.05rem; } .empty small { font-size: .9rem; max-width: 22rem; }
+.board-home > .a-inbox { display: flex; flex-direction: column; min-height: 340px; } .a-inbox > .empty { flex: 1; }
 .grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
 .coach-home { grid-template-areas: "match" "actions" "agenda" "attend" "reqs" "notice" "teams"; }
 .board-home { grid-template-areas: "kpis" "inbox" "teams" "notice"; }
@@ -336,7 +340,7 @@ html.big .act { flex-direction: row; justify-content: flex-start; min-height: 66
   main { margin-top: 18px; }
   .grid { align-items: start; }
   .coach-home { grid-template-areas: "hero hero" "match attend" "agenda agenda" "reqs reqs" "teams notice"; }
-  .board-home { grid-template-columns: minmax(0, 1fr) 20rem; grid-template-areas: "kpis kpis" "inbox teams" "inbox notice"; }
+  .board-home { grid-template-areas: "kpis kpis" "inbox inbox" "teams notice"; }
   .grid > .a-hero { display: flex; } .grid > .a-actions { display: none; }
   .ring { width: 70px; height: 70px; }
   .players { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); }
@@ -452,3 +456,10 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .modal p { margin: 0 0 6px; color: var(--muted); }
 .tm-btn .go { color: var(--muted); display: grid; place-items: center; flex: none; }
 .linkbtn { border: 0; background: none; color: var(--bad-ink); font-weight: 600; cursor: pointer; min-height: 44px; text-decoration: underline; text-underline-offset: 3px; align-self: center; }
+
+/* Escritorio ancho: las 4 tarjetas de arriba miden lo mismo que la columna de equipos */
+@media (min-width: 1360px) {
+  .board-home { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "kpis kpis kpis kpis" "inbox inbox inbox teams" "inbox inbox inbox notice"; }
+  .board-home .kpis { gap: 16px; }
+  .board-home > .a-inbox { align-self: stretch; min-height: 480px; }
+}
