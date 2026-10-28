@@ -1,6 +1,6 @@
 /* Generado por herramientas/actualizar.py desde rfaf.es y educationleague.es. No editar a mano. */
 window.DATOS = {
- "actualizado": "2026-10-27T18:15:03+00:00",
+ "actualizado": "2026-10-28T13:14:59+00:00",
  "equipos": [
   {
    "id": "senior",
@@ -1057,6 +1057,12 @@ window.DATOS = {
        "h": "20:30"
       },
       {
+       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
+       "v": "C.D. SAN JERONIMO",
+       "f": "2026-10-30",
+       "h": "21:00"
+      },
+      {
        "l": "U.D. LORETO",
        "v": "C.D. UNIÓN GERENA",
        "f": "2026-10-31",
@@ -1085,12 +1091,6 @@ window.DATOS = {
        "v": "C.D. SANTIPONCE",
        "f": "2026-11-01",
        "h": "18:00"
-      },
-      {
-       "l": "C.D. AZNALCOLLAR FUTBOL BASE",
-       "v": "C.D. SAN JERONIMO",
-       "f": "2026-10-30",
-       "h": "21:00"
       }
      ],
      "descansa": [
@@ -11714,11 +11714,11 @@ window.DATOS = {
      "pos": 10,
      "equipo": "CD Mairena",
      "pts": 3,
-     "j": 1,
+     "j": 2,
      "g": 1,
      "e": 0,
-     "p": 0,
-     "dif": 3
+     "p": 1,
+     "dif": 2
     },
     {
      "pos": 11,
@@ -11762,22 +11762,22 @@ window.DATOS = {
     },
     {
      "pos": 15,
+     "equipo": "EDM Bormujos",
+     "pts": 3,
+     "j": 2,
+     "g": 1,
+     "e": 0,
+     "p": 1,
+     "dif": -3
+    },
+    {
+     "pos": 16,
      "equipo": "EF Rio Grande",
      "pts": 0,
      "j": 2,
      "g": 0,
      "e": 0,
      "p": 2,
-     "dif": -4
-    },
-    {
-     "pos": 16,
-     "equipo": "EDM Bormujos",
-     "pts": 0,
-     "j": 1,
-     "g": 0,
-     "e": 0,
-     "p": 1,
      "dif": -4
     },
     {
@@ -12074,6 +12074,10 @@ window.DATOS = {
       {
        "l": "CD Mairena",
        "v": "EDM Bormujos",
+       "g": [
+        2,
+        3
+       ],
        "f": "2026-10-30",
        "h": "17:15"
       },
