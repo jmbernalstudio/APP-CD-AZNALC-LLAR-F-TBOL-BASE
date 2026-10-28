@@ -149,7 +149,7 @@ function modal(html, role, onClose) {
 function ask(title, text, okLabel) {
   return new Promise(done => {
     const m = modal(`<h2 id="mdl-t">${esc(title)}</h2><p>${esc(text)}</p>
-      <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="button" class="btn red" data-v="1">${esc(okLabel)}</button></div>`, 'alertdialog', done);
+      <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="button" class="btn red" data-v="1">${ic('trash')} ${esc(okLabel)}</button></div>`, 'alertdialog', done);
     m.el.querySelector('[data-v="0"]').focus();
   });
 }
@@ -1258,9 +1258,16 @@ function claveForm(p) {
     <div class="stack"><h2 class="fh">${p.rol === 'entrenador' ? 'Contraseña y equipos' : 'Contraseña'}</h2><label class="f" for="cp">Contraseña nueva<span class="hint">Déjala vacía para no cambiarla</span><input type="text" id="cp" autocomplete="off" autocapitalize="none" spellcheck="false"></label>
     ${p.rol === 'entrenador' ? `<fieldset class="f" id="ceq"><legend>Sus equipos</legend><div class="chips">${D.equipos.map(e => `<label class="chip"><input type="checkbox" value="${e.id}"${p.equipos.includes(e.id) ? ' checked' : ''}> ${esc(e.nombre)}</label>`).join('')}</div></fieldset>` : ''}</div></div>
     <p id="cerr" class="err" role="alert" hidden></p>
-    <button type="submit" class="btn blue block">${ic('check')} Guardar</button></form>`;
+    <button type="submit" class="btn blue block">${ic('check')} Guardar</button>
+    ${p.id !== S.me.id ? `<button type="button" class="btn red block" id="cdel">${ic('trash')} Borrar a ${esc(p.nombre.split(' ')[0])} y su acceso</button>` : ''}</form>`;
 }
 function bindClave(p) {
+  /* Borrar la cuenta: deja de poder entrar; sus peticiones se quedan en la bandeja */
+  if ($('#cdel')) $('#cdel').onclick = async () => {
+    if (!(await ask(`¿Borrar a ${p.nombre}?`, `Ya no podrá entrar en la app con “${p.usuario}”. Sus peticiones se quedan en la bandeja. No se puede deshacer.`, 'Sí, borrar'))) return;
+    try { API() && await API().borrarUsuario(p.id); } catch (_) { $('#cerr').textContent = 'No se ha podido borrar. Revisa la conexión.'; $('#cerr').hidden = false; return; }
+    S.people = S.people.filter(x => x !== p); go('team'); say(`${p.nombre} ya no tiene acceso a la app.`);
+  };
   const st = { foto: p.foto };
   bindPhoto(st);
   $('#cf').onsubmit = async e => {
