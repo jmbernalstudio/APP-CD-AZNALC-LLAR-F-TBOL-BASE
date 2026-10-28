@@ -55,7 +55,7 @@ create table if not exists public.asistencia (
 create table if not exists public.peticiones (
   id      bigint generated always as identity primary key,
   equipo  text references public.equipos on delete set null,
-  autor   uuid not null default auth.uid() references public.perfiles on delete cascade,
+  autor   uuid default auth.uid() references public.perfiles on delete set null,
   tipo    text not null check (tipo in ('material', 'roto', 'otra')),
   titulo  text not null,
   lugar   text not null default '',
@@ -237,6 +237,16 @@ begin
   update public.perfiles set nombre = left(trim(p_nombre), 60) where id = auth.uid();
 end $$;
 
+create or replace function public.borrar_usuario(p_perfil uuid) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not public.es_junta() then raise exception $m$Solo la junta puede borrar accesos$m$; end if;
+  if p_perfil = auth.uid() then raise exception $m$No puedes borrarte a ti mismo$m$; end if;
+  delete from auth.users where id = p_perfil;
+end $$;
+
+revoke all on function public.borrar_usuario(uuid) from public, anon;
+grant execute on function public.borrar_usuario(uuid) to authenticated;
 revoke all on function public.crear_usuario(text, text, text, text, text[]) from public, anon;
 revoke all on function public.cambiar_clave(uuid, text) from public, anon;
 revoke all on function public.cambiar_nombre(text) from public, anon;
