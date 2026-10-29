@@ -2165,7 +2165,7 @@ async function calPoster(wk) {
   const topLoose = HEAD + DAYH, topGrid = topLoose + (nLoose ? nLoose * LOOSE + 16 : 0), H = topGrid + (h1 - h0) * PXH + PAD + 16;
   const cv = document.createElement('canvas'), x = cv.getContext('2d');
   cv.width = W; cv.height = H;
-  const BLUE = '#0034DF', SOFT = '#E5EBFF', INK = '#0B0B0B', MUTED = '#5B6475', LINE = '#E3E6EE', BG = '#F3F5FA';
+  const BLUE = '#0034DF', SOFT = '#E5EBFF', INK = '#0B0B0B', MUTED = '#5B6475', LINE = '#BFC6D4', BG = '#F3F5FA';
   const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
   const text = (t, tx, y, w, px, color, maxW, align = 'left') => {
     x.font = font(w, px); while (px > 12 && x.measureText(t).width > maxW) x.font = font(w, --px);
