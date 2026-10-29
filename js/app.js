@@ -509,7 +509,7 @@ function openMatch(e, p) {
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
     ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
     ${p.campo && !p.casa ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}
-    ${lvAvail(e, p) ? `<button type="button" class="btn blue block" id="mx-lv">${ic(actaOf(e.nombre, p.fecha) && actaOf(e.nombre, p.fecha).fase === 'fin' ? 'list' : (actaOf(e.nombre, p.fecha) || {}).fase && actaOf(e.nombre, p.fecha).fase !== 'previa' ? 'play' : 'pen')} ${(() => { const a = actaOf(e.nombre, p.fecha); return !a || a.fase === 'previa' ? 'Datos del partido' : a.fase === 'fin' ? 'Ver acta del partido' : 'Seguir el directo'; })()}</button>` : ''}
+    ${lvAvail(e, p) ? `<button type="button" class="btn blue block" id="mx-lv">${ic(actaOf(e.nombre, p.fecha) && actaOf(e.nombre, p.fecha).fase === 'fin' ? 'list' : (actaOf(e.nombre, p.fecha) || {}).fase && actaOf(e.nombre, p.fecha).fase !== 'previa' ? 'play' : 'pen')} ${(() => { const a = actaOf(e.nombre, p.fecha); return !a || a.fase === 'previa' ? 'Rellenar datos' : a.fase === 'fin' ? 'Ver acta del partido' : 'Seguir el directo'; })()}</button>` : ''}
     ${fichaAvail(e, p) ? `<button type="button" class="btn outline block" id="mx-fp">${ic('list')} Ficha del partido</button>` : ''}
     ${p.goles && S.teams[e.nombre] && statsOn() && !stFilled(e.nombre, p.fecha) ? `<button type="button" class="btn outline block" id="mx-st">${ic('clock')} Apuntar minutos y goles</button>` : ''}
     <button type="button" class="btn outline block" id="mx-wa">${ic('send')} Enviar por WhatsApp</button>`, 'dialog', () => {});
@@ -1330,7 +1330,7 @@ function lvScreen(team, back) {
   const us = 'Aznalcóllar', them = L.rival;
   const score = `<div class="lv-sc"><b title="${esc(L.casa ? us : them)}">${esc(L.casa ? us : them)}</b><span class="lv-g">${L.casa ? L.nos : L.ellos}<i>–</i>${L.casa ? L.ellos : L.nos}</span><b title="${esc(L.casa ? them : us)}">${esc(L.casa ? them : us)}</b></div>`;
   const tag = `${dateLbl(f)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}`;
-  const kicker = `${L.fase === 'previa' ? 'Datos del partido' : 'Directo'} · ${esc(team)}`, title = `vs ${esc(them)}`;
+  const kicker = `${L.fase === 'previa' ? 'Rellenar datos' : 'Directo'} · ${esc(team)}`, title = `vs ${esc(them)}`;
 
   /* --- Antes de empezar: hace falta la convocatoria, y de ella salen titulares y suplentes --- */
   const cv = S.conv[convKey(team, p)];
@@ -1687,7 +1687,7 @@ function convScreen() {
 function matchSlide(team) {
   const nm = EQ[team] && nextMatch(EQ[team]), cv = nm && S.conv[convKey(team, nm)], ac = nm && actaOf(team, nm.fecha);
   return `${scoreHTML(team)}
-    <div class="match-btns">${nm && (cv || ac) ? `<button type="button" class="btn white" data-lv-team="${esc(team)}">${ic(!ac || ac.fase === 'previa' ? 'pen' : ac.fase === 'fin' ? 'list' : 'play')} ${!ac || ac.fase === 'previa' ? 'Datos del partido' : ac.fase === 'fin' ? 'Ver acta del partido' : 'Seguir el directo'}</button>` : ''}${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.casa ? '' : nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
+    <div class="match-btns">${nm && (cv || ac) ? `<button type="button" class="btn white" data-lv-team="${esc(team)}">${ic(!ac || ac.fase === 'previa' ? 'pen' : ac.fase === 'fin' ? 'list' : 'play')} ${!ac || ac.fase === 'previa' ? 'Rellenar datos' : ac.fase === 'fin' ? 'Ver acta del partido' : 'Seguir el directo'}</button>` : ''}${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.casa ? '' : nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
 }
 function matchTag(team) { const nm = EQ[team] && nextMatch(EQ[team]); return nm ? dateLbl(nm.fecha) : ''; }
 function matchCarousel() {
