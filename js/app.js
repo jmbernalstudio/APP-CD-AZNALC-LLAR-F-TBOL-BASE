@@ -1201,7 +1201,8 @@ const pzSpots = form => { const lines = form ? form.split('-').map(Number) : [],
   lines.forEach((k, r) => { for (let i = 0; i < k; i++) spots.push({ x: 100 * (i + 1) / (k + 1), y: 88 - (r + 1) * (74 / lines.length) }); });
   return spots; };
 function pizarra(team, L, players, save, e, p) {
-  const form = L.form || formsOf(team)[0] || '', spots = pzSpots(form), n = spots.length;
+  let form = L.form || formsOf(team)[0] || '', spots = pzSpots(form), n = spots.length;
+  const form0 = L.form;
   L.pz = L.pz || { ids: [] };
   let sel = null;   /* jugador elegido abajo, a la espera de tocar su hueco */
   const pl = id => players.find(x => x.id === id) || { id, n: 'Jugador', dorsal: null };
@@ -1214,7 +1215,9 @@ function pizarra(team, L, players, save, e, p) {
   const d = document.createElement('div');
   d.className = 'pz'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'pz-t');
   const back = document.activeElement;
-  const close = () => { d.remove(); document.removeEventListener('keydown', key); back && back.focus && back.focus(); };
+  const close = () => { d.remove(); document.removeEventListener('keydown', key);
+    if (L.form !== form0) render();   /* la tarjeta Formación de debajo enseña la nueva */
+    else if (back && back.focus) back.focus(); };
   const key = ev => { if (ev.key === 'Escape' && !document.querySelector('.modal')) close(); };
   const place = (i, id) => { const arr = slots(), cur = arr[i];
     if (id === null) arr[i] = null; else { const was = arr.indexOf(id); if (was >= 0) arr[was] = cur; arr[i] = id; }   /* si ya estaba en otro hueco, se cambian */
@@ -1225,7 +1228,8 @@ function pizarra(team, L, players, save, e, p) {
     d.innerHTML = `<div class="pz-in">
       <div class="pz-h"><div class="pz-vs">${crestBadge(e, L.casa ? us : p.rival, 'mini pz-cr')}<b title="${esc(L.casa ? us : them)}">${esc(L.casa ? us : them)}</b><span>vs</span><b title="${esc(L.casa ? them : us)}">${esc(L.casa ? them : us)}</b>${crestBadge(e, L.casa ? p.rival : us, 'mini pz-cr')}</div>
         <button type="button" class="iconbtn" id="pz-x" aria-label="Cerrar la pizarra">${ic('x')}</button></div>
-      <p class="pz-sub"><b id="pz-t">Pizarra${form ? ' · ' + esc(form) : ''}</b> · ${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}</p>
+      <p class="pz-sub"><b id="pz-t">Pizarra</b> · ${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}</p>
+      ${formsOf(team).length ? `<div class="pz-fm"><label for="pz-fm">Formación</label><select id="pz-fm">${formsOf(team).map(x => `<option${x === form ? ' selected' : ''}>${x}</option>`).join('')}</select></div>` : ''}
       <p class="pz-tip${sel != null ? ' on' : ''}" role="status">${sel != null ? `Ahora toca el hueco donde va <b>${esc(pl(sel).n)}</b>.` : '1. Toca un jugador de abajo · 2. Toca su hueco en el campo'}</p>
       <div class="pz-body"><div class="pz-field" role="group" aria-label="Campo">
         <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
@@ -1242,6 +1246,9 @@ function pizarra(team, L, players, save, e, p) {
         <div class="pz-btns"><button type="button" class="btn blue block" id="pz-wa"${ids.some(x => x != null) ? '' : ' disabled'}>${ic('send')} Enviar por WhatsApp</button>
         ${ids.some(x => x != null) ? `<button type="button" class="btn ghost block" id="pz-clr">${ic('undo')} Vaciar la pizarra</button>` : ''}</div></div></div></div>`;
     d.querySelector('#pz-x').onclick = close;
+    /* Cambiar la formación: los jugadores siguen en el mismo orden y pasan a las posiciones nuevas */
+    if (d.querySelector('#pz-fm')) d.querySelector('#pz-fm').onchange = ev => { form = L.form = ev.target.value; spots = pzSpots(form); n = spots.length; save(); draw();
+      d.querySelector('#pz-fm').focus(); };
     if (d.querySelector('#pz-clr')) d.querySelector('#pz-clr').onclick = () => { L.pz.ids = []; sel = null; save(); draw(); };
     d.querySelector('#pz-wa').onclick = () => shareImage({ title: 'Alineación', wait: 'Preparando la imagen…', build: () => pzPoster(team, L, players, e, p),
       name: fileName('alineacion', team, p.fecha), alt: `Alineación del ${team} contra ${them}`, msg: '', what: 'la imagen' });
