@@ -976,3 +976,28 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .st-sort { display: flex; width: 100%; max-width: 24rem; }
 .st-sort button { flex: 1 1 0; min-width: 0; padding-left: .5rem; padding-right: .5rem; }
 .modal .btn-row .btn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---------- Cómo fue el gol y ficha del partido ---------- */
+.como-g { display: flex; flex-direction: column; gap: 8px; }
+.como-g > b { font-size: .9rem; }
+.como-ch { display: flex; flex-wrap: wrap; gap: 8px; }
+.como-ch .chip { min-height: 42px; padding: 0 14px; box-shadow: none; background: var(--shell); font-size: .9rem; white-space: nowrap; }
+.como-ch .chip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.lv-como { display: block; color: var(--muted); font-size: .8rem; font-weight: 600; margin-top: 2px; }
+.lv-x.gol .lv-como { color: var(--muted); }
+.fp-seg button { padding-left: .5rem; padding-right: .5rem; min-width: 0; }
+.fp-gl { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.fp-g { display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 16px; background: var(--ok-soft); border-left: 5px solid var(--ok); }
+.fp-g.con { background: var(--bad-soft); border-left-color: var(--bad); }
+.fp-g .lv-mn { background: #fff; }
+.fp-g .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.fp-g b { font-size: .95rem; } .fp-g.fav b { color: var(--ok-ink); } .fp-g.con b { color: var(--bad-ink); }
+.fp-who { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fp-g small { color: var(--ink); opacity: .75; font-size: .85rem; }
+.fp-cit { display: flex; align-items: center; gap: 12px; }
+.fp-cit .i { color: var(--club); } .fp-cit span { min-width: 0; } .fp-cit b, .fp-cit small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .fp-cit small { color: var(--muted); }
+.fp-n { display: flex; flex-direction: column; min-width: 0; } .fp-n b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .fp-n small { color: var(--muted); font-size: .78rem; font-weight: 600; }
+.fp-btns { display: flex; flex-direction: column; gap: 10px; }
+.fp-btns:empty { display: none; }
+.fp-seg { width: 100%; max-width: 30rem; }
+.st-split > .stack { min-width: 0; }

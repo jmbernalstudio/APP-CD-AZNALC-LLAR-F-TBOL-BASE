@@ -144,9 +144,9 @@
       const t = S.teams[equipoDe[j.id]];
       if (t) t.players.push({ id: j.id, n: `${j.nombre} ${j.apellidos}`.trim(), dorsal: j.dorsal });
     }
-    /* Convocatorias de los próximos partidos (si la tabla aún no existe, se sigue sin ellas) */
+    /* Convocatorias de la temporada (también las pasadas, para la ficha de cada partido) (si la tabla aún no existe, se sigue sin ellas) */
     S.conv = {};
-    const conv = await sb.from('convocatorias').select('equipo, fecha, jugadores, hora, lugar, nota').gte('fecha', ISO(new Date()));
+    const conv = await sb.from('convocatorias').select('equipo, fecha, jugadores, hora, lugar, nota');
     for (const c of conv.data || []) S.conv[`${nombreEq(c.equipo)} ${c.fecha}`] = { ids: (c.jugadores || []).map(Number), hora: c.hora, lugar: c.lugar, nota: c.nota };
     /* Minutos y goles de la temporada (si la tabla aún no existe, se sigue sin ellos) */
     const est = { data: [] };
