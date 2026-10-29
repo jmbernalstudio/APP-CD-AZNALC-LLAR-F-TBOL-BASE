@@ -2202,8 +2202,10 @@ function trainView() {
     return `<div class="gt" role="table" aria-label="Calendario del día por equipos" style="--n:${n}">
       <div class="gt-r gt-th" role="row"><span role="columnheader">Equipo</span><span class="gt-ax" role="columnheader">${Array.from({ length: n }, (_, k) => `<i>${hhmm(t0 + k * 30)}</i>`).join('')}</span></div>
       ${teamsOf(list).map(t => { const mine = calLanes(timed.filter(x => x.team === t)), sin = loose.filter(x => x.team === t);
-        return `<div class="gt-r" role="row"><span class="pl-tm" role="rowheader" title="${esc(t)}"><span>${esc(t)}</span></span><span class="gt-tl" role="cell" style="height:${Math.max(1, ...mine.map(x => x.n)) * 76 + (sin.length ? 70 : 0)}px">
-          ${mine.map(x => `<span class="gt-ev" style="left:${pc(x.a)}%;width:${pc(x.z) - pc(x.a)}%;top:${x.lane * 76}px;height:76px">${chip(x)}</span>`).join('')}
+        /* Un partido lleva una línea más (escudos y rival), así que su fila es más alta */
+        const LH = mine.some(x => x.kind === 'pa') ? 120 : 76;
+        return `<div class="gt-r" role="row"><span class="pl-tm" role="rowheader" title="${esc(t)}"><span>${esc(t)}</span></span><span class="gt-tl" role="cell" style="height:${Math.max(1, ...mine.map(x => x.n)) * LH + (sin.length ? 70 : 0)}px">
+          ${mine.map(x => `<span class="gt-ev" style="left:${pc(x.a)}%;width:${pc(x.z) - pc(x.a)}%;top:${x.lane * LH}px;height:${LH}px">${chip(x)}</span>`).join('')}
           ${sin.length ? `<span class="gt-sin">${sin.map(x => chip(x)).join('')}</span>` : ''}</span></div>`; }).join('')}</div>`;
   };
   /* En el móvil y la tableta: lista por horas, con el principio y el final de cada cita */
