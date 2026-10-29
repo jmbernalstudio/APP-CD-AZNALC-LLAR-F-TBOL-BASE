@@ -1298,10 +1298,10 @@ async function pzPoster(team, L, players, e, p) {
   const ids = spots.map((_, i) => ok.includes((L.pz || { ids: [] }).ids[i]) ? L.pz.ids[i] : null);
   const bench = (L.fase === 'previa' ? L.sup : [...new Set([...L.tit, ...L.sup])].filter(id => !L.campo.includes(id))).filter(id => !ids.includes(id))
     .sort((a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99));
-  const W = 1080, PAD = 48, HEAD = 250, FW = W - PAD * 2, FH = Math.round(FW * 90 / 68), BENCH = bench.length ? 70 + Math.ceil(bench.length / 3) * 64 : 0;
-  const H = PAD + HEAD + 24 + FH + (BENCH ? 24 + BENCH : 0) + PAD;
+  const W = 1080, PAD = 48, HEAD = 380, FMH = form ? 84 + 24 : 0, FW = W - PAD * 2, FH = Math.round(FW * 90 / 68), BENCH = bench.length ? 70 + Math.ceil(bench.length / 3) * 64 : 0;
+  const H = PAD + HEAD + 24 + FMH + FH + (BENCH ? 24 + BENCH : 0) + PAD;
   const cv = document.createElement('canvas'), x = cv.getContext('2d'); cv.width = W; cv.height = H;
-  const BLUE = '#0034DF', GRASS = '#E9F6EE', INK = '#0B0B0B';   /* campo claro como el dibujo de la formación */
+  const BLUE = '#0034DF', GRASS = '#E9F6EE', INK = '#0B0B0B', MUTED = '#5B6582', SOFT = '#E6EBFD';   /* campo claro como el dibujo de la formación */
   const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
   const text = (t, tx, y, w, px, color, maxW, align = 'left', fit) => { x.font = font(w, px);
     if (fit) while (px > fit && x.measureText(t).width > maxW) x.font = font(w, --px);
@@ -1311,8 +1311,10 @@ async function pzPoster(team, L, players, e, p) {
   const rr = (rx, ry, rw, rh, rad, c) => { path(rx, ry, rw, rh, rad); x.fillStyle = c; x.fill(); };
   const crest = await loadImg('icons/escudo.png'), rival = crestOf(e, p.rival) ? await loadImg(crestOf(e, p.rival)) : null;
   const photos = {}; await Promise.all([...ids, ...bench].filter(id => id != null && pl(id).foto).map(async id => { photos[id] = await loadImg(pl(id).foto); }));
-  const badge = (img, cx, cy, sz) => { x.beginPath(); x.arc(cx, cy, sz / 2 + 8, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
-    if (img) { const k = Math.min(sz / img.width, sz / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); } };
+  const logo = (img, cx, cy, sz, name) => { if (img) { const k = Math.min(sz / img.width, sz / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); }
+    else { x.beginPath(); x.arc(cx, cy, sz / 2, 0, Math.PI * 2); x.fillStyle = INK; x.fill(); text(initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, '')), cx, cy + 2, 800, 36, '#FFFFFF', sz, 'center'); } };
+  /* Tarjeta blanca con la misma sombra suave que las de la app */
+  const card = (rx, ry, rw, rh, rad) => { x.save(); x.shadowColor = 'rgba(0,0,0,.16)'; x.shadowBlur = 40; x.shadowOffsetY = 14; rr(rx, ry, rw, rh, rad, '#FFFFFF'); x.restore(); };
   /* Cara del jugador: foto, si no dorsal, si no el icono de persona */
   const face = (id, cx, cy, r, bg = BLUE) => { const q = pl(id);
     x.beginPath(); x.arc(cx, cy, r + 4, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
@@ -1323,15 +1325,25 @@ async function pzPoster(team, L, players, e, p) {
     else { x.strokeStyle = '#FFFFFF'; x.lineWidth = r * 0.14; x.beginPath(); x.arc(cx, cy - r * 0.22, r * 0.3, 0, Math.PI * 2); x.stroke();
       x.beginPath(); x.arc(cx, cy + r * 0.72, r * 0.58, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); } };
   x.fillStyle = '#F3F5F9'; x.fillRect(0, 0, W, H);
-  /* Cabecera: los dos escudos y el partido */
-  rr(PAD, PAD, FW, HEAD, 32, BLUE);
-  const [lImg, rImg, lName, rName] = L.casa ? [crest, rival, 'Aznalcóllar', L.rival] : [rival, crest, L.rival, 'Aznalcóllar'];
-  badge(lImg, PAD + 100, PAD + 110, 104); badge(rImg, W - PAD - 100, PAD + 110, 104);
-  text(lName, W / 2 - 34, PAD + 92, 800, 40, '#FFFFFF', 300, 'right', 24); text('vs', W / 2, PAD + 92, 600, 30, '#C9D3FF', 60, 'center'); text(rName, W / 2 + 34, PAD + 92, 800, 40, '#FFFFFF', 300, 'left', 24);
-  text(`${longDate(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}`, W / 2, PAD + 150, 500, 28, '#FFFFFF', 560, 'center');
-  text(`${team} · Alineación${form ? ' · ' + form : ''}`, W / 2, PAD + 206, 700, 30, '#FFFFFF', FW - 80, 'center');
+  /* Cabecera: la misma tarjeta del partido que se ve en la pantalla */
+  card(PAD, PAD, FW, HEAD, 48);
+  x.font = font(700, 30); const pw = Math.min(x.measureText(team).width, 420) + 48;
+  rr(PAD + 36, PAD + 32, pw, 60, 30, SOFT); text(team, PAD + 60, PAD + 63, 700, 30, BLUE, 420);
+  const res = p.goles ? outcome(p) : null;
+  text(`${dateLbl(p.fecha)}${p.hora && res ? ' · ' + p.hora : ''} · J${p.j}`, PAD + FW - 36, PAD + 63, 500, 28, MUTED, FW - pw - 120, 'right');
+  const [lImg, rImg, lName, rName] = L.casa ? [crest, rival, 'Aznalcóllar', nice(p.rival)] : [rival, crest, nice(p.rival), 'Aznalcóllar'];
+  const lx = PAD + FW * 0.2, rx2 = PAD + FW * 0.8, cy0 = PAD + 178;
+  logo(lImg, lx, cy0, 120, lName); logo(rImg, rx2, cy0, 120, rName);
+  text(lName, lx, cy0 + 96, 700, 32, INK, 330, 'center'); text(rName, rx2, cy0 + 96, 700, 32, INK, 330, 'center');
+  if (res) { const sc = scoreTxt(p); x.font = font(800, 46); const sw = x.measureText(sc).width + 52;
+    rr(W / 2 - sw / 2, cy0 - 38, sw, 76, 20, res === 'G' ? '#12A15A' : res === 'P' ? '#E23B4E' : '#8A93A8'); text(sc, W / 2, cy0 + 2, 800, 46, '#FFFFFF', sw, 'center'); }
+  else if (p.hora) text(p.hora, W / 2, cy0 + 4, 800, 76, INK, 260, 'center');
+  else text('Hora por confirmar', W / 2, cy0 + 4, 700, 28, MUTED, 220, 'center');
+  text(`${L.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + placeOf(p) : ''}`, W / 2, PAD + HEAD - 40, 500, 28, MUTED, FW - 72, 'center');
+  /* La formación, como el selector de la pantalla */
+  if (form) { card(PAD, PAD + HEAD + 24, FW, 84, 28); text(form, PAD + 36, PAD + HEAD + 24 + 44, 700, 34, INK, FW - 72); }
   /* Campo */
-  const fx = PAD, fy = PAD + HEAD + 24;
+  const fx = PAD, fy = PAD + HEAD + 24 + FMH;
   rr(fx, fy, FW, FH, 28, GRASS); path(fx, fy, FW, FH, 28); x.strokeStyle = '#A9D5B7'; x.lineWidth = 6; x.stroke();
   x.strokeStyle = '#BFC6D4'; x.lineWidth = 4;
   x.beginPath(); x.moveTo(fx, fy + FH / 2); x.lineTo(fx + FW, fy + FH / 2); x.stroke();
@@ -1347,7 +1359,7 @@ async function pzPoster(team, L, players, e, p) {
   /* Banquillo */
   if (BENCH) { const by = fy + FH + 24; text(`Banquillo · ${bench.length}`, PAD, by + 26, 800, 32, INK, FW);
     const cw = FW / 3; bench.forEach((id, k) => { const cx = PAD + (k % 3) * cw, cy = by + 70 + Math.floor(k / 3) * 64 + 26;
-      rr(cx, cy - 26, cw - 12, 52, 26, '#E6EBFD'); face(id, cx + 26, cy, 20); text(pl(id).n, cx + 56, cy + 1, 700, 24, INK, cw - 80); }); }
+      rr(cx, cy - 26, cw - 12, 52, 26, '#FFFFFF'); face(id, cx + 26, cy, 20); text(pl(id).n, cx + 56, cy + 1, 700, 24, INK, cw - 80); }); }
   return new Promise(ok2 => cv.toBlob(b => ok2(b), 'image/png'));
 }
 /* Elegir jugador para un hueco de la pizarra: devuelve su id, null para dejar el hueco vacío, o undefined si se cierra */
