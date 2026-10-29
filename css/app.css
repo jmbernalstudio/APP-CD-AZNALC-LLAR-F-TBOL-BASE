@@ -1249,4 +1249,10 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .dd-l button[aria-selected="true"] { background: var(--ink); color: #fff; font-weight: 700; }
 .dd-l button .i { width: 18px; height: 18px; }
 .pz-gm .gm-h { justify-content: flex-start; min-width: 0; } .pz-gm .gm-h .pill { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pz-gm .gm-h small { margin-left: auto; flex: none; } .pz-gm .gm-h .iconbtn { flex: none; }
+.pz-gm .gm-h small { margin-left: auto; flex: none; } .pz-gm .gm-h .iconbtn { flex: none; background: var(--shell); box-shadow: none; }   /* la misma X que las ventanas */
+/* Todas las ventanas a pantalla completa (Jose): sin fondo oscuro, el contenido ocupa todo y en ordenador va centrado hasta 1100px */
+.modal { padding: 0; place-items: stretch; background: var(--card); }
+.modal > .card, .modal.rqd > .card, .modal.mx > .card { max-width: none; width: 100%; height: 100%; max-height: none; border-radius: 0; box-shadow: none; align-content: start;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, calc((100% - 1100px) / 2), env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, calc((100% - 1100px) / 2), env(safe-area-inset-left, 0px)); }
+.modal .card > * { flex-shrink: 0; }
+.modal .facts.mx-f { grid-template-columns: repeat(2, minmax(0, 1fr)); }
