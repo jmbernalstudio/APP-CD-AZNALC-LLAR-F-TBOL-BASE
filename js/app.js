@@ -25,6 +25,7 @@ const I = {
   up: '<path d="M6 15l6-6 6 6"/>',
   down: '<path d="M6 9l6 6 6-6"/>',
   eq: '<path d="M6 10h12M6 14h12"/>',
+  minus: '<path d="M5 12h14"/>',
   whistle: '<circle cx="9" cy="14" r="5"/><path d="M12.5 10.5L20 6v4l-5 2"/>'
 };
 const ic = n => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
@@ -69,7 +70,7 @@ function crestBadge(e, name, cls = 'mini') {
     : `<span class="${cls}" style="background:var(--navy)" aria-hidden="true">${initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, ''))}</span>`;
 }
 const S = {
-  role: 'coach', tab: 'home', sub: null, conv: {},
+  role: 'coach', tab: 'home', sub: null, conv: {}, stats: {},
   /* live = true cuando hay sesión iniciada en el servidor del club (js/servidor.js) */
   live: false, me: { id: null, nombre: 'Paco Martín' }, board: 'Ana Ruiz',
   coach: 'Paco', team: 'Alevín 2º año',
@@ -502,8 +503,10 @@ function openMatch(e, p) {
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
     ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
     ${p.campo && !p.casa ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}
+    ${p.goles && S.teams[e.nombre] && statsOn() ? `<button type="button" class="btn outline block" id="mx-st">${ic('clock')} ${stFilled(e.nombre, p.fecha) ? 'Ver minutos y goles' : 'Apuntar minutos y goles'}</button>` : ''}
     <button type="button" class="btn outline block" id="mx-wa">${ic('send')} Enviar por WhatsApp</button>`, 'dialog', () => {});
   m.el.classList.add('rqd', 'mx');
+  const st = m.el.querySelector('#mx-st'); if (st) st.onclick = () => { m.close(false); S.team = e.nombre; openSt(e.nombre, p.fecha); };
   m.el.querySelector('#mx-wa').onclick = () => { m.close(false); shareMatch(e, p); };
   m.el.querySelector('[data-v="0"]').focus();
 }
@@ -877,6 +880,7 @@ function editPlayer(team, p) {
   const t = S.teams[team];
   const m = modal(`<h2 id="mdl-t">${esc(p.n)}</h2>
     ${playerAttHTML(team, p)}
+    ${statsOn() && playerStats(p.id).pj ? `<div class="patt"><b>Liga</b>${statKpis(team, p)}</div>` : ''}
     <form id="ef" class="stack" novalidate><b style="margin-top:4px">Editar jugador</b>
       <label class="f" for="en">Nombre y apellidos<input type="text" id="en" autocomplete="off" value="${esc(p.n)}"></label>
       <label class="f" for="ed">Dorsal (opcional)<input type="number" id="ed" inputmode="numeric" min="1" max="99" value="${p.dorsal || ''}"></label>
@@ -898,6 +902,131 @@ function editPlayer(team, p) {
     try { API() && await API().quitarJugador(p.id, false); } catch (_) { say('No se ha podido quitar. Revisa la conexión.'); return; }
     t.players = t.players.filter(x => x !== p); render();
     say(`${p.n} ya no está en la plantilla`, () => { t.players.push(p); API() && API().quitarJugador(p.id, true); });
+  };
+}
+
+/* ---------- ESTADÍSTICAS ---------- */
+/* Minutos y goles de cada jugador en liga. La federación no los publica: el entrenador los apunta tras cada partido */
+const statOf = (id, f) => (S.stats[id] || {})[f];
+const stFilled = (team, f) => S.teams[team].players.some(p => statOf(p.id, f));
+function playerStats(id) {
+  const r = Object.values(S.stats[id] || {});
+  return { pj: r.length, m: r.reduce((a, x) => a + x.m, 0), g: r.reduce((a, x) => a + x.g, 0) };
+}
+const statsOn = () => !(S.live && S.statsOff);
+const goalsUs = p => p.goles[p.casa ? 0 : 1];
+function openSt(team, fecha) { S.stDate = fecha; S.stDraft = null; go('team', S.role === 'coach' ? 'st' : 'st:' + team); }
+function statsView(team) {
+  const t = S.teams[team], e = EQ[team];
+  if (!statsOn()) return `<section class="card stack notrain"><span class="ic">${ic('clock')}</span><p style="margin:0">Las estadísticas estarán listas en cuanto la junta termine un paso. Vuelve a mirar en un rato.</p></section>`;
+  const pl = e ? played(e).slice().reverse() : [], pend = pl.filter(p => !stFilled(team, p.fecha));
+  const sort = S.stSort || 'dorsal';
+  const rows = t.players.map(p => ({ p, ...playerStats(p.id) })).sort((a, b) => (sort === 'min' ? b.m - a.m || b.pj - a.pj : sort === 'goles' ? b.g - a.g || b.m - a.m : 0)
+    || (a.p.dorsal || 99) - (b.p.dorsal || 99) || a.p.n.localeCompare(b.p.n, 'es'));
+  const SORTS = [['dorsal', 'Dorsal'], ['min', 'Minutos'], ['goles', 'Goles']];
+  const players = card('h-st', 'Estadísticas de liga', !t.players.length ? '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>' : `
+    <div class="seg g-scope st-sort" role="group" aria-label="Ordenar por">${SORTS.map(([k, l]) => `<button type="button" data-sts="${k}" aria-pressed="${sort === k}">${l}</button>`).join('')}</div>
+    <div class="st-head" aria-hidden="true"><span>Jugador</span><span>PJ</span><span>Min.</span><span>Goles</span></div>
+    <div class="st-list">${rows.map(r => `<button type="button" class="st-row" data-stp="${r.p.id}" aria-label="${esc(r.p.n)}${r.p.dorsal ? ', dorsal ' + r.p.dorsal : ''}: ${r.pj} partidos, ${r.m} minutos, ${r.g} goles">
+      <span class="k">${r.p.dorsal || '–'}</span><b class="st-n" title="${esc(r.p.n)}">${esc(r.p.n)}</b><span>${r.pj}</span><span class="${sort === 'min' ? 'on' : ''}">${r.m}'</span><span class="${sort === 'goles' ? 'on' : ''}">${r.g}</span></button>`).join('')}</div>
+    <p class="muted st-foot">PJ: partidos jugados. Partidos apuntados: ${pl.length - pend.length} de ${pl.length}.</p>`, 'st-card');
+  const matches = card('h-stm', 'Partidos de liga', pl.length ? `<p class="muted" style="margin:0 0 4px">Toca un partido para apuntar o cambiar los minutos y los goles.</p>${pl.map(p => {
+    const res = outcome(p), done = stFilled(team, p.fecha);
+    return `<button type="button" class="mt st-mt" data-stm="${p.fecha}"><span class="cal-d"><span>J${p.j}</span><b>${toDate(p.fecha).getDate()}</b></span>${crestBadge(e, p.rival)}
+      <span class="grow"><b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b><small>${dateLbl(p.fecha)} · <span class="res-t ${res}">${scoreTxt(p)}</span></small></span>
+      ${done ? `<span class="pill">${ic('check')} Apuntado</span>` : '<span class="pill gold">Apuntar</span>'}</button>`;
+  }).join('')}` : '<p class="muted" style="margin:0">Todavía no se ha jugado ningún partido.</p>');
+  const banner = pend.length && t.players.length ? `<button type="button" class="card st-pend" data-stm="${pend[pend.length - 1].fecha}"><span class="ic">${ic('clock')}</span>
+    <span class="grow"><b>${pend.length === 1 ? '1 partido sin apuntar' : `${pend.length} partidos sin apuntar`}</b><small>Apunta el de ${esc(nice(pend[pend.length - 1].rival))}</small></span><span class="go" aria-hidden="true">${ic('chev')}</span></button>` : '';
+  return `<div class="stack">${banner}<div class="split st-split">${players}${matches}</div></div>`;
+}
+function bindStats(team) {
+  document.querySelectorAll('[data-sts]').forEach(b => b.onclick = () => { S.stSort = b.dataset.sts; render(); });
+  document.querySelectorAll('[data-stm]').forEach(b => b.onclick = () => openSt(team, b.dataset.stm));
+  document.querySelectorAll('[data-stp]').forEach(b => b.onclick = () => statPlayer(team, S.teams[team].players.find(x => x.id == b.dataset.stp)));
+}
+/* Cifras de liga de un jugador (en su ficha y en la ventana de estadísticas) */
+function statKpis(team, p) {
+  const s = playerStats(p.id), e = EQ[team], du = durOf(team), full = du.partes * du.min;
+  const filled = e ? played(e).filter(x => stFilled(team, x.fecha)).length : 0, pct = filled && full ? Math.round(s.m / (filled * full) * 100) : null;
+  return `<div class="st-kpis"><div><b>${s.pj}</b><small>Partidos</small></div><div><b>${s.m}'</b><small>Minutos</small></div><div><b>${s.g}</b><small>Goles</small></div><div><b>${s.pj ? Math.round(s.m / s.pj) + "'" : '–'}</b><small>Media</small></div></div>
+    ${pct != null ? `<small class="muted">Ha jugado el ${pct}% de los minutos posibles (${filled} partido${filled === 1 ? '' : 's'} apuntado${filled === 1 ? '' : 's'}).</small>` : ''}`;
+}
+function statPlayer(team, p) {
+  const e = EQ[team], pl = e ? played(e).slice().reverse().filter(x => stFilled(team, x.fecha)) : [];
+  const m = modal(`<div class="rqd-h"><span class="st-dor" aria-hidden="true">${p.dorsal || '–'}</span><div class="grow"><h2 id="mdl-t" class="st-h2" title="${esc(p.n)}">${esc(p.n)}</h2><small>${esc(team)}${p.dorsal ? ' · Dorsal ' + p.dorsal : ''}</small></div>
+      <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+    ${statKpis(team, p)}
+    <b>Partido a partido</b>
+    ${pl.length ? `<div class="st-pm">${pl.map(x => { const s = statOf(p.id, x.fecha);
+      return `<div class="${s ? '' : 'no'}"><span class="grow"><b title="${esc(nice(x.rival))}">${esc(nice(x.rival))}</b><small>${dateLbl(x.fecha)} · ${scoreTxt(x)}</small></span>${s ? `<span class="st-v">${s.m}'</span><span class="st-v">${s.g ? `${s.g} gol${s.g === 1 ? '' : 'es'}` : '–'}</span>` : '<span class="st-v no">No jugó</span>'}</div>`; }).join('')}</div>`
+      : '<p class="muted" style="margin:0">Todavía no hay partidos apuntados.</p>'}`, 'dialog', () => {});
+  m.el.classList.add('rqd');
+  m.el.querySelector('[data-v="0"]').focus();
+}
+/* Pantalla para apuntar quién jugó, cuántos minutos y sus goles en un partido */
+function stScreen(team, back) {
+  const t = S.teams[team], e = EQ[team], p = e && played(e).find(x => x.fecha === S.stDate);
+  if (!p) return { kicker: 'Minutos y goles', title: esc(team), back, body: emptyPage('cal', 'No encontramos ese partido', 'Vuelve atrás y elige otro partido.') };
+  const du = durOf(team), full = du.partes * du.min, max = full + 30, k = `${team} ${p.fecha}`;
+  const d = S.stDraft && S.stDraft.k === k ? S.stDraft
+    : (S.stDraft = { k, rows: Object.fromEntries(t.players.filter(x => statOf(x.id, p.fecha)).map(x => [x.id, { ...statOf(x.id, p.fecha) }])) });
+  const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n, 'es'));
+  const ours = goalsUs(p), res = outcome(p);
+  const row = x => { const r = d.rows[x.id], on = !!r;
+    return `<li class="st-e ${on ? 'on' : ''}" data-ste="${x.id}"><button type="button" class="st-tg" aria-pressed="${on}"><span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${x.dorsal || '–'}</span>
+      <span class="grow"><b title="${esc(x.n)}">${esc(x.n)}</b><small class="pstate">${on ? 'Ha jugado' : 'No ha jugado'}</small></span></button>
+      <div class="st-c" ${on ? '' : 'hidden'}><label class="st-m" for="stm-${x.id}">Minutos<input type="number" id="stm-${x.id}" inputmode="numeric" min="1" max="${max}" value="${on ? r.m : full}"></label>
+      <div class="st-g" role="group" aria-label="Goles de ${esc(x.n)}"><span>Goles</span><span class="st-gc"><button type="button" class="iconbtn" data-gd="-1" aria-label="Un gol menos">${ic('minus')}</button><output>${on ? r.g : 0}</output><button type="button" class="iconbtn" data-gd="1" aria-label="Un gol más">${ic('plus')}</button></span></div></div></li>`; };
+  const n = () => Object.keys(d.rows).length, gl = () => Object.values(d.rows).reduce((a, r) => a + r.g, 0);
+  const allOn = () => t.players.length > 0 && t.players.every(x => d.rows[x.id]);
+  const allBtn = () => allOn() ? `${ic('x')} Quitar a todos` : `${ic('check')} Todos jugaron`;
+  const goalsTxt = () => `Goles apuntados: <b>${gl()}</b> de ${ours} que marcó el equipo.`;
+  return {
+    kicker: `Minutos y goles · ${esc(team)}`, title: `vs ${esc(nice(p.rival))}`, back,
+    body: `<div class="split"><div class="stack">
+      <section class="card match" aria-label="Partido"><div class="att-top">
+        <div><span class="tag">${dateLbl(p.fecha)} · ${p.casa ? 'Local' : 'Visitante'} · ${res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado'} ${scoreTxt(p)}</span><div class="vs-time" style="margin-top:10px" id="stn">${n()}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han jugado</small></div>
+        <button type="button" class="btn gold" id="stall"${t.players.length ? '' : ' disabled'}>${allBtn()}</button></div>
+        <small class="cv-place">${ic('clock')} Partido de ${full} minutos</small></section>
+      <p class="muted" style="margin:0">Toca a cada jugador que ha jugado. Luego cambia sus minutos si no jugó el partido entero y súmale sus goles.</p>
+      ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
+      <ul class="st-es">${list.map(row).join('')}</ul></div>
+      <form id="stf" class="card stack st-save" novalidate aria-labelledby="h-sts"><h2 id="h-sts" style="margin:0;font-size:1.1rem">Guardar</h2>
+        <p class="muted" style="margin:0" id="stgl" aria-live="polite">${goalsTxt()}</p>
+        <p id="sterr" class="err" role="alert" hidden></p>
+        <button type="submit" class="btn blue block">${ic('check')} Guardar minutos y goles</button></form></div>`,
+    bind() {
+      const sync = () => { $('#stn').innerHTML = `${n()}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`; $('#stall').innerHTML = allBtn(); $('#stgl').innerHTML = goalsTxt(); };
+      const paint = li => { const id = +li.dataset.ste, r = d.rows[id], on = !!r;
+        li.querySelector('.st-tg').setAttribute('aria-pressed', on); li.querySelector('.pstate').textContent = on ? 'Ha jugado' : 'No ha jugado';
+        li.classList.toggle('on', on); li.querySelector('.st-c').hidden = !on; if (on) { li.querySelector('input').value = r.m; li.querySelector('output').textContent = r.g; } };
+      const lis = [...document.querySelectorAll('[data-ste]')];
+      lis.forEach(li => {
+        const id = +li.dataset.ste;
+        li.querySelector('.st-tg').onclick = () => { if (d.rows[id]) delete d.rows[id]; else d.rows[id] = { m: full, g: 0 }; paint(li); sync(); };
+        li.querySelector('input').oninput = ev => { if (d.rows[id]) d.rows[id].m = +ev.target.value || 0; };
+        li.querySelectorAll('[data-gd]').forEach(b => b.onclick = () => { const r = d.rows[id]; if (!r) return; r.g = Math.min(20, Math.max(0, r.g + +b.dataset.gd)); paint(li); sync();
+          $('#live').textContent = `${t.players.find(x => x.id === id).n}: ${r.g} gol${r.g === 1 ? '' : 'es'}`; });
+      });
+      $('#stall').onclick = () => { if (allOn()) d.rows = {}; else t.players.forEach(x => { d.rows[x.id] = d.rows[x.id] || { m: full, g: 0 }; }); lis.forEach(paint); sync(); };
+      $('#stf').onsubmit = async ev => {
+        ev.preventDefault();
+        const err = (m, el) => { $('#sterr').textContent = m; $('#sterr').hidden = false; if (el) { el.setAttribute('aria-invalid', 'true'); el.focus(); } };
+        document.querySelectorAll('.st-m input').forEach(i => i.removeAttribute('aria-invalid'));
+        const ids = Object.keys(d.rows).map(Number);
+        if (!ids.length) return err('Marca al menos a un jugador que haya jugado.');
+        const bad = list.find(x => d.rows[x.id] && !(d.rows[x.id].m >= 1 && d.rows[x.id].m <= max));
+        if (bad) return err(`Revisa los minutos de ${bad.n} (entre 1 y ${max}).`, $(`#stm-${bad.id}`));
+        const filas = ids.map(id => ({ id, m: Math.round(d.rows[id].m), g: d.rows[id].g }));
+        const quitar = t.players.filter(x => statOf(x.id, p.fecha) && !d.rows[x.id]).map(x => x.id);
+        try { API() && await API().estadisticas(p.fecha, filas, quitar); }
+        catch (x) { return err(/estadisticas|relation|schema/i.test(x.message || '') ? 'Falta un paso en Supabase para poder guardar esto. Avisa a la junta.' : 'No se ha podido guardar. Revisa la conexión.'); }
+        filas.forEach(f => { (S.stats[f.id] = S.stats[f.id] || {})[p.fecha] = { m: f.m, g: f.g }; });
+        quitar.forEach(id => { delete S.stats[id][p.fecha]; });
+        S.stDraft = null; back(); say(`Guardado: ${filas.length} jugadores contra ${nice(p.rival)}`);
+      };
+    }
   };
 }
 
@@ -1121,6 +1250,7 @@ const COACH = {
   },
   team() {
     if (S.sub === 'conv') return convScreen();
+    if (S.sub === 'st') return stScreen(S.team, () => { S.plView = 'stats'; go('team', 'roster'); });
     const t = S.teams[S.team];
     const sub = S.sub || 'list';
     const pend = pendingLists(S.team);
@@ -1157,7 +1287,11 @@ const COACH = {
         <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${p.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(p.n)}">${esc(p.n)}</span>
         <span class="pstate">${a.has(p.id) ? 'Ha venido' : 'Sin marcar'}</span></span></button></li>`).join('')}</ul></div>
       ${attendanceCard(S.team, 'h-at2')}</div>`;
-    if (sub === 'roster') body = `<div class="stack">${addPlayerCard(S.team)}${rosterCard(S.team)}</div>`;
+    const plv = S.plView === 'stats' ? 'stats' : 'roster';
+    if (sub === 'roster') body = `<div class="stack"><div class="seg g-scope gm-seg" role="group" aria-label="Qué ver de los jugadores">
+        <button type="button" data-plv="roster" aria-pressed="${plv === 'roster'}">Jugadores</button>
+        <button type="button" data-plv="stats" aria-pressed="${plv === 'stats'}">Estadísticas</button></div>
+      ${plv === 'stats' ? statsView(S.team) : addPlayerCard(S.team) + rosterCard(S.team)}</div>`;
     const e = EQ[S.team];
     const gv = S.gmView === 'group' ? 'group' : 'mine';
     if (sub === 'games') body = `<div class="stack"><div class="seg g-scope gm-seg" role="group" aria-label="Qué partidos ver">
@@ -1172,6 +1306,8 @@ const COACH = {
         document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; S.attDate = null; S.gj = null; render(); });
         bindSummary();
         document.querySelectorAll('[data-gmv]').forEach(b => b.onclick = () => { S.gmView = b.dataset.gmv; S.gj = null; render(); });
+        document.querySelectorAll('[data-plv]').forEach(b => b.onclick = () => { S.plView = b.dataset.plv; render(); });
+        if (sub === 'roster' && plv === 'stats') bindStats(S.team);
         document.querySelectorAll('[data-gj]').forEach(b => b.onclick = () => { if (b.dataset.gj) { S.gj = +b.dataset.gj; render(); } });
         /* El equipo y el día elegidos siempre a la vista, aunque el selector se deslice */
         document.querySelectorAll('.seg-x [aria-pressed="true"]').forEach(b => { const s = b.parentElement; s.scrollLeft = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2; });
@@ -1454,11 +1590,12 @@ const BOARD = {
       const p = S.people.find(x => x.id === S.sub.slice(3));
       return { kicker: 'Equipos · Accesos', title: esc(p.nombre), back: () => go('team'), body: claveForm(p), bind: () => bindClave(p) };
     }
+    if (S.sub && S.sub.startsWith('st:')) { const team = S.sub.slice(3); return stScreen(team, () => go('team', 'eq:' + team)); }
     if (S.sub && S.sub.startsWith('eq:')) {
       const team = S.sub.slice(3);
       S.teams[team] = S.teams[team] || { cat: (EQ[team] || {}).cat || '', train: null, players: [] };
       return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), back: () => go('team'),
-        body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div>${durCard(team)}${rosterCard(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); bindDur(team); } };
+        body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div>${durCard(team)}${rosterCard(team)}${statsView(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); bindDur(team); bindStats(team); } };
     }
     const view = S.eqView === 'train' ? 'train' : 'teams';
     const vseg = `<div class="seg g-scope" role="group" aria-label="Qué ver"><button type="button" data-eqv="teams" aria-pressed="${view === 'teams'}">Equipos</button><button type="button" data-eqv="train" aria-pressed="${view === 'train'}">Entrenamientos</button></div>`;

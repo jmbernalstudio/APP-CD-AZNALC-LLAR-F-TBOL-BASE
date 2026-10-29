@@ -54,6 +54,11 @@
     async convocatoria(team, fecha, c) {
       ok(await sb.from('convocatorias').upsert({ equipo: idEq(team), fecha, jugadores: c.ids, hora: c.hora || '', lugar: c.lugar || '', nota: c.nota || '' }, { onConflict: 'equipo,fecha' }));
     },
+    /* Minutos y goles de un partido: se guardan los que jugaron y se quitan los que ya no */
+    async estadisticas(fecha, filas, quitar) {
+      if (filas.length) ok(await sb.from('estadisticas').upsert(filas.map(f => ({ jugador: f.id, fecha, minutos: f.m, goles: f.g })), { onConflict: 'jugador,fecha' }));
+      if (quitar.length) ok(await sb.from('estadisticas').delete().eq('fecha', fecha).in('jugador', quitar));
+    },
     async nombre(nombre) { ok(await sb.rpc('cambiar_nombre', { p_nombre: nombre })); },
     async equipos(perfil, ids) {
       ok(await sb.from('entrenador_equipo').delete().eq('perfil', perfil).not('equipo', 'in', `(${ids.join(',')})`));
@@ -139,6 +144,15 @@
     S.conv = {};
     const conv = await sb.from('convocatorias').select('equipo, fecha, jugadores, hora, lugar, nota').gte('fecha', ISO(new Date()));
     for (const c of conv.data || []) S.conv[`${nombreEq(c.equipo)} ${c.fecha}`] = { ids: (c.jugadores || []).map(Number), hora: c.hora, lugar: c.lugar, nota: c.nota };
+    /* Minutos y goles de la temporada (si la tabla aún no existe, se sigue sin ellos) */
+    const est = { data: [] };
+    for (let i = 0; ; i += 1000) {  /* el servidor da como mucho 1000 filas de cada vez */
+      const r = await sb.from('estadisticas').select('jugador, fecha, minutos, goles').order('fecha').order('jugador').range(i, i + 999);
+      if (r.error) { est.error = r.error; break; }
+      est.data.push(...r.data); if (r.data.length < 1000) break;
+    }
+    S.statsOff = !!est.error; S.stats = {};
+    for (const x of est.data) (S.stats[x.jugador] = S.stats[x.jugador] || {})[x.fecha] = { m: x.minutos, g: x.goles };
     S.attend = {};
     for (const a of asis) {
       const k = `${equipoDe[a.jugador]} ${a.fecha}`;

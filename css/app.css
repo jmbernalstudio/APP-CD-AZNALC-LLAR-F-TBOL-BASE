@@ -856,3 +856,61 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 @media (min-width: 1080px) { .rs-v { flex-direction: row; align-items: baseline; gap: 8px; } .rs-b { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: center; } .rs-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
 .du-r { grid-template-columns: minmax(0, 1fr) auto; }
+
+/* ---------- Estadísticas de los jugadores (minutos y goles en liga) ---------- */
+.st-split { align-items: stretch; }
+.st-sort { margin-bottom: 8px; }
+.st-head, .st-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) 2.4rem 3.6rem 2.8rem; gap: 8px; align-items: center; }
+.st-head { padding: 4px 0; color: var(--muted); font-size: .78rem; font-weight: 700; }
+.st-head span:first-child { grid-column: 1 / 3; }
+.st-head span:not(:first-child), .st-row > span:not(.k) { text-align: right; }
+.st-row { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: none; padding: 8px 0; font: inherit; color: inherit; text-align: left; cursor: pointer; min-height: 60px; }
+.st-row:last-child { border-bottom: 0; }
+.st-row:hover .st-n { color: var(--club); }
+.st-row .k { width: 44px; height: 44px; border-radius: 14px; display: grid; place-items: center; background: var(--club-soft); color: var(--club); font-weight: 800; font-variant-numeric: tabular-nums; }
+.st-row .st-n { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.st-row > span:not(.k) { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.st-row > span.on { color: var(--club); }
+.st-foot { margin: 8px 0 0; font-size: .85rem; }
+.st-mt { width: 100%; border: 0; border-bottom: 1px solid var(--line); background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; }
+.st-mt .pill { gap: 4px; } .st-mt .pill .i { width: 14px; height: 14px; }
+.res-t { font-weight: 700; } .res-t.G { color: var(--ok-ink); } .res-t.P { color: var(--bad-ink); }
+.st-pend { display: flex; align-items: center; gap: 14px; width: 100%; border: 0; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+.st-pend .ic { width: 50px; height: 50px; border-radius: 14px; display: grid; place-items: center; background: var(--gold); color: var(--gold-ink); flex: none; }
+.st-pend .grow { flex: 1; min-width: 0; } .st-pend b, .st-pend small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-pend small { color: var(--muted); font-size: .85rem; } .st-pend .go { color: var(--muted); display: grid; flex: none; }
+.st-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.st-kpis div { background: var(--shell); border-radius: 16px; padding: 10px 8px; text-align: center; min-width: 0; }
+.st-kpis b { display: block; font-size: 1.35rem; font-weight: 700; color: var(--club); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.st-kpis small { display: block; color: var(--muted); font-size: .76rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 400px) { .st-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.st-dor { width: 50px; height: 50px; border-radius: 16px; display: grid; place-items: center; background: var(--club); color: #fff; font-weight: 800; font-size: 1.3rem; flex: none; font-variant-numeric: tabular-nums; }
+.rqd-h h2.st-h2 { margin: 0; font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-pm > div { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.st-pm > div:last-child { border-bottom: 0; }
+.st-pm .grow { flex: 1; min-width: 0; } .st-pm b, .st-pm small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .st-pm small { color: var(--muted); font-size: .82rem; }
+.st-pm .st-v { flex: none; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; text-align: right; min-width: 2.6rem; }
+.st-pm .st-v.no { color: var(--muted); font-weight: 600; }
+.st-es { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+@media (min-width: 720px) { .st-es { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.st-e { background: var(--card); border-radius: 22px; box-shadow: var(--shadow); border: 2px solid transparent; padding: 8px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.st-e.on { border-color: var(--ok); background: var(--ok-soft); padding-bottom: 14px; }
+.st-tg { display: flex; align-items: center; gap: 12px; width: 100%; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; padding: 4px 0; min-height: 56px; }
+.st-tg .num { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--club-soft); color: var(--club); font-weight: 800; flex: none; font-variant-numeric: tabular-nums; }
+.st-tg .grow { flex: 1; min-width: 0; } .st-tg b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-tg .pstate { display: block; color: var(--muted); font-size: .8rem; font-weight: 700; }
+.st-tg .tick { order: 3; width: 28px; height: 28px; border-radius: 50%; border: 2px solid #C9D1E0; display: grid; place-items: center; flex: none; color: transparent; }
+.st-tg .tick .i { width: 16px; height: 16px; }
+.st-e.on .st-tg .num { background: var(--ok); color: #fff; }
+.st-e.on .st-tg .pstate { color: var(--ok-ink); }
+.st-e.on .st-tg .tick { background: var(--ok); border-color: var(--ok); color: #fff; }
+.st-c { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.st-c[hidden] { display: none; }
+.st-m, .st-g { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: .82rem; color: var(--ok-ink); }
+.st-m input { width: 5.2rem; min-height: 46px; padding: 8px 10px; text-align: center; font-size: 1.1rem; font-weight: 700; }
+.st-gc { display: flex; align-items: center; gap: 8px; }
+.st-gc .iconbtn { width: 46px; height: 46px; box-shadow: none; border: 1px solid #C9D1E0; color: var(--ink); }
+.st-gc output { min-width: 1.6rem; text-align: center; font-weight: 800; font-size: 1.25rem; color: var(--ink); font-variant-numeric: tabular-nums; }
+.rqd-h h2.st-h2 + small { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (min-width: 720px) { .st-head, .st-row { grid-template-columns: 44px minmax(0, 1fr) 5rem 6rem 5rem; gap: 12px; } }
+@media (min-width: 1024px) { .st-split { grid-template-columns: minmax(0, 1fr) 25rem; } }
