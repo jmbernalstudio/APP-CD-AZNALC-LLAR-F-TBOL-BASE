@@ -1148,3 +1148,10 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .hs-c.anul { background: var(--bad-soft); } .hs-c.anul b { text-decoration: line-through; color: var(--muted); } .hs-c.anul small { color: var(--bad-ink); }
 .hs-c .tt-vs { margin-top: 4px; } .hs-c .tt-vs small { color: var(--club); font-weight: 600; }
 .hs .pl-r { grid-template-columns: 4.6rem repeat(7, minmax(0, 1fr)); } .hs .pl-r > span { padding: 6px 5px; } .hs-c { padding: 6px 8px; } .hs-h { font-size: 1rem !important; padding: 8px 4px !important; }
+/* Tarjetas de entrenamiento en azul claro, para que se distingan del fondo de las celdas */
+.hs-c, .tt-c { background: var(--club-soft); }
+.hs-c:hover, .tt-c[data-anu]:hover { background: #D5DEFC; }
+.hs-c.anul, .tt-c.anul { background: var(--bad-soft); }
+/* Un día: la tarjeta va dentro de sus casillas, con esquinas redondeadas, como en la semana */
+.gt-ev { padding: 6px 4px; }
+.gt-ev .tt-c { border-radius: 10px; box-shadow: none !important; }
