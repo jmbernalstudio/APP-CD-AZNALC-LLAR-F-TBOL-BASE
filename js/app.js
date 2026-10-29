@@ -725,7 +725,7 @@ function playerAttHTML(team, p) {
 }
 /* Resumen del equipo en la temporada: lo que piden los entrenadores para tener un control rápido */
 /* Duración de un partido por categoría (minutos), para los minutos jugados */
-const DURACION = { senior: 90, juvenil: 90, cadete: 60, infantil: 80, alevin2: 60, alevin1: 60, benjamin2: 50, benjamin1: 50, prebenjamin: 40, minis: 40 };
+const DURACION = { senior: 90, juvenil: 90, cadete: 60, infantil: 80, alevin2: 70, alevin1: 60, benjamin2: 60, benjamin1: 60, prebenjamin: 50, minis: 50 };
 function summaryCard(e) {
   if (!e) return '';
   const pl = played(e), n = pl.length, c = k => pl.filter(p => outcome(p) === k).length;
