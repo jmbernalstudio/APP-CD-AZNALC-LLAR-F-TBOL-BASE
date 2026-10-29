@@ -101,7 +101,7 @@ const S = {
     { id: 1, kind: 'roto', title: 'Portería pequeña con la red rota', where: 'Campo 2', team: 'Alevín A', by: 'Paco', st: 2, when: 'Hace 2 días', urgent: true },
     { id: 2, kind: 'material', title: '10 balones del número 4', where: '', team: 'Alevín A', by: 'Paco', st: 1, when: 'Ayer', urgent: false },
     { id: 3, kind: 'roto', title: 'Luz del vestuario 3 no enciende', where: 'Vestuario 3', team: 'Cadete A', by: 'Raquel', st: 0, when: 'Hoy, 9:12', urgent: true },
-    { id: 4, kind: 'otra', title: 'Cambiar el entreno del jueves a las 19:00', where: '', team: 'Infantil B', by: 'Manolo', st: 0, when: 'Hoy, 11:40', urgent: false }
+    { id: 4, kind: 'otra', title: 'Cambiar el entrenamiento del jueves a las 19:00', where: '', team: 'Infantil B', by: 'Manolo', st: 0, when: 'Hoy, 11:40', urgent: false }
   ],
   notices: [
     { id: 1, from: 'Junta directiva', title: 'Fotos oficiales del club', body: 'El sábado 31 a las 9:00 hacemos las fotos de todos los equipos en el Campo 1. Venid con la primera equipación.', read: false, readBy: 18, total: 24 },
@@ -281,28 +281,28 @@ const firstName = () => myName().split(' ')[0];
 const crestImg = (cls = '') => `<img class="cr ${cls}" src="${CREST}" alt="">`;
 
 
-/* Días de entreno: 1 = lunes … 7 = domingo (los elige la junta en cada equipo) */
+/* Días de entrenamiento: 1 = lunes … 7 = domingo (los elige la junta en cada equipo) */
 const DIAS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
 const DIAS_D = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 const DIAS_L = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados', 'domingos'];
 const dow = iso => (toDate(iso).getDay() + 6) % 7 + 1;
 const addDays = (iso, n) => { const d = toDate(iso); d.setDate(d.getDate() + n); return ISO(d); };
 const trainOf = team => S.teams[team] && S.teams[team].train && S.teams[team].train.dias.length ? S.teams[team].train : null;
-/* La junta puede anular el entreno de un equipo un día concreto (desde el Calendario) */
+/* La junta puede anular el entrenamiento de un equipo un día concreto (desde el Calendario) */
 const anulado = (team, iso) => !!(S.anulados && S.anulados.has(`${team} ${iso}`));
 const trainsOn = (team, iso) => { const t = trainOf(team); return !!t && t.dias.includes(dow(iso)) && !anulado(team, iso); };
-/* Cada día de entreno lleva su hora y su campo (p. ej. lunes Campo 1, miércoles Campo 2) */
+/* Cada día de entrenamiento lleva su hora y su campo (p. ej. lunes Campo 1, miércoles Campo 2) */
 const sesiones = t => t ? (t.ses && t.ses.length ? t.ses : t.dias.map(d => ({ d, h: t.h || '', where: t.where || '' }))) : [];
 const trainAt = (team, iso) => { const t = trainOf(team); if (!t || !t.dias.includes(dow(iso)) || anulado(team, iso)) return null; return sesiones(t).find(x => x.d === dow(iso)) || { d: dow(iso), h: t.h || '', where: t.where || '' }; };
 const trainLbl = t => ['Entrenamiento', t.h, t.where].filter(Boolean).join(' · ');
-/* Solo se pasa lista en días de entreno: hoy si toca, o uno de las dos últimas semanas que se olvidó */
+/* Solo se pasa lista en días de entrenamiento: hoy si toca, o uno de las dos últimas semanas que se olvidó */
 const LOOKBACK = 14;
 const trainDates = team => [...Array(LOOKBACK)].map((_, i) => addDays(TODAY, i - LOOKBACK + 1)).filter(d => trainsOn(team, d));
 /* Cuentan como pendientes desde la primera lista pasada en la app (antes no se usaba) */
 const firstList = team => Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort()[0] || TODAY;
 const pendingLists = team => S.teams[team].players.length ? trainDates(team).filter(d => d >= firstList(team) && !(S.attend[`${team} ${d}`] || { size: 0 }).size) : [];
 const pendingAll = () => Object.keys(S.teams).flatMap(team => pendingLists(team).map(iso => ({ team, iso })));
-/* Agenda: entrenos y partidos reales de los próximos 7 días; tira de días de lunes a domingo */
+/* Agenda: entrenamientos y partidos reales de los próximos 7 días; tira de días de lunes a domingo */
 const WEEK = [...Array(7)].map((_, i) => addDays(TODAY, i));
 const MONWEEK = [...Array(7)].map((_, i) => addDays(TODAY, i - dow(TODAY) + 1));
 function buildAgenda() {
@@ -712,7 +712,7 @@ function agendaCard(filter) {
   const f = filter || 'all';
   const list = AGENDA.filter(e => (e.kind !== 'match' || S.teams[e.team]) && (f === 'all' || e.kind === f));
   return card('h-ag', 'Próximos 7 días', `
-    <div class="tabs" role="group" aria-label="Filtrar agenda">${[['all', 'Todo'], ['train', 'Entrenos'], ['match', 'Partidos']].map(([k, l]) =>
+    <div class="tabs" role="group" aria-label="Filtrar agenda">${[['all', 'Todo'], ['train', 'Entrenamientos'], ['match', 'Partidos']].map(([k, l]) =>
       `<button type="button" data-ag="${k}" aria-pressed="${f === k}">${l}</button>`).join('')}</div>
     <div id="ag-list">${list.map(e => agendaRow(e, true)).join('')}</div>`, 'a-agenda');
 }
@@ -727,7 +727,7 @@ function attendanceHist(team) {
   const days = Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort().slice(-8);
   return { days: days.map(d => toDate(d).getDate()), pct: days.map(d => n ? Math.round(S.attend[`${team} ${d}`].size / n * 100) : 0) };
 }
-/* Asistencia de un jugador: entrenos con lista pasada a los que ha venido (global y por semana) */
+/* Asistencia de un jugador: entrenamientos con lista pasada a los que ha venido (global y por semana) */
 const listDays = team => Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort();
 const attLvl = p => p >= 90 ? 'hi' : p < 70 ? 'lo' : 'mid';
 function playerAtt(team, id, days = listDays(team)) {
@@ -740,8 +740,8 @@ function playerAttHTML(team, p) {
   if (g.pct == null) return `<div class="patt"><b>Asistencia</b><p class="muted" style="margin:0">Todavía no se ha pasado lista en ${esc(team)}.</p></div>`;
   const weeks = [...new Set(days.map(weekOf))].slice(-8).map(w => ({ w, ...playerAtt(team, p.id, days.filter(d => weekOf(d) === w)) }));
   const wl = w => { const d = toDate(w); return `${d.getDate()} ${MES[d.getMonth()]}`; };
-  return `<div class="patt"><b>Asistencia a los entrenos</b>
-    <div class="patt-g"><span class="bignum ${attLvl(g.pct)}">${g.pct}%</span><small>Global: ha venido a ${g.v} de ${g.n} entreno${g.n === 1 ? '' : 's'} desde el ${dateLbl(days[0]).toLowerCase()}</small></div>
+  return `<div class="patt"><b>Asistencia a los entrenamientos</b>
+    <div class="patt-g"><span class="bignum ${attLvl(g.pct)}">${g.pct}%</span><small>Global: ha venido a ${g.v} de ${g.n} entrenamiento${g.n === 1 ? '' : 's'} desde el ${dateLbl(days[0]).toLowerCase()}</small></div>
     <small class="muted">Por semana (de lunes a domingo)</small>
     <div class="bars" role="img" aria-label="Asistencia por semana: ${weeks.map(x => `semana del ${wl(x.w)}, ${x.pct}%`).join('; ')}">${weeks.map(x => `<span class="${attLvl(x.pct)}" style="height:${Math.max(x.pct, 4) * .82}%"><b>${x.pct}%</b></span>`).join('')}</div>
     <div class="bars-x" aria-hidden="true">${weeks.map(x => `<span>${wl(x.w)}</span>`).join('')}</div>
@@ -840,17 +840,17 @@ function attendanceCard(team, id) {
   const { days, pct } = attendanceHist(team);
   const avg = pct.length ? Math.round(pct.reduce((a, b) => a + b) / pct.length) : null;
   const n = S.teams[team].players.length;
-  // Abajo: el último entreno con lista pasada (hoy si ya la has pasado)
+  // Abajo: el último entrenamiento con lista pasada (hoy si ya la has pasado)
   const done = Object.keys(S.attend).filter(k => k.startsWith(team + ' ') && S.attend[k].size).map(k => k.slice(team.length + 1)).sort();
   const lastIso = done.length ? done[done.length - 1] : today();
   const a = S.attend[`${team} ${lastIso}`];
   const lvl = p => p >= 90 ? 'hi' : p < 70 ? 'lo' : 'mid';
   return card(id, `Asistencia · ${team}`, `
-    <div class="bignum">${avg == null ? '–' : avg + '%'}</div><div class="delta">${avg == null ? 'Aún no has pasado lista' : S.live ? `Media de los últimos ${pct.length} entrenos` : '+4% respecto a septiembre'}</div>
+    <div class="bignum">${avg == null ? '–' : avg + '%'}</div><div class="delta">${avg == null ? 'Aún no has pasado lista' : S.live ? `Media de los últimos ${pct.length} entrenamientos` : '+4% respecto a septiembre'}</div>
     <div class="bars" role="img" aria-label="Asistencia por entrenamiento: ${pct.join(', ')} por ciento">${pct.map(p => `<span class="${lvl(p)}" style="height:${Math.max(p, 4) * .82}%"><b>${p}%</b></span>`).join('')}</div>
     <div class="bars-x" aria-hidden="true">${days.map(d => `<span>${d}</span>`).join('')}</div>
     <div class="bars-key"><span><i class="hi"></i>90% o más</span><span><i class="mid"></i>70–89%</span><span><i class="lo"></i>Menos de 70%</span></div>
-    <div class="last">${ic('check')}${lastIso === today() ? 'Hoy' : 'Último entreno · ' + dayLbl(lastIso)}<b>${a ? a.size : 0} de ${n}</b></div>`, 'a-attend', `<span class="tag">${S.live ? 'Últimos entrenos' : 'Octubre'}</span>`);
+    <div class="last">${ic('check')}<span class="last-t">${lastIso === today() ? 'Hoy' : 'Último entrenamiento · ' + dayLbl(lastIso)}</span><b>${a ? a.size : 0} de ${n}</b></div>`, 'a-attend', `<span class="tag">${S.live ? `Últimos ${pct.length}` : 'Octubre'}</span>`);
 }
 function noticeCard(n, cls = '') {
   if (!n) return '';
@@ -858,7 +858,7 @@ function noticeCard(n, cls = '') {
     <span class="eyebrow">${esc(n.from)}</span><h3 id="nt${n.id}">${esc(n.title)}</h3><p class="eyebrow nb">${esc(n.body)}</p></section>`;
 }
 
-/* Días, hora y campo de entreno de un equipo (lo edita la junta) */
+/* Días, hora y campo de entrenamiento de un equipo (lo edita la junta) */
 const CAMPOS = ['Campo entero', 'Campo 1', 'Campo 2'];
 function trainCard(team) {
   const t = trainOf(team), ses = sesiones(t);
@@ -893,7 +893,7 @@ function bindTrain(team) {
     const tr = { dias: ses.map(x => x.d), h: (ses[0] || {}).h || '', where: (ses[0] || {}).where || '', ses };
     try { API() && await API().entreno(team, tr); } catch (_) { $('#terr').textContent = 'No se ha podido guardar. Revisa la conexión.'; $('#terr').hidden = false; return; }
     S.teams[team].train = tr; S.editTrain = null; AGENDA = buildAgenda(); render();
-    say(tr.dias.length ? `${team} entrena los ${tr.dias.map(d => DIAS_L[d - 1]).join(', ').replace(/, ([^,]*)$/, ' y $1')}` : `${team} sin días de entreno`);
+    say(tr.dias.length ? `${team} entrena los ${tr.dias.map(d => DIAS_L[d - 1]).join(', ').replace(/, ([^,]*)$/, ' y $1')}` : `${team} sin días de entrenamiento`);
   };
 }
 
@@ -1788,8 +1788,8 @@ const COACH = {
       kicker: `${greet()},`, title: esc(myName()), layout: '',
       body: `
       <div class="days" aria-label="Esta semana">${MONWEEK.map(iso => { const [w, n] = dayLbl(iso).split(' '); const tr = Object.keys(S.teams).some(tm => trainsOn(tm, iso)), mt = mine2.has(iso);
-        return `<span class="${iso === TODAY ? 'today' : ''}" aria-label="${dateLbl(iso)}${tr ? ', entreno' : ''}${mt ? ', partido' : ''}">${w}<b>${n}</b><i class="dots" aria-hidden="true">${tr ? '<i class="dt"></i>' : ''}${mt ? '<i class="dm"></i>' : ''}</i></span>`; }).join('')}</div>
-      <p class="days-key" aria-hidden="true"><span><i class="dt"></i>Entreno</span><span><i class="dm"></i>Partido</span></p>
+        return `<span class="${iso === TODAY ? 'today' : ''}" aria-label="${dateLbl(iso)}${tr ? ', entrenamiento' : ''}${mt ? ', partido' : ''}">${w}<b>${n}</b><i class="dots" aria-hidden="true">${tr ? '<i class="dt"></i>' : ''}${mt ? '<i class="dm"></i>' : ''}</i></span>`; }).join('')}</div>
+      <p class="days-key" aria-hidden="true"><span><i class="dt"></i>Entrenamiento</span><span><i class="dm"></i>Partido</span></p>
       ${pushCard()}
       ${pend.length ? `<section class="card pend" aria-labelledby="h-pend"><div class="card-h"><h2 id="h-pend">${pend.length === 1 ? 'Tienes 1 lista sin pasar' : `Tienes ${pend.length} listas sin pasar`}</h2></div>
         <div class="chips">${pend.map(x => `<button type="button" class="chip" data-att="${x.iso}" data-att-team="${esc(x.team)}">${ic('list')} ${x.iso === TODAY ? 'Hoy' : dayLbl(x.iso)}${Object.keys(S.teams).length > 1 ? ' · ' + esc(x.team) : ''}</button>`).join('')}</div></section>` : ''}
@@ -1832,8 +1832,8 @@ const COACH = {
     if (!dates.includes(S.attDate)) S.attDate = dates.includes(TODAY) ? TODAY : pend[pend.length - 1] || dates[dates.length - 1] || null;
     const date = S.attDate, isToday = date === TODAY;
     const nextTrain = [1, 2, 3, 4, 5, 6, 7].map(i => addDays(TODAY, i)).find(d => trainsOn(S.team, d));
-    const noTrainMsg = !trainOf(S.team) ? 'La junta aún no ha puesto los días de entreno de este equipo.'
-      : `Hoy no hay entreno, así que no se pasa lista.${nextTrain ? ` El próximo es el ${dateLbl(nextTrain).toLowerCase()}${trainAt(S.team, nextTrain).h ? ' a las ' + trainAt(S.team, nextTrain).h : ''}${trainAt(S.team, nextTrain).where ? ' en el ' + trainAt(S.team, nextTrain).where : ''}.` : ''}`;
+    const noTrainMsg = !trainOf(S.team) ? 'La junta aún no ha puesto los días de entrenamiento de este equipo.'
+      : `Hoy no hay entrenamiento, así que no se pasa lista.${nextTrain ? ` El próximo es el ${dateLbl(nextTrain).toLowerCase()}${trainAt(S.team, nextTrain).h ? ' a las ' + trainAt(S.team, nextTrain).h : ''}${trainAt(S.team, nextTrain).where ? ' en el ' + trainAt(S.team, nextTrain).where : ''}.` : ''}`;
     const key = `${S.team} ${date}`;
     const a = S.attend[key] || (S.attend[key] = new Set());
     const tt = date && trainAt(S.team, date);
@@ -1850,7 +1850,7 @@ const COACH = {
       ${attendanceCard(S.team, 'h-at2')}</div>`;
     else if (sub === 'list') body = `<div class="split"><div class="stack">
       ${!dates.includes(TODAY) ? `<p class="card muted" style="margin:0">${esc(noTrainMsg)} Si se te olvidó alguna, puedes completarla aquí:</p>` : ''}
-      ${dates.length > 1 || !dates.includes(TODAY) ? `<div class="seg g-scope seg-x" role="group" aria-label="Elige el entreno">${dates.map(d => `<button type="button" data-date="${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
+      ${dates.length > 1 || !dates.includes(TODAY) ? `<div class="seg g-scope seg-x" role="group" aria-label="Elige el entrenamiento">${dates.map(d => `<button type="button" data-date="${d}" aria-pressed="${d === date}">${d === TODAY ? 'Hoy' : dayLbl(d)}${pend.includes(d) ? ' <span class="pdot" aria-label="sin pasar"></span>' : ''}</button>`).join('')}</div>` : ''}
       <section class="card match" aria-label="Resumen de asistencia"><div class="att-top">
         <div><span class="tag">${isToday ? 'Hoy' : dateLbl(date)}${tt ? ` · ${esc([tt.h, tt.where].filter(Boolean).join(' · '))}` : ''}</span><div class="vs-time" style="margin-top:10px" id="cnt">${a.size}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>han venido</small></div>
         <button type="button" class="btn gold" id="all"${t.players.length ? '' : ' disabled'}>${allLbl()}</button></div>
@@ -2113,8 +2113,8 @@ function calItems(wk) {
 const calWeekLbl = wk => { const a = toDate(wk), z = toDate(addDays(wk, 6));
   return a.getMonth() === z.getMonth() ? `${a.getDate()} – ${z.getDate()} ${MES[z.getMonth()]}` : `${a.getDate()} ${MES[a.getMonth()]} – ${z.getDate()} ${MES[z.getMonth()]}`; };
 function calCell(x) {
-  if (x.kind === 'tr') return `<div class="tt-c${x.anul ? ' anul' : ''}" data-anu="${esc(x.team)}|${x.f}" role="button" tabindex="0" aria-label="${x.anul ? 'Entreno anulado' : 'Entreno'} del ${esc(x.team)}. Toca para ${x.anul ? 'recuperarlo' : 'anularlo'}">
-    <b title="${esc(x.team)}">${esc(x.team)}</b><small>${x.anul ? 'Entreno anulado' : `Entreno · ${esc(x.where)}`}</small></div>`;
+  if (x.kind === 'tr') return `<div class="tt-c${x.anul ? ' anul' : ''}" data-anu="${esc(x.team)}|${x.f}" role="button" tabindex="0" aria-label="${x.anul ? 'Entrenamiento anulado' : 'Entrenamiento'} del ${esc(x.team)}. Toca para ${x.anul ? 'recuperarlo' : 'anularlo'}">
+    <b title="${esc(x.team)}">${esc(x.team)}</b><small>${x.anul ? 'Entrenamiento anulado' : `Entrenamiento · ${esc(x.where)}`}</small></div>`;
   const us = crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr'), them = crestBadge(x.e, x.p.rival, 'mini tt-cr');
   return `<div class="tt-c pa" data-match="${x.e.id}|${x.p.j}" role="button" tabindex="0" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}"><b title="${esc(x.team)}">${esc(x.team)}</b>
     <span class="tt-vs">${x.casa ? us + them : them + us}<small title="vs ${esc(x.rival)}">${x.p.goles ? scoreTxt(x.p) + ' · ' : ''}${x.casa ? 'Local' : 'Visitante'} · ${esc(x.rival)}</small></span></div>`;
@@ -2138,7 +2138,7 @@ function trainView() {
   const nTr = all.filter(x => x.kind === 'tr' && !x.anul).length, nPa = all.filter(x => x.kind === 'pa').length;
   const top = `${nav}<div class="cal-bar">${seg}<button type="button" class="btn blue" id="calx"${all.length ? '' : ' disabled'}>${ic('send')} Exportar semana</button></div>
     <p class="muted cal-key"><span class="tt-dot"></span>Entrenamientos · ${nTr}<span class="tt-dot pa"></span>Partidos · ${nPa}</p>
-    <p class="muted cal-tip">Toca un entreno para anularlo esta semana.</p>`;
+    <p class="muted cal-tip">Toca un entrenamiento para anularlo esta semana.</p>`;
   if (!all.length) return top + emptyPage('cal', 'Nada esta semana', 'No hay entrenamientos ni partidos. Usa las flechas para ver otra semana.', 'g');
   if (sel !== 'week') {
     const d = +sel, list = all.filter(x => x.f === dayIso(d - 1));
@@ -2211,7 +2211,7 @@ async function calPoster(wk) {
   if (crest) { const k = Math.min(84 / crest.width, 84 / crest.height); x.drawImage(crest, PAD + 36, PAD + 60 - crest.height * k / 2, crest.width * k, crest.height * k); }
   text('C.D. Aznalcóllar Fútbol Base', PAD + 150, PAD + 40, 600, 26, '#FFFFFF', 700);
   text(`Calendario · semana del ${calWeekLbl(wk)}`, PAD + 150, PAD + 82, 800, 40, '#FFFFFF', 1000);
-  x.fillStyle = '#FFFFFF'; x.fillRect(W - PAD - 330, PAD + 50, 20, 20); text('Entreno', W - PAD - 300, PAD + 60, 700, 24, '#FFFFFF', 120);
+  x.fillStyle = '#FFFFFF'; x.fillRect(W - PAD - 430, PAD + 50, 20, 20); text('Entrenamiento', W - PAD - 400, PAD + 60, 700, 24, '#FFFFFF', 220);
   x.fillStyle = SOFT; x.fillRect(W - PAD - 160, PAD + 50, 20, 20); text('Partido', W - PAD - 130, PAD + 60, 700, 24, '#FFFFFF', 120);
   /* Rejilla: fondo blanco, días arriba, horas a la izquierda */
   rr(PAD, HEAD, W - PAD * 2, H - HEAD - PAD, 24, '#FFFFFF');
@@ -2304,12 +2304,12 @@ const BOARD = {
       document.querySelectorAll('[data-anu]').forEach(el => {
         const run = async () => {
           const [team, f] = el.dataset.anu.split('|'), off = anulado(team, f), day = longDate(f).toLowerCase();
-          const okd = off ? await confirmar('¿Recuperar el entreno?', `El ${team} vuelve a entrenar el ${day}. Su entrenador lo verá en la app.`, 'Sí, recuperar')
-            : await ask('¿Anular este entreno?', `El ${team} no entrenará el ${day}. Su entrenador lo verá en la app y ese día no tendrá que pasar lista.`, 'Sí, anular');
+          const okd = off ? await confirmar('¿Recuperar el entrenamiento?', `El ${team} vuelve a entrenar el ${day}. Su entrenador lo verá en la app.`, 'Sí, recuperar')
+            : await ask('¿Anular este entrenamiento?', `El ${team} no entrenará el ${day}. Su entrenador lo verá en la app y ese día no tendrá que pasar lista.`, 'Sí, anular');
           if (!okd) return;
-          try { API() && await API().anularEntreno(team, f, !off); } catch (_) { return say(S.live && S.anulOff ? 'Falta un paso en Supabase para poder anular entrenos.' : 'No se ha podido guardar. Revisa la conexión.'); }
+          try { API() && await API().anularEntreno(team, f, !off); } catch (_) { return say(S.live && S.anulOff ? 'Falta un paso en Supabase para poder anular entrenamientos.' : 'No se ha podido guardar. Revisa la conexión.'); }
           S.anulados = S.anulados || new Set(); off ? S.anulados.delete(`${team} ${f}`) : S.anulados.add(`${team} ${f}`);
-          render(); say(off ? `Entreno del ${team} recuperado.` : `Entreno del ${team} anulado.`);
+          render(); say(off ? `Entrenamiento del ${team} recuperado.` : `Entrenamiento del ${team} anulado.`);
         };
         el.onclick = run; el.onkeydown = ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); run(); } };
       });
