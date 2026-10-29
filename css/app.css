@@ -1178,3 +1178,45 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .fm-row .grow b, .fm-row .grow small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fm-row .pill { flex: none; }
 @media (max-width: 420px) { .fm-pitch { width: 76px; height: 95px; } .fm-body { gap: 12px; } }
+/* Pizarra: el campo a pantalla completa, con los jugadores por colocar y el banquillo debajo */
+.pz { position: fixed; inset: 0; z-index: 45; background: #fff; display: flex; overflow-y: auto; padding: max(12px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.pz-in { margin: 0 auto; width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pz-h { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pz-vs { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 8px; font-size: 1.1rem; }
+.pz-vs b { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 800; }
+.pz-vs > span:not(.pz-cr) { color: var(--muted); font-weight: 600; flex: none; }
+.mini.pz-cr { width: 34px; height: 34px; flex: none; } .mini.pz-cr img { width: 26px; height: 26px; }
+.pz-h .iconbtn { flex: none; }
+.pz-sub { margin: 0; color: var(--muted); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pz-sub b { color: var(--ink); }
+.pz-tip { margin: 0; font-size: .9rem; font-weight: 600; padding: 8px 12px; border-radius: 12px; background: var(--shell); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pz-tip.on { background: var(--club); color: #fff; }
+.pz-body { display: flex; gap: 18px; align-items: flex-start; min-width: 0; }
+.pz-field { position: relative; flex: 1 1 auto; min-width: 0; aspect-ratio: 68 / 90; max-height: calc(100dvh - 190px); margin: 0 auto; background: #2E8B57; border-radius: 16px; overflow: hidden; }
+.pz-field > i { position: absolute; border: 2px solid rgba(255,255,255,.75); pointer-events: none; }
+.pz-mid { left: 0; right: 0; top: 50%; border-width: 2px 0 0 !important; }
+.pz-circle { left: 50%; top: 50%; width: 22%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); }
+.pz-area { left: 25%; width: 50%; height: 13%; }
+.pz-area.top { top: -2px; } .pz-area.bot { bottom: -2px; }
+.pz-s { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 4px; width: 24%; max-width: 120px; background: none; border: 0; padding: 0; cursor: pointer; color: #fff; }
+.pz-s b { max-width: 100%; font-size: .8rem; font-weight: 700; background: #0B0B0B; color: #fff; padding: 2px 8px; border-radius: 99px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pz-s.hole b { background: rgba(11,11,11,.5); }
+.pz-s.wait .pz-f { outline: 3px solid #fff; outline-offset: 3px; }
+.pz-f { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: #fff; color: var(--club); font-weight: 800; font-size: 1.25rem; overflow: hidden; border: 3px solid #fff; flex: none; }
+.pz-f img { width: 100%; height: 100%; object-fit: cover; }
+.pz-f.none { color: #8E97A8; } .pz-f .i { width: 26px; height: 26px; }
+.pz-f.add { background: transparent; border: 3px dashed #fff; color: #fff; }
+.pz-s:focus-visible .pz-f { outline: 3px solid #F5C518; outline-offset: 2px; }
+.pz-side { width: 320px; flex: none; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.pz-side h3 { margin: 4px 0 0; font-size: 1rem; }
+.pz-free { display: flex; flex-wrap: wrap; gap: 8px; }
+.pz-chip { display: inline-flex; align-items: center; gap: 6px; max-width: 100%; min-width: 0; background: var(--club-soft); color: var(--ink); border: 2px solid transparent; border-radius: 99px; padding: 3px 12px 3px 3px; font: inherit; cursor: pointer; }
+.pz-chip.on { background: var(--club); color: #fff; }
+.pz-chip.off { background: var(--shell); cursor: default; }
+.pz-chip .pz-f { width: 32px; height: 32px; font-size: .85rem; border-width: 2px; }
+.pz-chip .pz-f .i { width: 18px; height: 18px; }
+.pz-chip b { font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.pz-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+@media (max-width: 760px) { .pz-body { flex-direction: column; align-items: stretch; } .pz-side { width: auto; } .pz-field { width: 100%; max-height: none; }
+  .pz-f { width: 42px; height: 42px; font-size: 1rem; } .pz-s b { font-size: .7rem; padding: 2px 6px; } .pz-vs { font-size: .98rem; } .mini.pz-cr { width: 28px; height: 28px; } .mini.pz-cr img { width: 21px; height: 21px; } }
+.pz-in > * { flex-shrink: 0; }

@@ -5,6 +5,7 @@ const I = {
   pen: '<path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/>',
   out: '<path d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"/>',
   x: '<path d="M6 6l12 12M18 6L6 18"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
   trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
   chat: '<path d="M4 5h16v11H9l-5 4z"/>',
   back: '<path d="M15 5l-7 7 7 7"/>',
@@ -1193,6 +1194,143 @@ const parteLbl = n => `${n}ª parte`;
 function openLv(team, fecha) { S.lvFrom = S.tab; S.lvSub = S.sub; S.lvDate = fecha; S.lv = null; if (S.role === 'coach') S.team = team; go('team', S.role === 'coach' ? 'lv' : 'lv:' + team); }
 /* Un partido tiene directo si es el próximo, si es de hoy o de ayer, o si ya se empezó */
 const lvAvail = (e, p) => !!S.teams[e.nombre] && !p.descansa && (!!actaOf(e.nombre, p.fecha) || p.fecha <= TODAY || p === nextMatch(e));
+/* Pizarra: el campo a pantalla completa con la formación, para colocar a cada jugador en su sitio.
+   Va aparte de la formación de las estadísticas: solo guarda quién va en cada hueco (L.pz). Antes del partido se colocan
+   los titulares; durante el partido, los que están en el campo (el que entra en un cambio ocupa el hueco del que sale) */
+const pzSpots = form => { const lines = form ? form.split('-').map(Number) : [], spots = [{ x: 50, y: 88 }];
+  lines.forEach((k, r) => { for (let i = 0; i < k; i++) spots.push({ x: 100 * (i + 1) / (k + 1), y: 88 - (r + 1) * (74 / lines.length) }); });
+  return spots; };
+function pizarra(team, L, players, save, e, p) {
+  const form = L.form || formsOf(team)[0] || '', spots = pzSpots(form), n = spots.length;
+  L.pz = L.pz || { ids: [] };
+  let sel = null;   /* jugador elegido abajo, a la espera de tocar su hueco */
+  const pl = id => players.find(x => x.id === id) || { id, n: 'Jugador', dorsal: null };
+  const byDor = (a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99) || pl(a).n.localeCompare(pl(b).n, 'es');
+  const avail = () => (L.fase === 'previa' ? L.tit : L.campo).filter(id => !(L.rojas || []).includes(id));
+  const bench = () => (L.fase === 'previa' ? L.sup : [...new Set([...L.tit, ...L.sup])].filter(id => !L.campo.includes(id) && !(L.rojas || []).includes(id))).slice().sort(byDor);
+  const slots = () => { const ok = avail(); return Array.from({ length: n }, (_, i) => ok.includes(L.pz.ids[i]) ? L.pz.ids[i] : null); };
+  const face = q => q.foto ? `<span class="pz-f"><img src="${esc(q.foto)}" alt=""></span>` : q.dorsal ? `<span class="pz-f num">${q.dorsal}</span>` : `<span class="pz-f none">${ic('user')}</span>`;
+  const us = 'Aznalcóllar', them = L.rival;
+  const d = document.createElement('div');
+  d.className = 'pz'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'pz-t');
+  const back = document.activeElement;
+  const close = () => { d.remove(); document.removeEventListener('keydown', key); back && back.focus && back.focus(); };
+  const key = ev => { if (ev.key === 'Escape' && !document.querySelector('.modal')) close(); };
+  const place = (i, id) => { const arr = slots(), cur = arr[i];
+    if (id === null) arr[i] = null; else { const was = arr.indexOf(id); if (was >= 0) arr[was] = cur; arr[i] = id; }   /* si ya estaba en otro hueco, se cambian */
+    L.pz.ids = arr; save(); };
+  const draw = () => {
+    const ids = slots(), free = avail().filter(id => !ids.includes(id)).sort(byDor), bn = bench();
+    if (sel != null && !free.includes(sel) && !ids.includes(sel)) sel = null;
+    d.innerHTML = `<div class="pz-in">
+      <div class="pz-h"><div class="pz-vs">${crestBadge(e, L.casa ? us : p.rival, 'mini pz-cr')}<b title="${esc(L.casa ? us : them)}">${esc(L.casa ? us : them)}</b><span>vs</span><b title="${esc(L.casa ? them : us)}">${esc(L.casa ? them : us)}</b>${crestBadge(e, L.casa ? p.rival : us, 'mini pz-cr')}</div>
+        <button type="button" class="iconbtn" id="pz-x" aria-label="Cerrar la pizarra">${ic('x')}</button></div>
+      <p class="pz-sub"><b id="pz-t">Pizarra${form ? ' · ' + esc(form) : ''}</b> · ${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}</p>
+      <p class="pz-tip${sel != null ? ' on' : ''}" role="status">${sel != null ? `Ahora toca el hueco donde va <b>${esc(pl(sel).n)}</b>.` : '1. Toca un jugador de abajo · 2. Toca su hueco en el campo'}</p>
+      <div class="pz-body"><div class="pz-field" role="group" aria-label="Campo">
+        <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
+        ${spots.map((sp, i) => { const id = ids[i], q = id != null ? pl(id) : null;
+          return `<button type="button" class="pz-s${q ? '' : ' hole'}${sel != null ? ' wait' : ''}" data-pz="${i}" style="left:${sp.x}%;top:${sp.y}%" aria-label="${i ? 'Hueco ' + i : 'Portero'}: ${q ? esc(q.n) : 'vacío'}">
+            ${q ? face(q) : `<span class="pz-f add">${ic('plus')}</span>`}<b>${q ? esc(q.n) : i ? 'Libre' : 'Portero'}</b></button>`; }).join('')}
+      </div>
+      <div class="pz-side">
+        <h3>${L.fase === 'previa' ? 'Titulares por colocar' : 'En el campo, por colocar'} · ${free.length}</h3>
+        ${free.length ? `<div class="pz-free">${free.map(id => `<button type="button" class="pz-chip${sel === id ? ' on' : ''}" data-pzp="${id}" aria-pressed="${sel === id}">${face(pl(id))}<b>${esc(pl(id).n)}</b></button>`).join('')}</div>`
+          : `<p class="muted" style="margin:0">${avail().length ? 'Todos colocados. Toca a uno del campo para moverlo.' : L.fase === 'previa' ? 'Primero elige a los titulares.' : 'No hay nadie en el campo.'}</p>`}
+        <h3>Banquillo · ${bn.length}</h3>
+        ${bn.length ? `<div class="pz-free">${bn.map(id => `<span class="pz-chip off">${face(pl(id))}<b>${esc(pl(id).n)}</b></span>`).join('')}</div>` : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>'}
+        <div class="pz-btns"><button type="button" class="btn blue block" id="pz-wa"${ids.some(x => x != null) ? '' : ' disabled'}>${ic('send')} Enviar por WhatsApp</button>
+        ${ids.some(x => x != null) ? `<button type="button" class="btn ghost block" id="pz-clr">${ic('undo')} Vaciar la pizarra</button>` : ''}</div></div></div></div>`;
+    d.querySelector('#pz-x').onclick = close;
+    if (d.querySelector('#pz-clr')) d.querySelector('#pz-clr').onclick = () => { L.pz.ids = []; sel = null; save(); draw(); };
+    d.querySelector('#pz-wa').onclick = () => shareImage({ title: 'Alineación', wait: 'Preparando la imagen…', build: () => pzPoster(team, L, players, e, p),
+      name: fileName('alineacion', team, p.fecha), alt: `Alineación del ${team} contra ${them}`, msg: '', what: 'la imagen' });
+    d.querySelectorAll('[data-pzp]').forEach(b => b.onclick = () => { const id = +b.dataset.pzp; sel = sel === id ? null : id; draw();
+      const again = d.querySelector(`[data-pzp="${id}"]`); if (again) again.focus({ preventScroll: true }); });
+    d.querySelectorAll('[data-pz]').forEach(b => b.onclick = async () => {
+      const i = +b.dataset.pz, cur = ids[i];
+      if (sel != null) { place(i, sel); sel = null; }
+      else { const id = await pickSlot(i ? 'Elige al jugador de este hueco' : 'Elige al portero', cur != null, avail().slice().sort(byDor), players);
+        if (id === undefined) return; place(i, id); }
+      draw(); const again = d.querySelector(`[data-pz="${i}"]`); if (again) again.focus({ preventScroll: true });
+    });
+  };
+  document.addEventListener('keydown', key);
+  document.body.append(d); draw(); d.querySelector('#pz-x').focus();
+}
+/* Imagen de la alineación para mandar por WhatsApp: escudos y partido arriba, el campo con cada jugador y el banquillo abajo */
+async function pzPoster(team, L, players, e, p) {
+  await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
+  const form = L.form || formsOf(team)[0] || '', spots = pzSpots(form);
+  const pl = id => players.find(x => x.id === id) || { id, n: 'Jugador', dorsal: null };
+  const ok = (L.fase === 'previa' ? L.tit : L.campo).filter(id => !(L.rojas || []).includes(id));
+  const ids = spots.map((_, i) => ok.includes((L.pz || { ids: [] }).ids[i]) ? L.pz.ids[i] : null);
+  const bench = (L.fase === 'previa' ? L.sup : [...new Set([...L.tit, ...L.sup])].filter(id => !L.campo.includes(id))).filter(id => !ids.includes(id))
+    .sort((a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99));
+  const W = 1080, PAD = 48, HEAD = 250, FW = W - PAD * 2, FH = Math.round(FW * 90 / 68), BENCH = bench.length ? 70 + Math.ceil(bench.length / 3) * 64 : 0;
+  const H = PAD + HEAD + 24 + FH + (BENCH ? 24 + BENCH : 0) + PAD;
+  const cv = document.createElement('canvas'), x = cv.getContext('2d'); cv.width = W; cv.height = H;
+  const BLUE = '#0034DF', GREEN = '#2E8B57', INK = '#0B0B0B';
+  const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
+  const text = (t, tx, y, w, px, color, maxW, align = 'left', fit) => { x.font = font(w, px);
+    if (fit) while (px > fit && x.measureText(t).width > maxW) x.font = font(w, --px);
+    if (x.measureText(t).width > maxW) { while (t.length > 1 && x.measureText(t + '…').width > maxW) t = t.slice(0, -1); t += '…'; }
+    x.fillStyle = color; x.textAlign = align; x.textBaseline = 'middle'; x.fillText(t, tx, y); return x.measureText(t).width; };
+  const path = (rx, ry, rw, rh, rad) => { rad = Math.min(rad, rh / 2, rw / 2); x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad); x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); };
+  const rr = (rx, ry, rw, rh, rad, c) => { path(rx, ry, rw, rh, rad); x.fillStyle = c; x.fill(); };
+  const crest = await loadImg('icons/escudo.png'), rival = crestOf(e, p.rival) ? await loadImg(crestOf(e, p.rival)) : null;
+  const photos = {}; await Promise.all([...ids, ...bench].filter(id => id != null && pl(id).foto).map(async id => { photos[id] = await loadImg(pl(id).foto); }));
+  const badge = (img, cx, cy, sz) => { x.beginPath(); x.arc(cx, cy, sz / 2 + 8, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
+    if (img) { const k = Math.min(sz / img.width, sz / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); } };
+  /* Cara del jugador: foto, si no dorsal, si no el icono de persona */
+  const face = (id, cx, cy, r) => { const q = pl(id);
+    x.beginPath(); x.arc(cx, cy, r + 4, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
+    if (photos[id]) { x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.clip(); const im = photos[id], k = Math.max(2 * r / im.width, 2 * r / im.height);
+      x.drawImage(im, cx - im.width * k / 2, cy - im.height * k / 2, im.width * k, im.height * k); x.restore(); }
+    else if (q.dorsal) text(String(q.dorsal), cx, cy + 2, 800, r * 0.95, BLUE, 2 * r, 'center');
+    else { x.strokeStyle = '#8E97A8'; x.lineWidth = r * 0.14; x.beginPath(); x.arc(cx, cy - r * 0.22, r * 0.3, 0, Math.PI * 2); x.stroke();
+      x.beginPath(); x.arc(cx, cy + r * 0.72, r * 0.58, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); } };
+  x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, W, H);
+  /* Cabecera: los dos escudos y el partido */
+  rr(PAD, PAD, FW, HEAD, 32, BLUE);
+  const [lImg, rImg, lName, rName] = L.casa ? [crest, rival, 'Aznalcóllar', L.rival] : [rival, crest, L.rival, 'Aznalcóllar'];
+  badge(lImg, PAD + 100, PAD + 110, 104); badge(rImg, W - PAD - 100, PAD + 110, 104);
+  text(lName, W / 2 - 34, PAD + 92, 800, 40, '#FFFFFF', 300, 'right', 24); text('vs', W / 2, PAD + 92, 600, 30, '#C9D3FF', 60, 'center'); text(rName, W / 2 + 34, PAD + 92, 800, 40, '#FFFFFF', 300, 'left', 24);
+  text(`${longDate(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}`, W / 2, PAD + 150, 500, 28, '#FFFFFF', 560, 'center');
+  text(`${team} · Alineación${form ? ' · ' + form : ''}`, W / 2, PAD + 206, 700, 30, '#FFFFFF', FW - 80, 'center');
+  /* Campo */
+  const fx = PAD, fy = PAD + HEAD + 24;
+  rr(fx, fy, FW, FH, 28, GREEN); path(fx, fy, FW, FH, 28); x.strokeStyle = '#FFFFFF'; x.lineWidth = 6; x.stroke();
+  x.strokeStyle = 'rgba(255,255,255,.75)'; x.lineWidth = 4;
+  x.beginPath(); x.moveTo(fx, fy + FH / 2); x.lineTo(fx + FW, fy + FH / 2); x.stroke();
+  x.beginPath(); x.arc(fx + FW / 2, fy + FH / 2, FW * 0.11, 0, Math.PI * 2); x.stroke();
+  x.strokeRect(fx + FW * 0.25, fy, FW * 0.5, FH * 0.13); x.strokeRect(fx + FW * 0.25, fy + FH * 0.87, FW * 0.5, FH * 0.13);
+  spots.forEach((sp, i) => { const cx = fx + FW * sp.x / 100, cy = fy + FH * sp.y / 100, id = ids[i];
+    if (id == null) { x.setLineDash([10, 8]); x.beginPath(); x.arc(cx, cy, 52, 0, Math.PI * 2); x.strokeStyle = '#FFFFFF'; x.lineWidth = 4; x.stroke(); x.setLineDash([]); return; }
+    face(id, cx, cy, 52);
+    x.font = font(700, 26); const nm = pl(id).n, tw = Math.min(x.measureText(nm).width, 210) + 28;
+    rr(cx - tw / 2, cy + 64, tw, 40, 20, INK); text(nm, cx, cy + 85, 700, 26, '#FFFFFF', 210, 'center'); });
+  /* Banquillo */
+  if (BENCH) { const by = fy + FH + 24; text(`Banquillo · ${bench.length}`, PAD, by + 26, 800, 32, INK, FW);
+    const cw = FW / 3; bench.forEach((id, k) => { const cx = PAD + (k % 3) * cw, cy = by + 70 + Math.floor(k / 3) * 64 + 26;
+      rr(cx, cy - 26, cw - 12, 52, 26, '#E6EBFD'); face(id, cx + 26, cy, 20); text(pl(id).n, cx + 56, cy + 1, 700, 24, INK, cw - 80); }); }
+  return new Promise(ok2 => cv.toBlob(b => ok2(b), 'image/png'));
+}
+/* Elegir jugador para un hueco de la pizarra: devuelve su id, null para dejar el hueco vacío, o undefined si se cierra */
+function pickSlot(title, filled, ids, players) {
+  return new Promise(done => {
+    let pick;
+    const pl = id => players.find(x => x.id === id) || { n: 'Jugador', dorsal: null };
+    const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${esc(title)}</h2></div>
+        <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+      ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}">${pnum(pl(id), 'num', '–')}<b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b></button>`).join('')}</div>`
+        : '<p class="muted" style="margin:0">No hay ningún jugador para elegir.</p>'}
+      ${filled ? `<button type="button" class="btn ghost block" data-pk="">${ic('minus')} Dejar el hueco vacío</button>` : ''}`, 'dialog', () => done(pick));
+    m.el.classList.add('rqd');
+    m.el.querySelectorAll('[data-pk]').forEach(b => b.onclick = () => { pick = b.dataset.pk === '' ? null : +b.dataset.pk; m.close(false); });
+    (m.el.querySelector('[data-pk]') || m.el.querySelector('[data-v]')).focus();
+  });
+}
 function pickPlayer(title, sub, ids, players) {
   return new Promise(done => {
     let pick = null;
@@ -1456,7 +1594,8 @@ function lvScreen(team, back) {
         ${formsOf(team).length ? `<section class="card fm" aria-labelledby="h-lvfm"><div class="card-h"><h2 id="h-lvfm">Formación</h2><span class="pill${L.form ? '' : ' gold'}" id="lvfmn">${L.form ? esc(L.form) : 'Sin elegir'}</span></div>
           <div class="fm-body"><div id="lvfmp">${formPitch(L.form || formsOf(team)[0])}</div><div class="chips fm-chips" role="radiogroup" aria-label="Formación (fútbol ${modOf(team)})">${formsOf(team).map(x =>
             `<label class="chip"><input type="radio" name="lvfm" value="${x}"${L.form === x ? ' checked' : ''}> ${x}</label>`).join('')}</div></div>
-          <p class="muted" style="margin:0">Fútbol ${modOf(team)}: sin contar al portero. Sale luego en las estadísticas.</p></section>` : ''}
+          <p class="muted" style="margin:0">Fútbol ${modOf(team)}: sin contar al portero. Sale luego en las estadísticas.</p>
+          <button type="button" class="btn outline block" id="lvpz">${ic('team')} Colocar a los titulares en el campo</button></section>` : ''}
         <p class="muted" style="margin:0">Toca a un jugador para cambiarlo de grupo. Se guarda solo.</p>
         <section class="card lv-team tit" aria-labelledby="h-lvT"><div class="card-h"><h2 id="h-lvT">Titulares</h2><span class="pill" id="lvTn"></span></div><div class="lv-tiles" id="lvT"></div></section>
         <section class="card lv-team" aria-labelledby="h-lvS"><div class="card-h"><h2 id="h-lvS">Suplentes</h2><span class="pill blue" id="lvSn"></span></div><div class="lv-tiles" id="lvS"></div></section></div>
@@ -1468,6 +1607,7 @@ function lvScreen(team, back) {
           <p id="lverr" class="err" role="alert" hidden></p></form></div>`,
       bind() {
         grids();
+        if ($('#lvpz')) $('#lvpz').onclick = () => pizarra(team, L, t.players, save, e, p);
         document.querySelectorAll('[name=lvfm]').forEach(r => r.onchange = () => { L.form = r.value; save();
           $('#lvfmp').innerHTML = formPitch(L.form); $('#lvfmn').textContent = L.form; $('#lvfmn').className = 'pill'; });
         $('#lvdif').onclick = async () => {
@@ -1528,13 +1668,15 @@ function lvScreen(team, back) {
         ${score}${ctl}</section>
       <div class="lv-acts">${actions.map(([a, i, l]) => `<button type="button" class="lv-a ${a}" data-lva="${a}"><span class="lv-ai" aria-hidden="true">${ic(i)}</span><span>${l}</span></button>`).join('')}
         <button type="button" class="lv-a undo" id="lvundo"${L.hist && L.hist.length ? '' : ' disabled'}><span class="lv-ai" aria-hidden="true">${ic('undo')}</span><span>Deshacer</span></button></div>
-      ${card('h-lvc', `En el campo · ${L.campo.length}`, L.campo.length ? L.campo.slice().sort(byDor).map(id => prow(id, true)).join('') : '<p class="muted" style="margin:0">No hay nadie en el campo.</p>')}
+      ${card('h-lvc', `En el campo · ${L.campo.length}`, L.campo.length ? L.campo.slice().sort(byDor).map(id => prow(id, true)).join('') : '<p class="muted" style="margin:0">No hay nadie en el campo.</p>', '',
+        formsOf(team).length && L.campo.length ? `<button type="button" class="more" id="lvpz2">${ic('team')} Pizarra</button>` : '')}
       ${card('h-lvb', `Banquillo · ${banca().length}`, banca().length ? banca().map(id => prow(id, false)).join('') : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>')}
       ${L.rojas.length ? card('h-lvr', 'Expulsados', L.rojas.map(id => prow(id, false)).join('')) : ''}
       <button type="button" class="btn red block" id="lvdel">${ic('trash')} Borrar el directo</button></div>
       ${card('h-lvt', 'Lo que ha pasado', lvTimeline(L, nm, true))}</div>`,
     bind() {
       clearInterval(S.lvTick);
+      if ($('#lvpz2')) $('#lvpz2').onclick = () => pizarra(team, L, t.players, save, e, p);
       if (playing) {
         S.lvTick = setInterval(() => {
           if (!$('#lv-clock')) return clearInterval(S.lvTick);
@@ -1592,6 +1734,7 @@ function lvScreen(team, back) {
           lvSnap(L);
           if (playing) { const c = lvCap(L); L.seg[out] = (L.seg[out] || 0) + c - (L.desde[out] || 0); L.desde[inn] = c; } else L.desde[inn] = L.acc;
           L.campo = L.campo.map(x => x === out ? inn : x);
+          if (L.pz) L.pz.ids = L.pz.ids.map(x => x === out ? inn : x);   /* en la pizarra, el que entra ocupa el sitio del que sale */
           L.ev.push({ t: 'cambio', out, in: inn, min: mn, ...at }); return done(`Entra ${pl(inn).n} y sale ${pl(out).n}`);
         }
       });
