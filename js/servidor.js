@@ -49,6 +49,7 @@
     },
     async foto(perfil, foto) { ok(await sb.from('perfiles').update({ foto }).eq('id', perfil)); },
     async clave(perfil, clave) { ok(await sb.rpc('cambiar_clave', { p_perfil: perfil, p_clave: clave })); },
+    async duracion(team, partes, min) { ok(await sb.from('equipos').update({ partes, minutos_parte: min }).eq('id', idEq(team))); },
     async borrarUsuario(perfil) { ok(await sb.rpc('borrar_usuario', { p_perfil: perfil })); },
     async convocatoria(team, fecha, c) {
       ok(await sb.from('convocatorias').upsert({ equipo: idEq(team), fecha, jugadores: c.ids, hora: c.hora || '', lugar: c.lugar || '', nota: c.nota || '' }, { onConflict: 'equipo,fecha' }));
@@ -125,7 +126,8 @@
     mios.sort((a, b) => ORDEN.indexOf(a) - ORDEN.indexOf(b));
     for (const id of mios) {
       const q = eqs.find(x => x.id === id) || {};
-      S.teams[nombreEq(id)] = { cat: '', train: { dias: q.dias || [], h: q.hora || '', where: q.lugar || '', ses: Array.isArray(q.sesiones) ? q.sesiones : null }, players: [] };
+      S.teams[nombreEq(id)] = { cat: '', train: { dias: q.dias || [], h: q.hora || '', where: q.lugar || '', ses: Array.isArray(q.sesiones) ? q.sesiones : null }, players: [],
+        dur: q.partes && q.minutos_parte ? { partes: q.partes, min: q.minutos_parte } : null };
     }
     const equipoDe = {};
     for (const j of jug) {

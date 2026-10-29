@@ -726,12 +726,38 @@ function playerAttHTML(team, p) {
 /* Resumen del equipo en la temporada: lo que piden los entrenadores para tener un control rápido */
 /* Duración de un partido por categoría (minutos), para los minutos jugados */
 const DURACION = { senior: 90, juvenil: 90, cadete: 60, infantil: 80, alevin2: 70, alevin1: 60, benjamin2: 60, benjamin1: 60, prebenjamin: 50, minis: 50 };
+/* La junta puede cambiarla en Equipos > el equipo; si no, la de arriba (siempre en 2 partes) */
+const durOf = team => { const t = S.teams[team], e = EQ[team]; return t && t.dur ? t.dur : { partes: 2, min: ((e && DURACION[e.id]) || 0) / 2 }; };
+function durCard(team) {
+  const d = durOf(team);
+  if (S.editDur !== team) return card('h-du', 'Duración de los partidos', `<div class="trs"><div class="trs-r du-r"><b>${d.partes} partes de ${d.min} minutos</b><span>${d.partes * d.min} minutos en total</span></div></div>`,
+    '', '<button type="button" class="more" id="duedit">Editar</button>');
+  return `<form id="duf" class="card stack" novalidate aria-labelledby="h-du"><h2 id="h-du" style="margin:0;font-size:1.1rem">Duración de los partidos</h2>
+    <p class="muted" style="margin:0">Se usa para los minutos jugados del resumen de la temporada.</p>
+    <div class="row2"><label class="f" for="dup">Partes<select id="dup">${[1, 2, 3, 4].map(n => `<option value="${n}" ${n === d.partes ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    <label class="f" for="dum">Minutos de cada parte<input type="number" id="dum" inputmode="numeric" min="5" max="60" value="${d.min}"></label></div>
+    <p id="duerr" class="err" role="alert" hidden></p>
+    <div class="btn-row"><button type="button" class="btn ghost" id="ducancel">Cancelar</button><button type="submit" class="btn blue">${ic('check')} Guardar</button></div></form>`;
+}
+function bindDur(team) {
+  if ($('#duedit')) { $('#duedit').onclick = () => { S.editDur = team; render(); $('#dum') && $('#dum').focus(); }; return; }
+  if (!$('#duf')) return;
+  $('#ducancel').onclick = () => { S.editDur = null; render(); };
+  $('#duf').onsubmit = async ev => {
+    ev.preventDefault();
+    const partes = +$('#dup').value, min = +$('#dum').value, err = m => { $('#duerr').textContent = m; $('#duerr').hidden = false; };
+    if (!(min >= 5 && min <= 60)) return err('Pon los minutos de cada parte (entre 5 y 60).');
+    try { API() && await API().duracion(team, partes, min); }
+    catch (x) { return err(/partes|minutos_parte|column/i.test(x.message || '') ? 'Falta un paso en Supabase para poder guardar esto. Pídeselo a Claude.' : 'No se ha podido guardar. Revisa la conexión.'); }
+    S.teams[team].dur = { partes, min }; S.editDur = null; render(); say(`${team}: ${partes} partes de ${min} minutos`);
+  };
+}
 function summaryCard(e) {
   if (!e) return '';
   const pl = played(e), n = pl.length, c = k => pl.filter(p => outcome(p) === k).length;
   const G = c('G'), E = c('E'), P = c('P');
   const gf = pl.reduce((a, p) => a + p.goles[p.casa ? 0 : 1], 0), gc = pl.reduce((a, p) => a + p.goles[p.casa ? 1 : 0], 0);
-  const min = n * (DURACION[e.id] || 0);
+  const du = durOf(e.nombre), min = n * du.partes * du.min;
   let open = true; try { open = localStorage.getItem('resumen-cerrado') !== '1'; } catch (_) {}
   const pct = x => n ? Math.round(x / n * 1000) / 10 : 0;
   /* Anillo: cada parte es un trozo de la circunferencia (sin degradados) */
@@ -1432,7 +1458,7 @@ const BOARD = {
       const team = S.sub.slice(3);
       S.teams[team] = S.teams[team] || { cat: (EQ[team] || {}).cat || '', train: null, players: [] };
       return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), back: () => go('team'),
-        body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div>${rosterCard(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); } };
+        body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div>${durCard(team)}${rosterCard(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); bindDur(team); } };
     }
     const view = S.eqView === 'train' ? 'train' : 'teams';
     const vseg = `<div class="seg g-scope" role="group" aria-label="Qué ver"><button type="button" data-eqv="teams" aria-pressed="${view === 'teams'}">Equipos</button><button type="button" data-eqv="train" aria-pressed="${view === 'train'}">Entrenamientos</button></div>`;
