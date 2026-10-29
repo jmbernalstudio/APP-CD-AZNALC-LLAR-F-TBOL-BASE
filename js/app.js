@@ -141,6 +141,16 @@ const initials = n => n.split(' ').map(w => w[0]).slice(0, 2).join('');
 const short = n => { const [a, b] = n.split(' '); return b ? `${a} ${b[0]}.` : a; };
 
 /* Ventanas propias (sirven en todos los móviles y en la vista previa). onClose recibe el valor de cierre. */
+/* Con una ventana abierta, la página de detrás queda quieta (también en iPhone, donde overflow:hidden no basta):
+   se fija el body en su sitio y al cerrar se vuelve a la misma altura */
+const LOCK = { on: false, y: 0 };
+function lockScroll() {
+  const open = !!document.querySelector('body > .modal, body > .pz'), b = document.body.style;
+  if (open === LOCK.on) return;
+  LOCK.on = open;
+  if (open) { LOCK.y = window.scrollY; Object.assign(b, { position: 'fixed', top: `${-LOCK.y}px`, left: '0', right: '0', width: '100%' }); }
+  else { Object.assign(b, { position: '', top: '', left: '', right: '', width: '' }); window.scrollTo(0, LOCK.y); }
+}
 function modal(html, role, onClose) {
   const back = document.activeElement, d = document.createElement('div');
   d.className = 'modal'; d.setAttribute('role', role); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'mdl-t');
@@ -151,10 +161,10 @@ function modal(html, role, onClose) {
     if (e.key === 'Tab') { const f = focusables(), first = f[0], last = f[f.length - 1];
       if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } }
   };
-  const close = v => { d.remove(); document.removeEventListener('keydown', key); back && back.focus && back.focus(); onClose(v); };
+  const close = v => { d.remove(); lockScroll(); document.removeEventListener('keydown', key); back && back.focus && back.focus({ preventScroll: true }); onClose(v); };
   d.onclick = e => { if (e.target === d) close(false); const b = e.target.closest('[data-v]'); if (b) close(b.dataset.v === '1'); };
   document.addEventListener('keydown', key);
-  document.body.append(d);
+  document.body.append(d); lockScroll();
   return { el: d, close };
 }
 function ask(title, text, okLabel) {
@@ -386,7 +396,7 @@ function render(focus) {
   bindMatches();
   bindGo();
   if (v.back) $('[data-back]').onclick = v.back;
-  if (focus) { $('#title').setAttribute('tabindex', '-1'); $('#title').focus({ preventScroll: true }); window.scrollTo(0, 0); }
+  if (focus) { LOCK.y = 0; $('#title').setAttribute('tabindex', '-1'); $('#title').focus({ preventScroll: true }); window.scrollTo(0, 0); }
 }
 
 const kindIco = k => k === 'roto' ? 'wrench' : k === 'material' ? 'box' : 'talk';
@@ -1215,9 +1225,9 @@ function pizarra(team, L, players, save, e, p) {
   const d = document.createElement('div');
   d.className = 'pz'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', `Alineación contra ${nice(p.rival)}`);
   const back = document.activeElement;
-  const close = () => { d.remove(); document.removeEventListener('keydown', key);
+  const close = () => { d.remove(); lockScroll(); document.removeEventListener('keydown', key);
     if (L.form !== form0) render();   /* la tarjeta Formación de debajo enseña la nueva */
-    else if (back && back.focus) back.focus(); };
+    else if (back && back.focus) back.focus({ preventScroll: true }); };
   const key = ev => { if (ev.key === 'Escape' && !document.querySelector('.modal')) close(); };
   const place = (i, id) => { const arr = slots(), cur = arr[i];
     if (id === null) arr[i] = null; else { const was = arr.indexOf(id); if (was >= 0) arr[was] = cur; arr[i] = id; }   /* si ya estaba en otro hueco, se cambian */
@@ -1228,9 +1238,10 @@ function pizarra(team, L, players, save, e, p) {
     d.innerHTML = `<div class="pz-in">
       ${gameCard(e, p, false).replace(/ data-match="[^"]*" role="button" tabindex="0" aria-label="[^"]*"/, '').replace('class="gm"', 'class="gm pz-gm"')
         .replace('</small></div>', `</small><button type="button" class="iconbtn" id="pz-x" aria-label="Cerrar la pizarra">${ic('x')}</button></div>`)}
-      <div class="pz-body">${formsOf(team).length ? `<section class="card fm pz-fm" aria-labelledby="h-pzfm"><div class="card-h"><h2 id="h-pzfm">Formación</h2><span class="pill">${esc(form)}</span></div>
-        <div class="chips fm-chips" role="radiogroup" aria-label="Formación (fútbol ${modOf(team)})">${formsOf(team).map(x =>
-          `<label class="chip"><input type="radio" name="pzfm" value="${x}"${x === form ? ' checked' : ''}> ${x}</label>`).join('')}</div></section>` : ''}
+      <div class="pz-body">${formsOf(team).length ? `<section class="card fm pz-fm" aria-labelledby="h-pzfm"><div class="card-h"><h2 id="h-pzfm">Formación</h2></div>
+        <div class="dd"><button type="button" class="dd-b" id="pz-fmb" aria-haspopup="listbox" aria-expanded="false" aria-label="Formación: ${esc(form)}. Toca para cambiarla">${esc(form)}</button>
+          <ul class="dd-l" id="pz-fml" role="listbox" aria-label="Formación (fútbol ${modOf(team)})" hidden>${formsOf(team).map(x =>
+            `<li><button type="button" role="option" data-fm="${x}" aria-selected="${x === form}">${x}${x === form ? ic('check') : ''}</button></li>`).join('')}</ul></div></section>` : ''}
       <div class="pz-field${n > 8 ? ' f11' : ''}" role="group" aria-label="Campo">
         <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
         ${spots.map((sp, i) => { const id = ids[i], q = id != null ? pl(id) : null;
@@ -1247,8 +1258,19 @@ function pizarra(team, L, players, save, e, p) {
         ${ids.some(x => x != null) ? `<button type="button" class="btn ghost block" id="pz-clr">${ic('undo')} Vaciar la pizarra</button>` : ''}</div></div></div></div>`;
     d.querySelector('#pz-x').onclick = close;
     /* Cambiar la formación: los jugadores siguen en el mismo orden y pasan a las posiciones nuevas */
-    d.querySelectorAll('[name=pzfm]').forEach(r => r.onchange = () => { form = L.form = r.value; spots = pzSpots(form); n = spots.length; save(); draw();
-      const again = d.querySelector(`[name=pzfm][value="${form}"]`); if (again) again.focus({ preventScroll: true }); });
+    /* Desplegable de formación: se abre al tocarlo y se cierra al elegir, al tocar fuera o con Escape */
+    const fb = d.querySelector('#pz-fmb'), fl = d.querySelector('#pz-fml');
+    if (fb) {
+      const shut = () => { fl.hidden = true; fb.setAttribute('aria-expanded', 'false'); document.removeEventListener('pointerdown', out, true); };
+      const out = ev => { if (!ev.target.closest('.dd')) shut(); };
+      fb.onclick = () => { if (!fl.hidden) return shut();
+        fl.hidden = false; fb.setAttribute('aria-expanded', 'true'); document.addEventListener('pointerdown', out, true);
+        (fl.querySelector('[aria-selected="true"]') || fl.querySelector('button')).focus({ preventScroll: true }); };
+      fl.onkeydown = ev => { if (ev.key === 'Escape') { ev.stopPropagation(); shut(); fb.focus(); } };
+      fl.querySelectorAll('[data-fm]').forEach(b => b.onclick = () => { shut();
+        if (b.dataset.fm !== form) { form = L.form = b.dataset.fm; spots = pzSpots(form); n = spots.length; save(); draw(); }
+        const again = d.querySelector('#pz-fmb'); if (again) again.focus({ preventScroll: true }); });
+    }
     if (d.querySelector('#pz-clr')) d.querySelector('#pz-clr').onclick = () => { L.pz.ids = []; sel = null; save(); draw(); };
     d.querySelector('#pz-wa').onclick = () => shareImage({ title: 'Alineación', wait: 'Preparando la imagen…', build: () => pzPoster(team, L, players, e, p),
       name: fileName('alineacion', team, p.fecha), alt: `Alineación del ${team} contra ${them}`, msg: '', what: 'la imagen' });
@@ -1263,7 +1285,7 @@ function pizarra(team, L, players, save, e, p) {
     });
   };
   document.addEventListener('keydown', key);
-  document.body.append(d); draw(); d.querySelector('#pz-x').focus();
+  document.body.append(d); lockScroll(); draw(); d.querySelector('#pz-x').focus({ preventScroll: true });
 }
 /* Imagen de la alineación para mandar por WhatsApp: escudos y partido arriba, el campo con cada jugador y el banquillo abajo */
 async function pzPoster(team, L, players, e, p) {
