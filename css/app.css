@@ -1213,6 +1213,12 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .pz-s.gk .pz-f:not(.add):not(:has(img)) { background: var(--ink); } .pz-s.gk b { background: var(--ink); }
 .pz-s.wait .pz-f { outline: 3px solid var(--club); outline-offset: 3px; }
 .pz-f { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--club); color: #fff; font-weight: 800; font-size: 1.25rem; overflow: hidden; border: 3px solid #fff; flex: none; }
+/* Bolas del campo grandes y con sombra para que se vean bien; en fútbol 11 algo menores para que quepan */
+.pz-s .pz-f { width: 76px; height: 76px; font-size: 1.9rem; border-width: 4px; box-shadow: 0 3px 8px rgba(11,11,11,.28); }
+.pz-s .pz-f .i { width: 36px; height: 36px; }
+.pz-s b { font-size: .95rem; padding: 3px 10px; }
+.pz-field.f11 .pz-s { width: 17%; } .pz-field.f11 .pz-s .pz-f { width: 60px; height: 60px; font-size: 1.5rem; } .pz-field.f11 .pz-s b { font-size: .82rem; padding: 2px 8px; }
+.pz-s .pz-f.add { box-shadow: none; }
 .pz-f img { width: 100%; height: 100%; object-fit: cover; }
 .pz-f.none { color: #fff; } .pz-f .i { width: 26px; height: 26px; }
 .pz-f.add { background: #fff; border: 3px dashed #8E97A8; color: #5B6475; }
@@ -1229,5 +1235,6 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .pz-chip b { font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .pz-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
 @media (max-width: 760px) { .pz-body { display: flex; flex-direction: column; align-items: stretch; } .pz-side { width: auto; } .pz-field { width: 100%; max-height: none; }
-  .pz-f { width: 42px; height: 42px; font-size: 1rem; } .pz-s b { font-size: .7rem; padding: 2px 6px; } .pz-vs { font-size: .98rem; } .mini.pz-cr { width: 28px; height: 28px; } .mini.pz-cr img { width: 21px; height: 21px; } }
+  .pz-s .pz-f { width: 60px; height: 60px; font-size: 1.5rem; border-width: 3px; } .pz-s .pz-f .i { width: 28px; height: 28px; } .pz-s b { font-size: .8rem; padding: 2px 8px; }
+  .pz-field.f11 .pz-s .pz-f { width: 46px; height: 46px; font-size: 1.15rem; } .pz-field.f11 .pz-s .pz-f .i { width: 22px; height: 22px; } .pz-field.f11 .pz-s b { font-size: .7rem; padding: 2px 6px; } .pz-vs { font-size: .98rem; } .mini.pz-cr { width: 28px; height: 28px; } .mini.pz-cr img { width: 21px; height: 21px; } }
 .pz-in > * { flex-shrink: 0; }

@@ -1233,7 +1233,7 @@ function pizarra(team, L, players, save, e, p) {
       <div class="pz-body">${formsOf(team).length ? `<section class="card fm pz-fm" aria-labelledby="h-pzfm"><div class="card-h"><h2 id="h-pzfm">Formación</h2><span class="pill">${esc(form)}</span></div>
         <div class="chips fm-chips" role="radiogroup" aria-label="Formación (fútbol ${modOf(team)})">${formsOf(team).map(x =>
           `<label class="chip"><input type="radio" name="pzfm" value="${x}"${x === form ? ' checked' : ''}> ${x}</label>`).join('')}</div></section>` : ''}
-      <div class="pz-field" role="group" aria-label="Campo">
+      <div class="pz-field${n > 8 ? ' f11' : ''}" role="group" aria-label="Campo">
         <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
         ${spots.map((sp, i) => { const id = ids[i], q = id != null ? pl(id) : null;
           return `<button type="button" class="pz-s${i ? '' : ' gk'}${q ? '' : ' hole'}${sel != null ? ' wait' : ''}" data-pz="${i}" style="left:${sp.x}%;top:${sp.y}%" aria-label="${i ? 'Hueco ' + i : 'Portero'}: ${q ? esc(q.n) : 'vacío'}">
@@ -1315,12 +1315,13 @@ async function pzPoster(team, L, players, e, p) {
   x.beginPath(); x.moveTo(fx, fy + FH / 2); x.lineTo(fx + FW, fy + FH / 2); x.stroke();
   x.beginPath(); x.arc(fx + FW / 2, fy + FH / 2, FW * 0.11, 0, Math.PI * 2); x.stroke();
   x.strokeRect(fx + FW * 0.25, fy, FW * 0.5, FH * 0.13); x.strokeRect(fx + FW * 0.25, fy + FH * 0.87, FW * 0.5, FH * 0.13);
+  const R = spots.length > 8 ? 54 : 70, PW = spots.length > 8 ? 150 : 220;   /* bolas grandes; en fútbol 11 algo menos para que quepan */
   spots.forEach((sp, i) => { const cx = fx + FW * sp.x / 100, cy = fy + FH * sp.y / 100, id = ids[i];
-    if (id == null) { x.setLineDash([10, 8]); x.beginPath(); x.arc(cx, cy, 52, 0, Math.PI * 2); x.strokeStyle = '#8E97A8'; x.lineWidth = 4; x.stroke(); x.setLineDash([]); return; }
+    if (id == null) { x.setLineDash([10, 8]); x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.strokeStyle = '#8E97A8'; x.lineWidth = 4; x.stroke(); x.setLineDash([]); return; }
     const col = i ? BLUE : INK;   /* el portero, en negro */
-    face(id, cx, cy, 52, col);
-    x.font = font(700, 26); const nm = pl(id).n, tw = Math.min(x.measureText(nm).width, 210) + 28;
-    rr(cx - tw / 2, cy + 64, tw, 40, 20, col); text(nm, cx, cy + 85, 700, 26, '#FFFFFF', 210, 'center'); });
+    face(id, cx, cy, R, col);
+    x.font = font(700, 28); const nm = pl(id).n, tw = Math.min(x.measureText(nm).width, PW) + 28;
+    rr(cx - tw / 2, cy + R + 12, tw, 42, 21, col); text(nm, cx, cy + R + 34, 700, 28, '#FFFFFF', PW, 'center'); });
   /* Banquillo */
   if (BENCH) { const by = fy + FH + 24; text(`Banquillo · ${bench.length}`, PAD, by + 26, 800, 32, INK, FW);
     const cw = FW / 3; bench.forEach((id, k) => { const cx = PAD + (k % 3) * cw, cy = by + 70 + Math.floor(k / 3) * 64 + 26;
