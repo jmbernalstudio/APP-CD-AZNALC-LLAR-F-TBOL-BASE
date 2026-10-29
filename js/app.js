@@ -1293,11 +1293,12 @@ async function pzPoster(team, L, players, e, p) {
   const face = (id, cx, cy, r) => { const q = pl(id);
     x.beginPath(); x.arc(cx, cy, r + 4, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
     if (photos[id]) { x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.clip(); const im = photos[id], k = Math.max(2 * r / im.width, 2 * r / im.height);
-      x.drawImage(im, cx - im.width * k / 2, cy - im.height * k / 2, im.width * k, im.height * k); x.restore(); }
-    else if (q.dorsal) text(String(q.dorsal), cx, cy + 2, 800, r * 0.95, BLUE, 2 * r, 'center');
-    else { x.strokeStyle = '#8E97A8'; x.lineWidth = r * 0.14; x.beginPath(); x.arc(cx, cy - r * 0.22, r * 0.3, 0, Math.PI * 2); x.stroke();
+      x.drawImage(im, cx - im.width * k / 2, cy - im.height * k / 2, im.width * k, im.height * k); x.restore(); return; }
+    x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fillStyle = BLUE; x.fill();
+    if (q.dorsal) text(String(q.dorsal), cx, cy + 2, 800, r * 0.95, '#FFFFFF', 2 * r, 'center');
+    else { x.strokeStyle = '#FFFFFF'; x.lineWidth = r * 0.14; x.beginPath(); x.arc(cx, cy - r * 0.22, r * 0.3, 0, Math.PI * 2); x.stroke();
       x.beginPath(); x.arc(cx, cy + r * 0.72, r * 0.58, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); } };
-  x.fillStyle = '#FFFFFF'; x.fillRect(0, 0, W, H);
+  x.fillStyle = '#F3F5F9'; x.fillRect(0, 0, W, H);
   /* Cabecera: los dos escudos y el partido */
   rr(PAD, PAD, FW, HEAD, 32, BLUE);
   const [lImg, rImg, lName, rName] = L.casa ? [crest, rival, 'Aznalcóllar', L.rival] : [rival, crest, L.rival, 'Aznalcóllar'];
@@ -1307,7 +1308,7 @@ async function pzPoster(team, L, players, e, p) {
   text(`${team} · Alineación${form ? ' · ' + form : ''}`, W / 2, PAD + 206, 700, 30, '#FFFFFF', FW - 80, 'center');
   /* Campo */
   const fx = PAD, fy = PAD + HEAD + 24;
-  rr(fx, fy, FW, FH, 28, GREEN); path(fx, fy, FW, FH, 28); x.strokeStyle = '#FFFFFF'; x.lineWidth = 6; x.stroke();
+  rr(fx, fy, FW, FH, 28, GREEN); path(fx, fy, FW, FH, 28); x.strokeStyle = BLUE; x.lineWidth = 6; x.stroke();
   x.strokeStyle = 'rgba(255,255,255,.75)'; x.lineWidth = 4;
   x.beginPath(); x.moveTo(fx, fy + FH / 2); x.lineTo(fx + FW, fy + FH / 2); x.stroke();
   x.beginPath(); x.arc(fx + FW / 2, fy + FH / 2, FW * 0.11, 0, Math.PI * 2); x.stroke();
@@ -1316,7 +1317,7 @@ async function pzPoster(team, L, players, e, p) {
     if (id == null) { x.setLineDash([10, 8]); x.beginPath(); x.arc(cx, cy, 52, 0, Math.PI * 2); x.strokeStyle = '#FFFFFF'; x.lineWidth = 4; x.stroke(); x.setLineDash([]); return; }
     face(id, cx, cy, 52);
     x.font = font(700, 26); const nm = pl(id).n, tw = Math.min(x.measureText(nm).width, 210) + 28;
-    rr(cx - tw / 2, cy + 64, tw, 40, 20, INK); text(nm, cx, cy + 85, 700, 26, '#FFFFFF', 210, 'center'); });
+    rr(cx - tw / 2, cy + 64, tw, 40, 20, BLUE); text(nm, cx, cy + 85, 700, 26, '#FFFFFF', 210, 'center'); });
   /* Banquillo */
   if (BENCH) { const by = fy + FH + 24; text(`Banquillo · ${bench.length}`, PAD, by + 26, 800, 32, INK, FW);
     const cw = FW / 3; bench.forEach((id, k) => { const cx = PAD + (k % 3) * cw, cy = by + 70 + Math.floor(k / 3) * 64 + 26;
