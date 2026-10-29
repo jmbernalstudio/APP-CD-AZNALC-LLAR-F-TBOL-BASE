@@ -1034,3 +1034,21 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .tt-c { border-left: 4px solid var(--ink); }
 .tt-c.pa { border-left-color: var(--gold); background: var(--gold-soft); cursor: pointer; }
 .tt-c.pa:hover { background: var(--club-soft); }
+/* Calendario como tabla, con bordes */
+.tt-week { gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.tt-week .tt-wr { gap: 0; align-items: stretch; }
+.tt-week .tt-wr > span { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 8px 6px; min-height: 56px; }
+.tt-week .tt-wr > span:last-child { border-right: 0; }
+.tt-week .tt-wr:last-child > span { border-bottom: 0; }
+.tt-week .tt-wr.th > span { background: var(--shell); min-height: 0; padding: 10px 6px; color: var(--ink); }
+.tt-week .tt-wr .tt-h { padding-top: 14px; text-align: center; }
+.tt { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; gap: 0; }
+.tt .tt-row { gap: 0; padding: 0; border-bottom: 1px solid var(--line); }
+.tt .tt-row:last-child { border-bottom: 0; }
+.tt .tt-row .tt-h { border-right: 1px solid var(--line); padding: 14px 6px; text-align: center; align-self: stretch; }
+.tt .tt-row .tt-cells { padding: 8px; }
+.tt-vs { display: flex; align-items: center; gap: 4px; min-width: 0; margin-top: 3px; }
+.tt-vs small { min-width: 0; margin-left: 2px; }
+.mini.tt-cr { width: 22px; height: 22px; font-size: .5rem; }
+.mini.tt-cr img { width: 16px; height: 16px; }
+.tt-h.nh { font-size: .72rem; padding-left: 2px !important; padding-right: 2px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
