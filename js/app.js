@@ -294,6 +294,10 @@ const trainsOn = (team, iso) => { const t = trainOf(team); return !!t && t.dias.
 /* Cada día de entrenamiento lleva su hora y su campo (p. ej. lunes Campo 1, miércoles Campo 2) */
 const sesiones = t => t ? (t.ses && t.ses.length ? t.ses : t.dias.map(d => ({ d, h: t.h || '', where: t.where || '' }))) : [];
 const trainAt = (team, iso) => { const t = trainOf(team); if (!t || !t.dias.includes(dow(iso)) || anulado(team, iso)) return null; return sesiones(t).find(x => x.d === dow(iso)) || { d: dow(iso), h: t.h || '', where: t.where || '' }; };
+/* Duración fija de los entrenamientos (no se edita): hora y media, y los Minis una hora */
+const trainMin = team => (EQ[team] || {}).id === 'minis' ? 60 : 90;
+const hhmm = m => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+const trainEnd = (team, h) => { const [a, b] = (h || '').split(':').map(Number); return isNaN(a) ? '' : hhmm(a * 60 + (b || 0) + trainMin(team)); };
 const trainLbl = t => ['Entrenamiento', t.h, t.where].filter(Boolean).join(' · ');
 /* Solo se pasa lista en días de entrenamiento: hoy si toca, o uno de las dos últimas semanas que se olvidó */
 const LOOKBACK = 14;
@@ -308,7 +312,12 @@ const MONWEEK = [...Array(7)].map((_, i) => addDays(TODAY, i - dow(TODAY) + 1));
 function buildAgenda() {
   const ev = [];
   for (const team of Object.keys(S.teams)) WEEK.forEach((iso, i) => {
-    const t = trainAt(team, iso);
+    const t = trainAt(team, iso), tt = trainOf(team);
+    /* Un entrenamiento anulado por la junta sale como anulado: no hay que pasar lista */
+    if (!t && tt && tt.dias.includes(dow(iso)) && anulado(team, iso)) {
+      const x = sesiones(tt).find(y => y.d === dow(iso)) || {};
+      return ev.push({ iso, day: i === 0 ? 'Hoy' : dayLbl(iso), h: x.h || '--:--', kind: 'train', team, where: '', anul: true });
+    }
     if (!t) return;
     ev.push({ iso, day: i === 0 ? 'Hoy' : dayLbl(iso), h: t.h || '--:--', kind: 'train', team, where: t.where || '', today: i === 0 });
   });
@@ -448,12 +457,13 @@ function agendaRow(e, withAct) {
     const p = e.p;
     what = `<span class="vsl"><span class="pill gold">vs</span>${crestBadge(e.e, p.rival)}<span class="nm">${esc(nice(p.rival))}</span></span><span class="where">${p.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + esc(placeOf(p)) : ''}</span>`;
   } else if (e.kind === 'club') what = `<span class="t">${e.title}</span><span class="where">${e.where}</span>`;
+  else if (e.anul) what = `<span class="t">Entrenamiento anulado</span><span class="where"><span class="ev-tm">${e.team} · </span>Lo ha anulado la junta</span>`;
   else {
     // El equipo va en la etiqueta de la derecha; en el móvil (sin etiqueta) o con el botón de pasar lista, va junto al campo
     const btn = withAct && e.today;
     what = `<span class="t">Entrenamiento</span>${e.today ? '<span class="pill">Hoy</span>' : ''}<span class="where"><span class="ev-tm${btn ? ' on' : ''}">${e.team}${e.where ? ' · ' : ''}</span>${e.where}</span>`;
   }
-  const act = withAct && e.today && e.kind === 'train'
+  const act = withAct && e.today && e.kind === 'train' && !e.anul
     ? `<button type="button" class="btn gold sm ev-act" data-team-go="${e.team}">Pasar lista</button>`
     : `<span class="pill ${e.kind === 'match' ? 'gold' : e.kind === 'club' ? 'grey' : 'blue'} ev-act">${e.kind === 'club' ? 'Club' : e.team}</span>`;
   return `<div class="ev"><div class="when"><b>${e.h}</b><small>${e.day}</small></div><div class="what">${what}</div>${act}</div>`;
@@ -2114,7 +2124,7 @@ const calWeekLbl = wk => { const a = toDate(wk), z = toDate(addDays(wk, 6));
   return a.getMonth() === z.getMonth() ? `${a.getDate()} – ${z.getDate()} ${MES[z.getMonth()]}` : `${a.getDate()} ${MES[a.getMonth()]} – ${z.getDate()} ${MES[z.getMonth()]}`; };
 function calCell(x) {
   if (x.kind === 'tr') return `<div class="tt-c${x.anul ? ' anul' : ''}" data-anu="${esc(x.team)}|${x.f}" role="button" tabindex="0" aria-label="${x.anul ? 'Entrenamiento anulado' : 'Entrenamiento'} del ${esc(x.team)}. Toca para ${x.anul ? 'recuperarlo' : 'anularlo'}">
-    <b title="${esc(x.team)}">${esc(x.team)}</b><small>${x.anul ? 'Entrenamiento anulado' : `Entrenamiento · ${esc(x.where)}`}</small></div>`;
+    <b title="${esc(x.team)}">${esc(x.team)}</b><small>${x.anul ? 'Entrenamiento anulado' : `${x.h ? `${x.h}–${trainEnd(x.team, x.h)} · ` : ''}${esc(x.where)}`}</small></div>`;
   const us = crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr'), them = crestBadge(x.e, x.p.rival, 'mini tt-cr');
   return `<div class="tt-c pa" data-match="${x.e.id}|${x.p.j}" role="button" tabindex="0" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}"><b title="${esc(x.team)}">${esc(x.team)}</b>
     <span class="tt-vs">${x.casa ? us + them : them + us}<small title="vs ${esc(x.rival)}">${x.p.goles ? scoreTxt(x.p) + ' · ' : ''}${x.casa ? 'Local' : 'Visitante'} · ${esc(x.rival)}</small></span></div>`;
@@ -2158,7 +2168,7 @@ function trainView() {
 async function calPoster(wk) {
   await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
   const all = calItems(wk).filter(it => !it.anul), mins = h => { const [a, b] = h.split(':').map(Number); return a * 60 + (b || 0); };
-  const timed = all.filter(it => it.h).map(it => ({ ...it, a: mins(it.h), z: mins(it.h) + 90 })), loose = all.filter(it => !it.h);
+  const timed = all.filter(it => it.h).map(it => { const d = it.kind === 'tr' ? trainMin(it.team) : (du => du.partes * du.min ? du.partes * du.min + 15 : 90)(durOf(it.team)); return { ...it, a: mins(it.h), z: mins(it.h) + d }; }), loose = all.filter(it => !it.h);
   const W = 2200, GUT = 110, PAD = 40, COLW = (W - PAD * 2 - GUT) / 7, HEAD = 190, DAYH = 90, LOOSE = 92, PXH = 130;
   const nLoose = Math.max(0, ...DIAS.map((_, i) => loose.filter(it => it.f === addDays(wk, i)).length));
   const h0 = timed.length ? Math.floor(Math.min(...timed.map(t => t.a)) / 60) : 9, h1 = timed.length ? Math.ceil(Math.max(...timed.map(t => t.z)) / 60) : 21;
@@ -2203,7 +2213,7 @@ async function calPoster(wk) {
       badge(l, ix + 13, by + 58, 22); badge(v, ix + 45, by + 58, 22);
       if (bh >= 110) { if (it.h) text(it.h, ix + 70, by + 58, 700, 20, BLUE, iw - 70); text(`${it.casa ? 'Local' : 'Visitante'} · ${it.rival}`, ix, by + 94, 500, 19, MUTED, iw); }
       else text(`${it.h ? it.h + ' · ' : ''}${it.rival}`, ix + 70, by + 58, 500, 19, MUTED, iw - 70);
-    } else text(`${it.h} · ${it.where}`, ix, by + 54, 500, 19, MUTED, iw);
+    } else text(`${it.h}–${trainEnd(it.team, it.h)} · ${it.where}`, ix, by + 54, 500, 19, MUTED, iw);
   };
   x.fillStyle = BG; x.fillRect(0, 0, W, H);
   /* Cabecera */
