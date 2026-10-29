@@ -588,28 +588,34 @@ async function matchPoster(e, p) {
   }
   return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
 }
-async function shareMatch(e, p) {
-  /* De local jugamos en nuestro campo: sin "Cómo llegar" */
-  const maps = p.campo && !p.casa ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}` : '';
-  const msg = maps ? `*Cómo llegar y ubicación del partido:*\n\n📍 ${maps}` : '';
+/* Texto con la ubicación del campo (solo de visitante: de local jugamos en casa) */
+const mapsMsg = p => p.campo && !p.casa ? `*Cómo llegar y ubicación del partido:*\n\n📍 https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}` : '';
+/* Ventana para mandar una imagen por WhatsApp. Muchos móviles (iPhone y algunos Android) quitan el texto
+   cuando se comparte una imagen, así que la ubicación va en un segundo paso con un enlace de WhatsApp,
+   que abre el chat con el texto ya escrito en los dos sistemas. Al compartir la imagen, el texto también queda copiado */
+async function shareImage({ title, wait, build, name, alt, msg, what }) {
   let url = null;
-  const m = modal(`<h2 id="mdl-t">Enviar el partido</h2><p id="pst-w">Preparando la imagen…</p><div id="pst"></div>`, 'dialog', () => { if (url) URL.revokeObjectURL(url); });
-  const blob = await matchPoster(e, p);
+  const m = modal(`<h2 id="mdl-t">${title}</h2><p id="pst-w">${wait}</p><div id="pst"></div>`, 'dialog', () => { if (url) URL.revokeObjectURL(url); });
+  const blob = await build();
   if (!document.body.contains(m.el)) return;
-  const name = `partido-${e.nombre}-${p.fecha}.png`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9.-]+/g, '-');
   const file = new File([blob], name, { type: 'image/png' });
   const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
   url = URL.createObjectURL(blob);
-  $('#pst-w').textContent = canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : `Descarga la imagen y mándala por WhatsApp${msg ? ' junto con el enlace' : ''}.`;
-  $('#pst').outerHTML = `<img class="pst-img" src="${url}" alt="Partido del ${esc(e.nombre)} contra ${esc(nice(p.rival))}, ${longDate(p.fecha)}">
-    ${canShare ? `<button type="button" class="btn blue block" id="pst-sh">${ic('send')} Compartir</button>`
-      : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} Descargar imagen</button>`}
-    ${msg ? `<button type="button" class="btn ghost block" id="pst-cp">${ic('pin')} Copiar enlace de ubicación</button>` : ''}
+  $('#pst-w').textContent = msg ? `Manda primero ${what} y después la ubicación, al mismo grupo.` : canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : `Descarga ${what} y mándalo por WhatsApp.`;
+  $('#pst').outerHTML = `<img class="pst-img" src="${url}" alt="${esc(alt)}">
+    ${canShare ? `<button type="button" class="btn blue block" id="pst-sh">${ic('send')} ${msg ? '1. Enviar ' + what : 'Compartir'}</button>`
+      : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} ${msg ? '1. ' : ''}Descargar ${what}</button>`}
+    ${msg ? `<a class="btn outline block" id="pst-wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">${ic('pin')} 2. Enviar ubicación</a>` : ''}
     <button type="button" class="btn ghost block" data-v="0">Cerrar</button>`;
-  const sh = $('#pst-sh'), dl = $('#pst-dl'), cp = $('#pst-cp');
-  if (sh) { sh.focus(); sh.onclick = () => navigator.share(msg ? { files: [file], text: msg } : { files: [file] }).catch(() => {}); }
+  const sh = $('#pst-sh'), dl = $('#pst-dl');
+  const copy = () => { try { navigator.clipboard && navigator.clipboard.writeText(msg).catch(() => {}); } catch (_) {} };
+  if (sh) { sh.focus(); sh.onclick = () => { if (msg) copy(); navigator.share(msg ? { files: [file], text: msg } : { files: [file] }).catch(() => {}); }; }
   if (dl) { dl.focus(); dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); }; }
-  if (cp) cp.onclick = () => navigator.clipboard.writeText(msg).then(() => say('Enlace copiado. Pégalo en WhatsApp debajo de la imagen.'), () => say(msg));
+}
+const fileName = (pre, team, f) => `${pre}-${team}-${f}.png`.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9.-]+/g, '-');
+function shareMatch(e, p) {
+  return shareImage({ title: 'Enviar el partido', wait: 'Preparando la imagen…', build: () => matchPoster(e, p), name: fileName('partido', e.nombre, p.fecha),
+    alt: `Partido del ${e.nombre} contra ${nice(p.rival)}, ${longDate(p.fecha)}`, msg: mapsMsg(p), what: 'la imagen' });
 }
 function bindMatches() {
   document.querySelectorAll('#main [data-match]').forEach(el => {
@@ -1223,7 +1229,7 @@ function lvEdit(team, f, L, i, players, after) {
 }
 /* Borrar el directo entero: vuelve a "sin empezar" y quita los minutos y goles que guardó de ese partido */
 async function lvDelete(team, f) {
-  if (!(await ask('¿Borrar el directo?', 'Se borra todo lo apuntado en este partido (titulares, goles, tarjetas, cambios y minutos) y queda como si no se hubiera empezado.', 'Sí, borrar el directo'))) return;
+  if (!(await ask('¿Borrar el directo?', 'Se borra todo lo apuntado en este partido (titulares, goles, tarjetas, cambios y minutos) y queda como si no se hubiera empezado.', 'Sí, borrar'))) return;
   const ids = S.teams[team].players.filter(x => statOf(x.id, f)).map(x => x.id);
   try { if (API()) { if (!(S.live && S.directoOff)) await API().borrarDirecto(team, f); if (ids.length && statsOn()) await API().estadisticas(f, [], ids); } }
   catch (_) { return say('No se ha podido borrar. Revisa la conexión.'); }
@@ -1476,23 +1482,9 @@ async function convPoster(team, p, c, players) {
   if (c.nota) text(`Nota: ${c.nota}`, 96, rowsY + list.length * ROW + 30 + 30, 500, 30, MUTED, W - 192, 'left');
   return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
 }
-async function sharePoster(team, p, c, players) {
-  const m = modal(`<h2 id="mdl-t">Cartel de la convocatoria</h2><p id="pst-w">Preparando el cartel…</p><div id="pst"></div>`, 'dialog', () => { if (url) URL.revokeObjectURL(url); });
-  let url = null;
-  const blob = await convPoster(team, p, c, players);
-  if (!document.body.contains(m.el)) return;
-  const name = `convocatoria-${team}-${p.fecha}.png`.toLowerCase().replace(/[^a-z0-9.-]+/g, '-');
-  const file = new File([blob], name, { type: 'image/png' });
-  const canShare = !!(navigator.canShare && navigator.canShare({ files: [file] }));
-  url = URL.createObjectURL(blob);
-  $('#pst-w').textContent = canShare ? 'Pulsa "Compartir" y elige WhatsApp y el grupo del equipo.' : 'Descarga el cartel y mándalo por WhatsApp.';
-  $('#pst').outerHTML = `<img class="pst-img" src="${url}" alt="Cartel: convocatoria del ${esc(team)} contra ${esc(nice(p.rival))}, ${c.ids.length} convocados">
-    ${canShare ? `<button type="button" class="btn blue block" id="pst-sh">${ic('send')} Compartir</button>`
-      : `<button type="button" class="btn blue block" id="pst-dl">${ic('check')} Descargar cartel</button>`}
-    <button type="button" class="btn ghost block" data-v="0">Cerrar</button>`;
-  const sh = $('#pst-sh'), dl = $('#pst-dl');
-  if (sh) { sh.focus(); sh.onclick = () => navigator.share({ files: [file] }).catch(() => {}); }
-  if (dl) { dl.focus(); dl.onclick = () => { const a = document.createElement('a'); a.href = url; a.download = name; document.body.append(a); a.click(); a.remove(); }; }
+function sharePoster(team, p, c, players) {
+  return shareImage({ title: 'Cartel de la convocatoria', wait: 'Preparando el cartel…', build: () => convPoster(team, p, c, players), name: fileName('convocatoria', team, p.fecha),
+    alt: `Cartel: convocatoria del ${team} contra ${nice(p.rival)}, ${c.ids.length} convocados`, msg: mapsMsg(p), what: 'el cartel' });
 }
 function convScreen() {
   const team = S.team, t = S.teams[team], e = EQ[team], p = e && nextMatch(e);
