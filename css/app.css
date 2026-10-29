@@ -823,3 +823,34 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .tt-wr .tt-c { padding: 6px 8px; } .tt-wr .tt-c b { font-size: .85rem; } .tt-wr .tt-c small { font-size: .74rem; }
 .tt-desk { display: none; }
 @media (min-width: 1080px) { .tt-desk { display: block; } .tt-mob { display: none; } }
+
+/* Resumen de la temporada (Mi equipo) */
+.rs { padding-top: 6px; padding-bottom: 6px; }
+.rs-h { width: 100%; display: flex; align-items: center; gap: 12px; min-height: 48px; border: 0; background: none; padding: 6px 0; cursor: pointer; text-align: left; color: var(--ink); font: inherit; }
+.rs-h #h-rs { font-weight: 700; font-size: 1.05rem; white-space: nowrap; }
+.rs-line { flex: 1; min-width: 0; display: flex; gap: 6px 14px; justify-content: flex-end; color: var(--muted); font-size: .86rem; white-space: nowrap; overflow: hidden; }
+.rs-line b { color: var(--ink); } .rs-line b.ok { color: var(--ok-ink); } .rs-line b.bad { color: var(--bad-ink); }
+.rs-h[aria-expanded="true"] .rs-line { visibility: hidden; }
+.rs-ch { flex: none; width: 36px; height: 36px; border-radius: 12px; background: var(--shell); display: grid; place-items: center; }
+.rs-ch svg { width: 20px; height: 20px; }
+.rs-b { display: grid; gap: 16px; padding: 10px 0 12px; }
+.rs-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rs-t { display: flex; align-items: center; gap: 10px; min-width: 0; padding: 12px; border-radius: 16px; background: var(--shell); }
+.rs-v { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
+.rs-t b { font-size: 1.35rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.rs-t small { color: var(--muted); font-weight: 600; font-size: .84rem; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rs-i { flex: none; width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; border: 2px solid currentColor; }
+.rs-i svg { width: 20px; height: 20px; stroke-width: 2.4; }
+.rs-t.ok .rs-i { color: var(--ok-ink); } .rs-t.mid .rs-i { color: var(--warn-ink); } .rs-t.bad .rs-i { color: var(--bad-ink); } .rs-t.blue .rs-i { color: var(--club); }
+.rs-chart { display: flex; align-items: center; gap: 20px; min-width: 0; }
+.rs-chart svg { flex: none; width: 140px; height: 140px; }
+.rs-ok { stroke: var(--ok); } .rs-mid { stroke: var(--gold); } .rs-bad { stroke: var(--bad); }
+.rs-n { font-size: 9px; font-weight: 800; fill: var(--ink); } .rs-l { font-size: 3.6px; font-weight: 600; fill: var(--muted); }
+.rs-key { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; flex: 1; min-width: 0; }
+.rs-key li { display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; align-items: center; gap: 10px; }
+.rs-key i { width: 14px; height: 14px; border-radius: 4px; } .rs-key i.ok { background: var(--ok); } .rs-key i.mid { background: var(--gold); } .rs-key i.bad { background: var(--bad); }
+.rs-key span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .rs-key small { color: var(--muted); font-weight: 700; }
+@media (max-width: 719px) { .rs-line { display: none; } .rs-h #h-rs { flex: 1; } .rs-t { padding: 10px; gap: 8px; } .rs-t small { font-size: .8rem; } .rs-i { width: 30px; height: 30px; } .rs-i svg { width: 17px; height: 17px; } }
+@media (max-width: 419px) { .rs-i { display: none; } .rs-t { padding: 10px 12px; } }
+@media (max-width: 360px) { .rs-chart { gap: 12px; } .rs-chart svg { width: 112px; height: 112px; } .rs-key li { grid-template-columns: 14px minmax(0, 1fr); row-gap: 0; } .rs-key small { grid-column: 2; } .rs-t { padding: 8px 10px; } .rs-t small { font-size: .74rem; } }
+@media (min-width: 1080px) { .rs-v { flex-direction: row; align-items: baseline; gap: 8px; } .rs-b { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: center; } .rs-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); } }

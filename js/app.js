@@ -22,6 +22,9 @@ const I = {
   chev: '<path d="M9 5l7 7-7 7"/>',
   clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
   cal: '<rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  up: '<path d="M6 15l6-6 6 6"/>',
+  down: '<path d="M6 9l6 6 6-6"/>',
+  eq: '<path d="M6 10h12M6 14h12"/>',
   whistle: '<circle cx="9" cy="14" r="5"/><path d="M12.5 10.5L20 6v4l-5 2"/>'
 };
 const ic = n => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
@@ -720,6 +723,41 @@ function playerAttHTML(team, p) {
     <div class="bars-x" aria-hidden="true">${weeks.map(x => `<span>${wl(x.w)}</span>`).join('')}</div>
     <div class="pweeks">${weeks.slice().reverse().map(x => `<div><span>Semana del ${wl(x.w)}</span><b>${x.v} de ${x.n}</b></div>`).join('')}</div></div>`;
 }
+/* Resumen del equipo en la temporada: lo que piden los entrenadores para tener un control rápido */
+/* Duración de un partido por categoría (minutos), para los minutos jugados */
+const DURACION = { senior: 90, juvenil: 90, cadete: 70, infantil: 70, alevin2: 60, alevin1: 60, benjamin2: 50, benjamin1: 50, prebenjamin: 40, minis: 40 };
+function summaryCard(e) {
+  if (!e) return '';
+  const pl = played(e), n = pl.length, c = k => pl.filter(p => outcome(p) === k).length;
+  const G = c('G'), E = c('E'), P = c('P');
+  const gf = pl.reduce((a, p) => a + p.goles[p.casa ? 0 : 1], 0), gc = pl.reduce((a, p) => a + p.goles[p.casa ? 1 : 0], 0);
+  const min = n * (DURACION[e.id] || 0);
+  let open = true; try { open = localStorage.getItem('resumen-cerrado') !== '1'; } catch (_) {}
+  const pct = x => n ? Math.round(x / n * 1000) / 10 : 0;
+  /* Anillo: cada parte es un trozo de la circunferencia (sin degradados) */
+  const R = 15.915, parts = [['ok', G], ['mid', E], ['bad', P]];
+  let off = 25;
+  const ring = n ? parts.filter(x => x[1]).map(([cl, v]) => { const len = v / n * 100, seg = `<circle class="rs-${cl}" cx="21" cy="21" r="${R}" fill="none" stroke-width="7" stroke-dasharray="${len} ${100 - len}" stroke-dashoffset="${off}"/>`; off -= len; return seg; }).join('')
+    : `<circle cx="21" cy="21" r="${R}" fill="none" stroke="var(--line)" stroke-width="7"/>`;
+  const tile = (cls, icon, v, l) => `<div class="rs-t ${cls}"><span class="rs-i" aria-hidden="true">${ic(icon)}</span><span class="rs-v"><b>${v}</b><small>${l}</small></span></div>`;
+  const line = `<span><b>${n}</b> jugados</span><span><b class="ok">${G}</b> G</span><span><b>${E}</b> E</span><span><b class="bad">${P}</b> P</span><span><b>${gf}</b> a favor</span><span><b>${gc}</b> en contra</span>`;
+  return `<section class="card rs" aria-labelledby="h-rs">
+    <button type="button" class="rs-h" id="rs-tg" aria-expanded="${open}" aria-controls="rs-b"><span id="h-rs">Resumen de la temporada</span><span class="rs-line">${line}</span><span class="rs-ch" aria-hidden="true">${ic(open ? 'up' : 'down')}</span></button>
+    <div id="rs-b" class="rs-b" ${open ? '' : 'hidden'}>
+      <div class="rs-tiles">${tile('ok', 'up', G, G === 1 ? 'Ganado' : 'Ganados')}${tile('mid', 'eq', E, E === 1 ? 'Empatado' : 'Empatados')}${tile('bad', 'down', P, P === 1 ? 'Perdido' : 'Perdidos')}${tile('blue', 'clock', min + "'", 'Minutos jugados')}
+        ${tile('blue', 'check', gf, 'Goles a favor')}${tile('blue', 'x', gc, 'Goles en contra')}</div>
+      <div class="rs-chart"><svg viewBox="0 0 42 42" role="img" aria-label="${n ? `De ${n} partidos: ${G} ganados, ${E} empatados y ${P} perdidos` : 'Todavía no hay partidos jugados'}">${ring}<text x="21" y="20" text-anchor="middle" class="rs-n">${n}</text><text x="21" y="26" text-anchor="middle" class="rs-l">jugados</text></svg>
+        <ul class="rs-key">${[['ok', G, 'Ganados'], ['mid', E, 'Empatados'], ['bad', P, 'Perdidos']].map(([cl, v, l]) => `<li><i class="${cl}" aria-hidden="true"></i><span><b>${v}</b> ${l}</span><small>${pct(v).toLocaleString('es-ES')}%</small></li>`).join('')}</ul></div>
+    </div></section>`;
+}
+function bindSummary() {
+  const b = $('#rs-tg'); if (!b) return;
+  b.onclick = () => {
+    const open = b.getAttribute('aria-expanded') !== 'true';
+    b.setAttribute('aria-expanded', open); $('#rs-b').hidden = !open; b.querySelector('.rs-ch').innerHTML = ic(open ? 'up' : 'down');
+    try { localStorage.setItem('resumen-cerrado', open ? '0' : '1'); } catch (_) {}
+  };
+}
 function attendanceCard(team, id) {
   const { days, pct } = attendanceHist(team);
   const avg = pct.length ? Math.round(pct.reduce((a, b) => a + b) / pct.length) : null;
@@ -1074,6 +1112,7 @@ const COACH = {
     const allLbl = () => allIn() ? `${ic('x')} Quitar a todos` : `${ic('check')} Marcar a todos`;
     const head = `<div class="stack" style="margin-bottom:16px">
       <div class="seg g-scope seg-x" role="group" aria-label="Elige equipo">${Object.keys(S.teams).map(n => `<button type="button" data-team="${n}" aria-pressed="${n === S.team}">${n}</button>`).join('')}</div>
+      ${summaryCard(EQ[S.team])}
       <div class="tabs" role="group" aria-label="Vista">${[['list', 'Pasar lista'], ['games', 'Partidos'], ['table', 'Clasificación'], ['roster', 'Plantilla']].map(([k, l]) =>
         `<button type="button" data-sub="${k}" aria-pressed="${sub === k}">${l}</button>`).join('')}</div></div>`;
     let body = '';
@@ -1105,6 +1144,7 @@ const COACH = {
       body: head + body,
       bind() {
         document.querySelectorAll('[data-team]').forEach(b => b.onclick = () => { S.team = b.dataset.team; S.attDate = null; S.gj = null; render(); });
+        bindSummary();
         document.querySelectorAll('[data-gmv]').forEach(b => b.onclick = () => { S.gmView = b.dataset.gmv; S.gj = null; render(); });
         document.querySelectorAll('[data-gj]').forEach(b => b.onclick = () => { if (b.dataset.gj) { S.gj = +b.dataset.gj; render(); } });
         /* El equipo y el día elegidos siempre a la vista, aunque el selector se deslice */
