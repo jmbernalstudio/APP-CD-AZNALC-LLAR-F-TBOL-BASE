@@ -1189,6 +1189,9 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .pz-h .iconbtn { flex: none; }
 .pz-sub { margin: 0; color: var(--muted); font-size: .9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pz-sub b { color: var(--ink); }
+.pz-fm { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pz-fm label { flex: none; font-weight: 700; font-size: .95rem; }
+.pz-fm select { flex: 1; min-width: 0; max-width: 220px; min-height: 46px; padding-top: 0; padding-bottom: 0; border-radius: 12px; font-weight: 700; }
 .pz-tip { margin: 0; font-size: .9rem; font-weight: 600; padding: 8px 12px; border-radius: 12px; background: var(--shell); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .pz-tip.on { background: var(--club); color: #fff; }
 .pz-body { display: flex; gap: 18px; align-items: flex-start; min-width: 0; }
