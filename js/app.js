@@ -783,6 +783,17 @@ const durOf = team => { const t = S.teams[team], e = EQ[team]; return t && t.dur
 const MODALIDAD = { senior: 11, juvenil: 11, infantil: 11, cadete: 7, alevin2: 7, alevin1: 7, benjamin2: 7, benjamin1: 7, prebenjamin: 7, minis: 7 };
 const modOf = team => (S.teams[team] && S.teams[team].mod) || (EQ[team] && MODALIDAD[EQ[team].id]) || 11;
 const maxConv = team => modOf(team) + 7;
+/* Formaciones posibles según los jugadores en el campo (sin contar al portero) */
+const FORMACIONES = { 11: ['4-4-2', '4-3-3', '4-2-3-1', '4-1-4-1', '4-5-1', '4-4-1-1', '3-5-2', '3-4-3', '5-3-2', '5-4-1'],
+  8: ['3-3-1', '3-2-2', '2-3-2', '3-1-3', '2-4-1'], 7: ['2-3-1', '3-2-1', '3-1-2', '2-1-2-1', '3-3', '2-2-2', '1-3-2'], 5: ['2-2', '1-2-1', '2-1-1', '1-1-2'] };
+const formsOf = team => FORMACIONES[modOf(team)] || [];
+/* Dibujo pequeño de la formación: el portero abajo y cada línea hacia arriba */
+function formPitch(form) {
+  const lines = form.split('-').map(Number), n = lines.length, W = 120, H = 150;
+  const dot = (x, y, gk) => `<circle cx="${x}" cy="${y}" r="7.5" class="${gk ? 'gk' : ''}"/>`;
+  const rows = lines.map((k, r) => { const y = H - 34 - (r + 1) * ((H - 52) / n); return Array.from({ length: k }, (_, i) => dot(W * (i + 1) / (k + 1), y)).join(''); }).join('');
+  return `<svg class="fm-pitch" viewBox="0 0 ${W} ${H}" aria-hidden="true"><rect x="2" y="2" width="${W - 4}" height="${H - 4}" rx="10"/><line x1="2" y1="${H / 2}" x2="${W - 2}" y2="${H / 2}"/><circle cx="${W / 2}" cy="${H / 2}" r="14" fill="none"/><rect x="${W / 2 - 26}" y="${H - 26}" width="52" height="24" fill="none"/>${rows}${dot(W / 2, H - 16, true)}</svg>`;
+}
 function modCard(team) {
   const m = modOf(team);
   if (S.editMod !== team) return card('h-mo', 'Modalidad', `<div class="trs"><div class="trs-r du-r"><b>Fútbol ${m}</b><span>${m} titulares y hasta 7 suplentes (${m + 7} convocados)</span></div></div>`,
@@ -1032,7 +1043,17 @@ function statsView(team) {
       <span class="grow"><b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b><small>${dateLbl(p.fecha)} · <span class="res-t ${outcome({ ...p, goles: g })}">${g[0]}–${g[1]}</span></small></span>
       ${fin ? `<span class="pill">${ic('check')} Acabada</span>` : '<span class="pill gold">En juego</span>'}</button>`;
   }).join('')}`) : '';
-  return `<div class="stack">${banner}<div class="split st-split">${players}<div class="stack">${actasCard}${matches}</div></div></div>`;
+  /* Formaciones: la de cada jornada y cuánto se ha usado cada una */
+  const conForm = e ? e.partidos.filter(p => !p.descansa && (actaOf(team, p.fecha) || {}).form).sort((a, b) => b.fecha.localeCompare(a.fecha)) : [];
+  const cuenta = {}; conForm.forEach(p => { const fm = actaOf(team, p.fecha).form; cuenta[fm] = (cuenta[fm] || 0) + 1; });
+  const ranking = Object.entries(cuenta).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const formCard = formsOf(team).length ? card('h-stf', 'Formaciones', !conForm.length ? '<p class="muted" style="margin:0">Todavía no hay ninguna. Elige la formación al rellenar los datos de cada partido.</p>' : `
+    <div class="fm-top">${formPitch(ranking[0][0])}<div class="grow"><small class="muted">La que más usas</small><b class="fm-big">${esc(ranking[0][0])}</b><small class="muted">${Math.round(ranking[0][1] * 100 / conForm.length)}% de ${conForm.length} ${conForm.length === 1 ? 'partido' : 'partidos'}</small></div></div>
+    <div class="fm-bars">${ranking.map(([fm, n]) => { const pc = Math.round(n * 100 / conForm.length);
+      return `<div class="fm-bar"><b>${esc(fm)}</b><span class="fm-track"><i style="width:${pc}%"></i></span><span>${pc}%</span></div>`; }).join('')}</div>
+    <h3 class="fm-h">Jornada a jornada</h3>${conForm.map(p => `<div class="fm-row"><span class="cal-d"><span>J${p.j}</span><b>${toDate(p.fecha).getDate()}</b></span>${crestBadge(e, p.rival)}
+      <span class="grow"><b title="${esc(nice(p.rival))}">${esc(nice(p.rival))}</b><small>${dateLbl(p.fecha)}</small></span><span class="pill blue">${esc(actaOf(team, p.fecha).form)}</span></div>`).join('')}`) : '';
+  return `<div class="stack">${banner}<div class="split st-split">${players}<div class="stack">${formCard}${actasCard}${matches}</div></div></div>`;
 }
 function bindStats(team) {
   document.querySelectorAll('[data-sts]').forEach(b => b.onclick = () => { S.stSort = b.dataset.sts; render(); });
@@ -1392,7 +1413,7 @@ function lvScreen(team, back) {
   const save = () => lvSave(team, f, L);
   const us = 'Aznalcóllar', them = L.rival;
   const score = `<div class="lv-sc"><b title="${esc(L.casa ? us : them)}">${esc(L.casa ? us : them)}</b><span class="lv-g">${L.casa ? L.nos : L.ellos}<i>–</i>${L.casa ? L.ellos : L.nos}</span><b title="${esc(L.casa ? them : us)}">${esc(L.casa ? them : us)}</b></div>`;
-  const tag = `${dateLbl(f)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}`;
+  const tag = `${dateLbl(f)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}${L.form ? ' · ' + L.form : ''}`;
   const kicker = `${L.fase === 'previa' ? 'Rellenar datos' : 'Directo'} · ${esc(team)}`, title = `vs ${esc(them)}`;
 
   /* --- Antes de empezar: hace falta la convocatoria, y de ella salen titulares y suplentes --- */
@@ -1432,6 +1453,10 @@ function lvScreen(team, back) {
       body: `<div class="split"><div class="stack">
         <section class="card match" aria-label="Partido"><span class="tag">${tag}</span>${score}
           <small class="cv-place">${ic('clock')} ${L.partes} partes de ${L.min} minutos · ${cv.todos ? 'toda la plantilla' : cv.ids.length + ' convocados'}</small></section>
+        ${formsOf(team).length ? `<section class="card fm" aria-labelledby="h-lvfm"><div class="card-h"><h2 id="h-lvfm">Formación</h2><span class="pill${L.form ? '' : ' gold'}" id="lvfmn">${L.form ? esc(L.form) : 'Sin elegir'}</span></div>
+          <div class="fm-body"><div id="lvfmp">${formPitch(L.form || formsOf(team)[0])}</div><div class="chips fm-chips" role="radiogroup" aria-label="Formación (fútbol ${modOf(team)})">${formsOf(team).map(x =>
+            `<label class="chip"><input type="radio" name="lvfm" value="${x}"${L.form === x ? ' checked' : ''}> ${x}</label>`).join('')}</div></div>
+          <p class="muted" style="margin:0">Fútbol ${modOf(team)}: sin contar al portero. Sale luego en las estadísticas.</p></section>` : ''}
         <p class="muted" style="margin:0">Toca a un jugador para cambiarlo de grupo. Se guarda solo.</p>
         <section class="card lv-team tit" aria-labelledby="h-lvT"><div class="card-h"><h2 id="h-lvT">Titulares</h2><span class="pill" id="lvTn"></span></div><div class="lv-tiles" id="lvT"></div></section>
         <section class="card lv-team" aria-labelledby="h-lvS"><div class="card-h"><h2 id="h-lvS">Suplentes</h2><span class="pill blue" id="lvSn"></span></div><div class="lv-tiles" id="lvS"></div></section></div>
@@ -1443,6 +1468,8 @@ function lvScreen(team, back) {
           <p id="lverr" class="err" role="alert" hidden></p></form></div>`,
       bind() {
         grids();
+        document.querySelectorAll('[name=lvfm]').forEach(r => r.onchange = () => { L.form = r.value; save();
+          $('#lvfmp').innerHTML = formPitch(L.form); $('#lvfmn').textContent = L.form; $('#lvfmn').className = 'pill'; });
         $('#lvdif').onclick = async () => {
           if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular: toca a un jugador de los suplentes.'; $('#lverr').hidden = false; return; }
           lvSnap(L); lvDiferido(L); L.hist = []; save();
