@@ -2167,11 +2167,6 @@ function trainView() {
       ${tm}<b class="tt-t">${span(x)}</b><span class="tt-vs">${x.casa ? us + them : them + us}<small>${x.p.goles ? `${scoreTxt(x.p)} · ` : ''}${x.casa ? 'Local' : 'Visitante'}</small></span><small title="${esc(x.rival)}">${esc(x.rival)}</small></div>`;
   };
   const teamsOf = list => [...new Set(list.map(x => x.team))].sort((a, b) => teamOrd(a) - teamOrd(b));
-  /* Semana en el ordenador: una fila por equipo y una columna por día */
-  const weekTable = () => `<div class="pl" role="table" aria-label="Calendario de la semana por equipos">
-    <div class="pl-r pl-th" role="row"><span role="columnheader">Equipo</span>${DIAS_D.map((d, i) => `<span role="columnheader"${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${d} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
-    ${teamsOf(all).map(t => `<div class="pl-r" role="row"><span class="pl-tm" role="rowheader" title="${esc(t)}"><span>${esc(t)}</span></span>${DIAS.map((_, i) =>
-      `<span role="cell"${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${all.filter(x => x.team === t && x.f === dayIso(i)).map(x => chip(x)).join('')}</span>`).join('')}</div>`).join('')}</div>`;
   /* Un día en el ordenador: una fila por equipo y las horas en horizontal; cada cita ocupa todo su tiempo */
   const dayGantt = list => {
     const timed = list.filter(x => x.h).map(x => ({ ...x, a: hm2min(x.h), z: hm2min(endOf(x)) })), loose = list.filter(x => !x.h);
@@ -2186,71 +2181,28 @@ function trainView() {
   };
   /* En el móvil y la tableta: lista por horas, con el principio y el final de cada cita */
   const dayList = list => `<div class="tl">${list.map(x => `<div class="tl-r"><span class="tl-t">${x.h ? `<b>${x.h}</b><small>${endOf(x)}</small>` : '<small>Sin hora</small>'}</span>${chip(x, true)}</div>`).join('')}</div>`;
-  /* Versiones para que la junta elija (provisional) */
-  const V = S.calV || 1;
-  const weekCols = () => `<div class="kc">${DIAS_D.map((d, i) => { const l = all.filter(x => x.f === dayIso(i));
-    return `<div class="kc-c"><div class="kc-h${dayIso(i) === TODAY ? ' hoy' : ''}">${d} ${toDate(dayIso(i)).getDate()}</div>${l.map(x => chip(x, true)).join('') || '<p class="muted kc-0">Nada</p>'}</div>`; }).join('')}</div>`;
-  const wideList = list => `<div class="wl">${list.map(x => `<div class="wl-r${x.kind === 'pa' ? ' pa' : ''}${x.anul ? ' anul' : ''}" ${x.kind === 'pa' ? `data-match="${x.e.id}|${x.p.j}"` : `data-anu="${esc(x.team)}|${x.f}"`} role="button" tabindex="0">
-      <span class="wl-t">${span(x)}</span><b class="wl-tm">${esc(x.team)}</b><span class="wl-k">${x.kind === 'pa' ? `${ic('ball')} Partido` : x.anul ? 'Anulado' : 'Entrenamiento'}</span>
-      <span class="wl-w">${x.kind === 'pa' ? `${x.casa ? crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr') + crestBadge(x.e, x.p.rival, 'mini tt-cr') : crestBadge(x.e, x.p.rival, 'mini tt-cr') + crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr')}<span>${x.casa ? 'Local' : 'Visitante'} · ${esc(x.rival)}</span>` : `<span>${esc(x.where)}</span>`}</span></div>`).join('')}</div>`;
-  const weekAgenda = () => `<div class="stack">${DIAS_D.map((d, i) => ({ d: `${d} ${toDate(dayIso(i)).getDate()}`, l: all.filter(x => x.f === dayIso(i)) })).filter(x => x.l.length)
-    .map((x, i) => card(`h-wa${i}`, `${x.d} · ${x.l.length} ${x.l.length === 1 ? 'cita' : 'citas'}`, wideList(x.l))).join('')}</div>`;
-  const weekTeams = () => `<div class="tc">${teamsOf(all).map(t => card('', esc(t), `<div class="tc-l">${DIAS.map((dn, i) => all.filter(x => x.team === t && x.f === dayIso(i))
-    .map(x => `<div class="tc-r"><span class="tc-d">${dn} ${toDate(dayIso(i)).getDate()}</span>${chip(x)}</div>`).join('')).join('')}</div>`)).join('')}</div>`;
-  /* Horas de la semana entera (para que todas las versiones por horas usen la misma escala) */
-  const TW = all.filter(x => x.h).map(x => ({ ...x, a: hm2min(x.h), z: hm2min(endOf(x)) }));
-  /* Por la tarde es lo normal: un partido por la mañana (p. ej. domingo a las 10) va aparte, para no estirar toda la rejilla */
-  const TA = TW.filter(x => x.a >= 840).length ? TW.filter(x => x.a >= 840) : TW;
-  const w0 = TA.length ? Math.floor(Math.min(...TA.map(x => x.a)) / 60) * 60 : 960, w1 = TA.length ? Math.ceil(Math.max(...TA.map(x => x.z)) / 60) * 60 : 1320;
-  const wn = (w1 - w0) / 30, wp = m => Math.max(0, Math.min(100, (m - w0) / (w1 - w0) * 100));
-  const MORN = TW.filter(x => x.a < w0), TWD = TW.filter(x => x.a >= w0);
-  const mornRow = () => MORN.length ? `<div class="gc-hd cf-pa"><span>Mañana</span>${DIAS.map((_, i) => `<span>${MORN.filter(x => x.f === dayIso(i)).map(x => `<div class="hs-c${x.kind === 'pa' ? ' pa' : ''}" role="button" tabindex="0" ${attrs(x)}><b>${esc(shortT(x.team))}</b><small>${span(x)}${x.kind === 'pa' ? ' · Partido' : ''}</small></div>`).join('')}</span>`).join('')}</div>` : '';
-  const axis = cls => `<span class="gt-ax ${cls || ''}" role="columnheader">${Array.from({ length: wn }, (_, k) => `<i>${hhmm(w0 + k * 30)}</i>`).join('')}</span>`;
   const SHORT = { senior: 'Senior', juvenil: 'Juvenil', cadete: 'Cadete', infantil: 'Infantil', alevin2: 'Alevín 2º', alevin1: 'Alevín 1º', benjamin2: 'Benjamín 2º', benjamin1: 'Benjamín 1º', prebenjamin: 'Prebenj. 2º', minis: 'Minis' };
   const shortT = t => SHORT[(EQ[t] || {}).id] || t;
-  const TCOL = { senior: '#DDE4FF', juvenil: '#FFE7B8', cadete: '#D7F2E3', infantil: '#FFD9D9', alevin2: '#E6DAFF', alevin1: '#D3EEFA', benjamin2: '#FBE0F2', benjamin1: '#E4F0C8', prebenjamin: '#FFE2CC', minis: '#E3E6EC' };
-  const tcol = t => TCOL[(EQ[t] || {}).id] || '#E3E6EC';
-  const attrs = x => x.kind === 'pa' ? `data-match="${x.e.id}|${x.p.j}" aria-label="Partido del ${esc(x.team)}, ${span(x)}"` : `data-anu="${esc(x.team)}|${x.f}" aria-label="Entrenamiento del ${esc(x.team)}, ${span(x)}"`;
-  /* 5: la vista A para toda la semana: un bloque por día, una fila por equipo y las horas en horizontal */
-  const weekGantt = () => `<div class="gt wg" role="table" style="--n:${wn}"><div class="gt-r wg-r gt-th" role="row"><span role="columnheader">Día</span><span role="columnheader">Equipo</span>${axis()}</div>
-    ${DIAS_D.map((d, i) => { const l = TW.filter(x => x.f === dayIso(i)); if (!l.length) return '';
-      return `<div class="wg-d"><span class="wg-dl${dayIso(i) === TODAY ? ' hoy' : ''}">${d}<b>${toDate(dayIso(i)).getDate()}</b></span><div class="wg-rows">${teamsOf(l).map(t => { const mine = calLanes(l.filter(x => x.team === t));
-        return `<div class="gt-r wg-tr"><span class="pl-tm" title="${esc(t)}"><span>${esc(t)}</span></span><span class="gt-tl" style="height:${Math.max(1, ...mine.map(x => x.n)) * 64}px">${mine.map(x => `<span class="gt-ev" style="left:${wp(x.a)}%;width:${Math.max(wp(x.z) - wp(x.a), 300 / wn)}%;top:${x.lane * 64}px;height:64px">${chip(x)}</span>`).join('')}</span></div>`; }).join('')}</div></div>`; }).join('')}</div>`;
-  /* 6: una fila por hora de empiece y una columna por día; cada equipo con su hora de fin */
+  /* Semana en el ordenador: una fila por hora de empiece y una columna por día; cada cita dice hasta qué hora dura */
+  const hsCell = x => {
+    if (x.kind === 'tr') return `<div class="hs-c${x.anul ? ' anul' : ''}" role="button" tabindex="0" data-anu="${esc(x.team)}|${x.f}" aria-label="${x.anul ? 'Entrenamiento anulado' : 'Entrenamiento'} del ${esc(x.team)}, ${span(x)}. Toca para ${x.anul ? 'recuperarlo' : 'anularlo'}">
+      <b title="${esc(x.team)}">${esc(shortT(x.team))}</b><small>${x.anul ? 'Anulado' : `hasta ${endOf(x)} · ${esc(x.where)}`}</small></div>`;
+    const us = crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr'), them = crestBadge(x.e, x.p.rival, 'mini tt-cr');
+    return `<div class="hs-c pa" role="button" tabindex="0" data-match="${x.e.id}|${x.p.j}" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}, ${span(x)}">
+      <b title="${esc(x.team)}">${esc(shortT(x.team))}</b><small>${x.p.goles ? `${scoreTxt(x.p)} · ` : ''}${x.casa ? 'Local' : 'Visitante'}${x.h ? ` · hasta ${endOf(x)}` : ''}</small>
+      <span class="tt-vs">${x.casa ? us + them : them + us}<small title="${esc(x.rival)}">${esc(x.rival)}</small></span></div>`;
+  };
   const weekStarts = () => { const hs = [...new Set(all.map(x => x.h))].sort((a, b) => (a || '99').localeCompare(b || '99'));
-    return `<div class="pl hs" role="table"><div class="pl-r pl-th" role="row"><span>Empieza</span>${DIAS_D.map((d, i) => `<span${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${d} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
-      ${hs.map(h => `<div class="pl-r" role="row"><span class="pl-tm hs-h"><span>${h || 'Sin hora'}</span></span>${DIAS.map((_, i) => `<span role="cell"${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${all.filter(x => x.h === h && x.f === dayIso(i)).map(x =>
-        `<div class="hs-c${x.kind === 'pa' ? ' pa' : ''}${x.anul ? ' anul' : ''}" role="button" tabindex="0" ${attrs(x)}><b>${esc(shortT(x.team))}</b><small>${x.anul ? 'Anulado' : x.kind === 'pa' ? `Partido · hasta ${endOf(x)}` : `hasta ${endOf(x)} · ${esc(x.where)}`}</small></div>`).join('')}</span>`).join('')}</div>`).join('')}</div>`; };
-  /* 7: rejilla por horas (como Google Calendar) con nombres cortos y un color por equipo */
-  const weekColor = () => { const PX = 40, byDay = DIAS.map((_, i) => calLanes(TWD.filter(x => x.f === dayIso(i))));
-    return `<div class="gc-key">${teamsOf(all).map(t => `<span><i style="background:${tcol(t)}"></i>${esc(t)}</span>`).join('')}</div>
-    <div class="gc" style="--px:${PX}px"><div class="gc-hd"><span></span>${DIAS_D.map((d, i) => `<span${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${d} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>${mornRow()}
-    <div class="gc-bd" style="height:${wn * PX}px"><div class="gc-hr">${Array.from({ length: wn }, (_, k) => `<span>${hhmm(w0 + k * 30)}</span>`).join('')}</div>
-    ${byDay.map(l => `<div class="gc-day">${l.map(x => `<div class="gc-ev${x.kind === 'pa' ? ' pa' : ''}${x.anul ? ' anul' : ''}" role="button" tabindex="0" ${attrs(x)} style="top:${(x.a - w0) / 30 * PX}px;height:${(x.z - x.a) / 30 * PX}px;left:calc(${x.lane} * 100% / ${x.n});width:calc(100% / ${x.n});${x.kind === 'pa' || x.anul ? '' : `background:${tcol(x.team)}`}">
-      <b>${esc(shortT(x.team))}</b><small>${x.h}</small>${x.kind === 'pa' ? '<small>Partido</small>' : ''}</div>`).join('')}</div>`).join('')}</div></div>`; };
-  /* 8: ocupación de los campos: cada día con Campo 1 y Campo 2; "Campo entero" ocupa los dos */
-  const weekFields = () => { const PX = 40, side = w => /campo\s*1\b/i.test(w) ? 0 : /campo\s*2\b/i.test(w) ? 1 : -1;
-    const tr = TWD.filter(x => x.kind === 'tr'), pa = all.filter(x => x.kind === 'pa');
-    return `<div class="gc cf" style="--px:${PX}px"><div class="gc-hd"><span></span>${DIAS_D.map((d, i) => `<span${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${d} ${toDate(dayIso(i)).getDate()}<small><em>Campo 1</em><em>Campo 2</em></small></span>`).join('')}</div>
-    ${mornRow()}${pa.filter(x => !MORN.some(m => m.p === x.p)).length ? `<div class="gc-hd cf-pa"><span>Partidos</span>${DIAS.map((_, i) => `<span>${pa.filter(x => x.f === dayIso(i) && !MORN.some(m => m.p === x.p)).map(x => `<div class="hs-c pa" role="button" tabindex="0" ${attrs(x)}><b>${esc(shortT(x.team))}</b><small>${x.h || 'Sin hora'} · ${x.casa ? 'Local' : 'Visitante'}</small></div>`).join('')}</span>`).join('')}</div>` : ''}
-    <div class="gc-bd" style="height:${wn * PX}px"><div class="gc-hr">${Array.from({ length: wn }, (_, k) => `<span>${hhmm(w0 + k * 30)}</span>`).join('')}</div>
-    ${DIAS.map((_, i) => `<div class="gc-day cf-day">${tr.filter(x => x.f === dayIso(i)).map(x => { const sd = side(x.where);
-      return `<div class="gc-ev${x.anul ? ' anul' : ''}" role="button" tabindex="0" ${attrs(x)} style="top:${(x.a - w0) / 30 * PX}px;height:${(x.z - x.a) / 30 * PX}px;left:${sd === 1 ? '50%' : '0'};width:${sd < 0 ? '100%' : '50%'};${x.anul ? '' : `background:${tcol(x.team)}`}"><b>${esc(shortT(x.team))}</b><small>${x.h}–${endOf(x)}</small></div>`; }).join('')}</div>`).join('')}</div></div>`; };
-  /* 9: tabla por equipos con una barra de horas en cada día */
-  const weekBars = () => `<div class="pl wb" role="table"><div class="pl-r pl-th" role="row"><span>Equipo</span>${DIAS_D.map((d, i) => `<span${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${d} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
-    <div class="pl-r wb-sc" role="row"><span></span>${DIAS.map(() => `<span><i>${hhmm(w0)}</i><i>${hhmm((w0 + w1) / 2)}</i><i>${hhmm(w1)}</i></span>`).join('')}</div>
-    ${teamsOf(all).map(t => `<div class="pl-r" role="row"><span class="pl-tm"><span>${esc(t)}</span></span>${DIAS.map((_, i) => { const l = all.filter(x => x.team === t && x.f === dayIso(i));
-      return `<span role="cell" class="wb-c${dayIso(i) === TODAY ? ' hoy' : ''}">${l.map(x => `<div class="wb-x${x.kind === 'pa' ? ' pa' : ''}${x.anul ? ' anul' : ''}" role="button" tabindex="0" ${attrs(x)}>
-        <span class="wb-tr">${x.h ? `<i style="left:${wp(hm2min(x.h))}%;width:${wp(hm2min(endOf(x))) - wp(hm2min(x.h))}%"></i>` : ''}</span><small>${x.anul ? 'Anulado' : `${span(x)}${x.kind === 'pa' ? ' · Partido' : ''}`}</small></div>`).join('')}</span>`; }).join('')}</div>`).join('')}</div>`;
+    return `<div class="pl hs" role="table" aria-label="Calendario de la semana por hora de empiece"><div class="pl-r pl-th" role="row"><span role="columnheader">Empieza</span>${DIAS_D.map((d, i) => `<span role="columnheader"${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${d} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
+      ${hs.map(h => `<div class="pl-r" role="row"><span class="pl-tm hs-h" role="rowheader"><span>${h || 'Sin hora'}</span></span>${DIAS.map((_, i) => `<span role="cell"${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${all.filter(x => x.h === h && x.f === dayIso(i)).map(hsCell).join('')}</span>`).join('')}</div>`).join('')}</div>`; };
   if (sel !== 'week') {
     const d = +sel, list = all.filter(x => x.f === dayIso(d - 1));
-    if (list.length && V > 1 && V < 5) return `${top}<div class="tt-desk">${card('h-tt', `${DIAS_D[d - 1]} ${toDate(dayIso(d - 1)).getDate()} · ${list.length} citas`, wideList(list))}</div><div class="tt-mob">${card('h-ttm', 'x', dayList(list))}</div>`;
     if (!list.length) return `${top}${emptyPage('cal', `Nada el ${DIAS_D[d - 1].toLowerCase()}`, 'Elige otro día o mira la semana entera.', 'g')}`;
     const h = `${DIAS_D[d - 1]} ${toDate(dayIso(d - 1)).getDate()} · ${list.length} ${list.length === 1 ? 'cita' : 'citas'}`;
     return `${top}<div class="tt-desk">${card('h-tt', h, dayGantt(list))}</div><div class="tt-mob">${card('h-ttm', h, dayList(list))}</div>`;
   }
   const days = DIAS_D.map((dn, i) => ({ dn: `${dn} ${toDate(dayIso(i)).getDate()}`, list: all.filter(x => x.f === dayIso(i)) })).filter(x => x.list.length);
-  return `${top}<div class="tt-desk">${V === 2 ? weekCols() : V === 3 ? weekAgenda() : V === 4 ? weekTeams() : V === 5 ? card('h-ttw', 'Semana por horas', weekGantt()) : V === 6 ? card('h-ttw', 'Semana por hora de empiece', weekStarts()) : V === 7 ? card('h-ttw', 'Semana por horas', weekColor()) : V === 8 ? card('h-ttw', 'Campos ocupados', weekFields()) : V === 9 ? card('h-ttw', 'Semana por equipos', weekBars()) : card('h-ttw', 'Semana por equipos', weekTable())}</div>
+  return `${top}<div class="tt-desk">${card('h-ttw', 'Semana por hora de empiece', weekStarts())}</div>
     <div class="tt-mob stack">${days.map((x, i) => card(`h-tt${i}`, `${x.dn} · ${x.list.length} ${x.list.length === 1 ? 'cita' : 'citas'}`, dayList(x.list))).join('')}</div>`;
 }
 /* Imagen del calendario de la semana al estilo Google Calendar: una columna por día, las horas en vertical
