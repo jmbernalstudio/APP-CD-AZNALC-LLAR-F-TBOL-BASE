@@ -154,6 +154,9 @@ function lockScroll() {
 function modal(html, role, onClose) {
   const back = document.activeElement, d = document.createElement('div');
   d.className = 'modal'; d.setAttribute('role', role); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'mdl-t');
+  /* Todas las ventanas llevan arriba la misma X (redonda, gris): si no la traen, se le pone junto al título */
+  if (!/class="iconbtn" data-v="0"/.test(html)) html = html.replace(/^\s*<h2 id="mdl-t">([\s\S]*?)<\/h2>/, (_, t) =>
+    `<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${t}</h2></div><button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>`);
   d.innerHTML = `<div class="card stack">${html}</div>`;
   const focusables = () => [...d.querySelectorAll('button, input, select, textarea')];
   const key = e => {
@@ -1238,10 +1241,9 @@ function pizarra(team, L, players, save, e, p) {
     d.innerHTML = `<div class="pz-in">
       ${gameCard(e, p, false).replace(/ data-match="[^"]*" role="button" tabindex="0" aria-label="[^"]*"/, '').replace('class="gm"', 'class="gm pz-gm"')
         .replace('</small></div>', `</small><button type="button" class="iconbtn" id="pz-x" aria-label="Cerrar la pizarra">${ic('x')}</button></div>`)}
-      <div class="pz-body">${formsOf(team).length ? `<section class="card fm pz-fm" aria-labelledby="h-pzfm"><div class="card-h"><h2 id="h-pzfm">Formación</h2></div>
-        <div class="dd"><button type="button" class="dd-b" id="pz-fmb" aria-haspopup="listbox" aria-expanded="false" aria-label="Formación: ${esc(form)}. Toca para cambiarla">${esc(form)}</button>
+      <div class="pz-body">${formsOf(team).length ? `<div class="dd pz-fm"><button type="button" class="dd-b" id="pz-fmb" aria-haspopup="listbox" aria-expanded="false" aria-label="Formación: ${esc(form)}. Toca para cambiarla">${esc(form)}</button>
           <ul class="dd-l" id="pz-fml" role="listbox" aria-label="Formación (fútbol ${modOf(team)})" hidden>${formsOf(team).map(x =>
-            `<li><button type="button" role="option" data-fm="${x}" aria-selected="${x === form}">${x}${x === form ? ic('check') : ''}</button></li>`).join('')}</ul></div></section>` : ''}
+            `<li><button type="button" role="option" data-fm="${x}" aria-selected="${x === form}">${x}${x === form ? ic('check') : ''}</button></li>`).join('')}</ul></div>` : ''}
       <div class="pz-field${n > 8 ? ' f11' : ''}" role="group" aria-label="Campo">
         <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
         ${spots.map((sp, i) => { const id = ids[i], q = id != null ? pl(id) : null;
