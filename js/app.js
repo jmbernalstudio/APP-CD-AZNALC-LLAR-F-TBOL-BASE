@@ -298,6 +298,16 @@ const trainAt = (team, iso) => { const t = trainOf(team); if (!t || !t.dias.incl
 const trainMin = team => (EQ[team] || {}).id === 'minis' ? 60 : 90;
 const hhmm = m => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 const trainEnd = (team, h) => { const [a, b] = (h || '').split(':').map(Number); return isNaN(a) ? '' : hhmm(a * 60 + (b || 0) + trainMin(team)); };
+/* Duración aproximada de un partido: sus partes más 10 minutos de descanso */
+const matchMin = team => { const du = durOf(team), m = du.partes * du.min; return m ? m + 10 : 90; };
+const hm2min = h => { const [a, b] = (h || '').split(':').map(Number); return a * 60 + (b || 0); };
+/* Reparte en carriles las citas de un día que se pisan (como Google Calendar): cada una lleva lane y n */
+function calLanes(day) {
+  const out = [], list = day.slice().sort((x, y) => x.a - y.a); let g = null, end = -1;
+  for (const it of list) { if (!g || it.a >= end) { g = []; out.push(g); end = -1; } g.push(it); end = Math.max(end, it.z); }
+  for (const grp of out) { const lanes = []; for (const it of grp) { let l = lanes.findIndex(z => z <= it.a); if (l < 0) { l = lanes.length; lanes.push(0); } lanes[l] = it.z; it.lane = l; } grp.forEach(it => { it.n = lanes.length; }); }
+  return list;
+}
 const trainLbl = t => ['Entrenamiento', t.h, t.where].filter(Boolean).join(' · ');
 /* Solo se pasa lista en días de entrenamiento: hoy si toca, o uno de las dos últimas semanas que se olvidó */
 const LOOKBACK = 14;
@@ -2130,7 +2140,7 @@ function calCell(x) {
   if (x.kind === 'tr') return `<div class="tt-c${x.anul ? ' anul' : ''}" data-anu="${esc(x.team)}|${x.f}" role="button" tabindex="0" aria-label="${x.anul ? 'Entrenamiento anulado' : 'Entrenamiento'} del ${esc(x.team)}. Toca para ${x.anul ? 'recuperarlo' : 'anularlo'}">
     <b title="${esc(x.team)}">${esc(x.team)}</b><small>${x.anul ? 'Entrenamiento anulado' : `${x.h ? `${x.h}–${trainEnd(x.team, x.h)} · ` : ''}${esc(x.where)}`}</small></div>`;
   const us = crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr'), them = crestBadge(x.e, x.p.rival, 'mini tt-cr');
-  return `<div class="tt-c pa" data-match="${x.e.id}|${x.p.j}" role="button" tabindex="0" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}"><b title="${esc(x.team)}">${esc(x.team)}</b>
+  return `<div class="tt-c pa" data-match="${x.e.id}|${x.p.j}" role="button" tabindex="0" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}"><b title="${esc(x.team)}">${esc(x.team)}</b>${x.h ? `<small>${x.h}–${hhmm(hm2min(x.h) + matchMin(x.team))} · Partido</small>` : ''}
     <span class="tt-vs">${x.casa ? us + them : them + us}<small title="vs ${esc(x.rival)}">${x.p.goles ? scoreTxt(x.p) + ' · ' : ''}${x.casa ? 'Local' : 'Visitante'} · ${esc(x.rival)}</small></span></div>`;
 }
 function trainRows(list) {
@@ -2154,15 +2164,30 @@ function trainView() {
     <p class="muted cal-key"><span class="tt-dot"></span>Entrenamientos · ${nTr}<span class="tt-dot pa"></span>Partidos · ${nPa}</p>
     <p class="muted cal-tip">Toca un entrenamiento para anularlo esta semana.</p>`;
   if (!all.length) return top + emptyPage('cal', 'Nada esta semana', 'No hay entrenamientos ni partidos. Usa las flechas para ver otra semana.', 'g');
+  /* Rejilla por horas (como Google Calendar) de los días idx (0 = lunes) */
+  const timeGrid = (idx, all) => {
+  /* Ordenador: cada cita ocupa todo su tiempo (los entrenamientos 1 h 30, los Minis 1 h; los partidos sus partes y el descanso),
+     en franjas de media hora; lo que no tiene hora va arriba */
+  const SLOT = 30, PX = 46;
+  const timed = all.filter(x => x.h).map(x => ({ ...x, a: hm2min(x.h), z: hm2min(x.h) + (x.kind === 'tr' ? trainMin(x.team) : matchMin(x.team)) })), loose = all.filter(x => !x.h);
+  const t0 = timed.length ? Math.floor(Math.min(...timed.map(x => x.a)) / SLOT) * SLOT : 0, t1 = timed.length ? Math.ceil(Math.max(...timed.map(x => x.z)) / SLOT) * SLOT : 0;
+  const slots = (t1 - t0) / SLOT;
+  /* Los días con citas a la vez son más anchos, para que cada una se lea */
+  const byDay = idx.map(i => calLanes(timed.filter(x => x.f === dayIso(i))));
+  const cols = `grid-template-columns:var(--hcol) ${byDay.map(l => `minmax(0,${Math.max(1, ...l.map(x => x.n))}fr)`).join(' ')}`;
+  return `<div class="tt-week tg" role="table" aria-label="Calendario de la semana"><div class="tt-wr th" role="row" style="${cols}"><span role="columnheader"></span>${idx.map(i => `<span role="columnheader">${DIAS_D[i]} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
+    ${loose.length ? `<div class="tt-wr" role="row" style="${cols}"><span class="tt-h nh" role="rowheader">Sin hora</span>${idx.map(i => `<span role="cell">${loose.filter(x => x.f === dayIso(i)).map(calCell).join('')}</span>`).join('')}</div>` : ''}
+    ${slots ? `<div class="tg-body" style="--px:${PX}px;height:${slots * PX}px;${cols}"><div class="tg-hours">${Array.from({ length: slots }, (_, k) => `<span class="tt-h">${hhmm(t0 + k * SLOT)}</span>`).join('')}</div>
+      ${byDay.map(l => `<div class="tg-day">${l.map(x =>
+        `<div class="tg-ev" style="top:${(x.a - t0) / SLOT * PX + 3}px;height:${(x.z - x.a) / SLOT * PX - 6}px;left:calc(${x.lane} * 100% / ${x.n} + 4px);width:calc(100% / ${x.n} - 8px)">${calCell(x)}</div>`).join('')}</div>`).join('')}</div>` : ''}</div>`;
+  };
   if (sel !== 'week') {
     const d = +sel, list = all.filter(x => x.f === dayIso(d - 1));
-    return `${top}${list.length ? card('h-tt', `${DIAS_D[d - 1]} ${toDate(dayIso(d - 1)).getDate()} · ${list.length} ${list.length === 1 ? 'cita' : 'citas'}`, `<div class="tt">${trainRows(list)}</div>`)
+    return `${top}${list.length ? card('h-tt', `${DIAS_D[d - 1]} ${toDate(dayIso(d - 1)).getDate()} · ${list.length} ${list.length === 1 ? 'cita' : 'citas'}`, timeGrid([d - 1], list))
       : emptyPage('cal', `Nada el ${DIAS_D[d - 1].toLowerCase()}`, 'Elige otro día o mira la semana entera.', 'g')}`;
   }
   /* Semana: en el ordenador, una tabla por horas y días; en el móvil, un bloque por día */
-  const hours = [...new Set(all.map(x => x.h))].sort((a, b) => (a || '99').localeCompare(b || '99'));
-  const grid = `<div class="tt-week" role="table" aria-label="Calendario de la semana"><div class="tt-wr th" role="row"><span role="columnheader"></span>${DIAS_D.map((d, i) => `<span role="columnheader">${d} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
-    ${hours.map(h => `<div class="tt-wr" role="row"><span class="tt-h${h ? '' : ' nh'}" role="rowheader">${h || 'Sin hora'}</span>${DIAS_D.map((_, i) => `<span role="cell">${all.filter(x => x.f === dayIso(i) && x.h === h).map(calCell).join('')}</span>`).join('')}</div>`).join('')}</div>`;
+  const grid = timeGrid([0, 1, 2, 3, 4, 5, 6], all);
   const days = DIAS_D.map((dn, i) => ({ dn: `${dn} ${toDate(dayIso(i)).getDate()}`, list: all.filter(x => x.f === dayIso(i)) })).filter(x => x.list.length);
   return `${top}<div class="tt-desk">${card('h-ttw', 'Semana completa', grid)}</div>
     <div class="tt-mob stack">${days.map((x, i) => card(`h-tt${i}`, `${x.dn} · ${x.list.length} ${x.list.length === 1 ? 'cita' : 'citas'}`, `<div class="tt">${trainRows(x.list)}</div>`)).join('')}</div>`;
@@ -2172,7 +2197,7 @@ function trainView() {
 async function calPoster(wk) {
   await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
   const all = calItems(wk).filter(it => !it.anul), mins = h => { const [a, b] = h.split(':').map(Number); return a * 60 + (b || 0); };
-  const timed = all.filter(it => it.h).map(it => { const d = it.kind === 'tr' ? trainMin(it.team) : (du => du.partes * du.min ? du.partes * du.min + 15 : 90)(durOf(it.team)); return { ...it, a: mins(it.h), z: mins(it.h) + d }; }), loose = all.filter(it => !it.h);
+  const timed = all.filter(it => it.h).map(it => ({ ...it, a: mins(it.h), z: mins(it.h) + (it.kind === 'tr' ? trainMin(it.team) : matchMin(it.team)) })), loose = all.filter(it => !it.h);
   const W = 2200, GUT = 110, PAD = 40, COLW = (W - PAD * 2 - GUT) / 7, HEAD = 190, DAYH = 90, LOOSE = 92, PXH = 130;
   const nLoose = Math.max(0, ...DIAS.map((_, i) => loose.filter(it => it.f === addDays(wk, i)).length));
   const h0 = timed.length ? Math.floor(Math.min(...timed.map(t => t.a)) / 60) : 9, h1 = timed.length ? Math.ceil(Math.max(...timed.map(t => t.z)) / 60) : 21;
@@ -2246,15 +2271,8 @@ async function calPoster(wk) {
   for (let h = h0; h <= h1; h++) { const y = topGrid + (h - h0) * PXH; if (h < h1) text(`${String(h).padStart(2, '0')}:00`, PAD + GUT - 14, y + 2, 600, 20, MUTED, GUT - 20, 'right'); if (h > h0) line(PAD + GUT, y, W - PAD, y); }
   /* Citas con hora: las que se pisan se reparten el ancho de la columna */
   DIAS.forEach((_, i) => {
-    const day = timed.filter(it => it.f === addDays(wk, i)).sort((a, b) => a.a - b.a);
-    const groups = []; let g = null, end = -1;
-    for (const it of day) { if (!g || it.a >= end) { g = []; groups.push(g); end = -1; } g.push(it); end = Math.max(end, it.z); }
-    for (const grp of groups) {
-      const lanes = [];
-      for (const it of grp) { let l = lanes.findIndex(z => z <= it.a); if (l < 0) { l = lanes.length; lanes.push(0); } lanes[l] = it.z; it.lane = l; }
-      const n = lanes.length, lw = (COLW - 12) / n;
-      for (const it of grp) block(it, colX(i) + 6 + it.lane * lw, topGrid + (it.a / 60 - h0) * PXH + 3, lw - 6, (it.z - it.a) / 60 * PXH - 6);
-    }
+    for (const it of calLanes(timed.filter(it => it.f === addDays(wk, i)))) { const lw = (COLW - 12) / it.n;
+      block(it, colX(i) + 6 + it.lane * lw, topGrid + (it.a / 60 - h0) * PXH + 3, lw - 6, (it.z - it.a) / 60 * PXH - 6); }
   });
   return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
 }

@@ -1068,3 +1068,19 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .tt .tt-row { border-bottom-color: #BFC6D4; }
 .tt .tt-row .tt-h { border-right-color: #BFC6D4; }
 .last-t { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .last b { flex: none; } .last svg { flex: none; }
+/* Semana en el ordenador: cada cita ocupa todo su tiempo, en franjas de media hora */
+.tg-body { position: relative; display: grid; grid-template-columns: 4rem repeat(7, minmax(0, 1fr)); border-top: 1px solid #BFC6D4; }
+.tg-hours { display: flex; flex-direction: column; border-right: 1px solid #BFC6D4; }
+.tg-hours .tt-h { height: var(--px); flex: none; display: flex; align-items: center; justify-content: center; background: #F3F5F9; border-bottom: 1px solid #BFC6D4; padding: 0; font-size: .92rem; }
+.tg-hours .tt-h:last-child { border-bottom: 0; }
+.tg-day { position: relative; border-right: 1px solid #BFC6D4; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent calc(var(--px) - 1px), #BFC6D4 calc(var(--px) - 1px), #BFC6D4 var(--px)); }
+.tg-day:last-child { border-right: 0; }
+.tg-ev { position: absolute; min-width: 0; display: flex; }
+.tg-ev .tt-c { flex: 1; min-width: 0; overflow: hidden; }
+.tt-week.tg .tt-wr:last-of-type > span { border-bottom: 0; }
+.tt-vs { overflow: hidden; } .tt-vs small { display: block; flex: 1 1 auto; } .tt-c small { display: block; }
+/* Dentro de un bloque estrecho el nombre del equipo puede ocupar dos líneas, como en Google Calendar */
+.tg-ev .tt-c { padding: 6px 8px; }
+.tg-ev .tt-c b { white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.15; font-size: .84rem; }
+.tg-ev .tt-c small { font-size: .72rem; }
+.tg { --hcol: 4rem; } @media (max-width: 600px) { .tg { --hcol: 3.1rem; } .tg-hours .tt-h { font-size: .8rem; } .tg-ev { } .tg-ev .tt-c { padding: 5px 6px; } }
