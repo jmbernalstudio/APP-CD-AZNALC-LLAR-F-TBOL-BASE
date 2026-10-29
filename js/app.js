@@ -2241,7 +2241,7 @@ async function calPoster(wk, day) {
   const all = calItems(wk).filter(it => !day || it.f === day);
   const endOf = it => it.h ? hhmm(hm2min(it.h) + (it.kind === 'tr' ? trainMin(it.team) : matchMin(it.team))) : '';
   const SHORT = { prebenjamin: 'Prebenj. 2º' }, shortT = t => SHORT[(EQ[t] || {}).id] || t.replace(' año', '');
-  const BLUE = '#0034DF', SOFT = '#E6EBFD', INK = '#0B0B0B', MUTED = '#5B6475', LINE = '#BFC6D4', HEADBG = '#F3F5F9', BG = '#EEF1F7', BAD = '#FDE7EA', BADINK = '#B42318', TODAYBG = '#F7F9FF';
+  const BLUE = '#0034DF', SOFT = '#E6EBFD', INK = '#0B0B0B', MUTED = '#5B6475', LINE = '#BFC6D4', HEADBG = '#F3F5F9', BG = '#EEF1F7', BAD = '#FDE7EA', BADINK = '#B42318';
   const W = 2200, PAD = 40, HEAD = 190;
   const cv = document.createElement('canvas'), x = cv.getContext('2d');
   const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
@@ -2293,9 +2293,8 @@ async function calPoster(wk, day) {
     x.save(); path(TB.x, TB.y, TB.w, TB.h, 22); x.clip();
     x.fillStyle = '#FFFFFF'; x.fillRect(TB.x, TB.y, TB.w, TB.h);
     x.fillStyle = HEADBG; x.fillRect(TB.x, TB.y, TB.w, TH); x.fillRect(TB.x, TB.y, FC, TB.h);
-    DIAS.forEach((_, i) => { if (addDays(wk, i) === TODAY) { x.fillStyle = BLUE; x.fillRect(X0 + i * COLW, TB.y, COLW, TH); x.fillStyle = TODAYBG; x.fillRect(X0 + i * COLW, top, COLW, TB.h - TH); } });
     text('Empieza', PAD + FC / 2, HEAD + TH / 2, 700, 24, INK, FC - 16, 'center');
-    DIAS_D.forEach((dn, i) => { const f = addDays(wk, i); text(`${dn} ${toDate(f).getDate()}`, X0 + i * COLW + COLW / 2, HEAD + TH / 2, 700, 24, f === TODAY ? '#FFFFFF' : INK, COLW - 16, 'center'); });
+    DIAS_D.forEach((dn, i) => { const f = addDays(wk, i); text(`${dn} ${toDate(f).getDate()}`, X0 + i * COLW + COLW / 2, HEAD + TH / 2, 700, 24, INK, COLW - 16, 'center'); });
     let y = top;
     rows.forEach(r => { line(TB.x, y, TB.x + TB.w, y);
       text(r.h || 'Sin hora', PAD + FC / 2, y + r.hgt / 2, 800, r.h ? 30 : 22, BLUE, FC - 16, 'center');
