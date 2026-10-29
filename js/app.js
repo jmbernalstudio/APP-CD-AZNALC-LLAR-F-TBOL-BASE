@@ -739,6 +739,34 @@ function playerAttHTML(team, p) {
 const DURACION = { senior: 90, juvenil: 90, cadete: 60, infantil: 80, alevin2: 70, alevin1: 60, benjamin2: 60, benjamin1: 60, prebenjamin: 50, minis: 50 };
 /* La junta puede cambiarla en Equipos > el equipo; si no, la de arriba (siempre en 2 partes) */
 const durOf = team => { const t = S.teams[team], e = EQ[team]; return t && t.dur ? t.dur : { partes: 2, min: ((e && DURACION[e.id]) || 0) / 2 }; };
+/* Fútbol 7 o fútbol 11: marca cuántos titulares hay y cuántos se pueden convocar (titulares + 7 suplentes).
+   La junta lo cambia en Equipos > el equipo; si no, el de abajo */
+const MODALIDAD = { senior: 11, juvenil: 11, infantil: 7, cadete: 7, alevin2: 7, alevin1: 7, benjamin2: 7, benjamin1: 7, prebenjamin: 7, minis: 7 };
+const modOf = team => (S.teams[team] && S.teams[team].mod) || (EQ[team] && MODALIDAD[EQ[team].id]) || 11;
+const maxConv = team => modOf(team) + 7;
+function modCard(team) {
+  const m = modOf(team);
+  if (S.editMod !== team) return card('h-mo', 'Modalidad', `<div class="trs"><div class="trs-r du-r"><b>Fútbol ${m}</b><span>${m} titulares y hasta 7 suplentes (${m + 7} convocados)</span></div></div>`,
+    '', '<button type="button" class="more" id="moedit">Editar</button>');
+  return `<form id="mof" class="card stack" novalidate aria-labelledby="h-mo"><h2 id="h-mo" style="margin:0;font-size:1.1rem">Modalidad</h2>
+    <p class="muted" style="margin:0">Marca cuántos titulares hay y cuántos jugadores se pueden convocar.</p>
+    <div class="seg g-scope gm-seg" role="group" aria-label="Modalidad">${[7, 11].map(n => `<button type="button" data-mo="${n}" aria-pressed="${n === m}">Fútbol ${n}</button>`).join('')}</div>
+    <p id="moerr" class="err" role="alert" hidden></p>
+    <div class="btn-row"><button type="button" class="btn ghost" id="mocancel">Cancelar</button><button type="submit" class="btn blue">${ic('check')} Guardar</button></div></form>`;
+}
+function bindMod(team) {
+  if ($('#moedit')) { $('#moedit').onclick = () => { S.editMod = team; render(); }; return; }
+  if (!$('#mof')) return;
+  let v = modOf(team);
+  document.querySelectorAll('[data-mo]').forEach(b => b.onclick = () => { v = +b.dataset.mo; document.querySelectorAll('[data-mo]').forEach(x => x.setAttribute('aria-pressed', x === b)); });
+  $('#mocancel').onclick = () => { S.editMod = null; render(); };
+  $('#mof').onsubmit = async ev => {
+    ev.preventDefault();
+    try { API() && await API().modalidad(team, v); }
+    catch (x) { $('#moerr').textContent = /modalidad|column/i.test(x.message || '') ? 'Falta un paso en Supabase para poder guardar esto. Pídeselo a Claude.' : 'No se ha podido guardar. Revisa la conexión.'; $('#moerr').hidden = false; return; }
+    S.teams[team].mod = v; S.editMod = null; render(); say(`${team}: fútbol ${v}`);
+  };
+}
 function durCard(team) {
   const d = durOf(team);
   if (S.editDur !== team) return card('h-du', 'Duración de los partidos', `<div class="trs"><div class="trs-r du-r"><b>${d.partes} partes de ${d.min} minutos</b><span>${d.partes * d.min} minutos en total</span></div></div>`,
@@ -1154,7 +1182,8 @@ function lvScreen(team, back) {
     L.tit = L.tit.filter(id => cv.ids.includes(id)); L.sup = [...new Set([...L.sup.filter(id => cv.ids.includes(id)), ...cv.ids.filter(id => !L.tit.includes(id) && !L.sup.includes(id))])];
     const st = id => L.tit.includes(id) ? 'tit' : 'sup';
     const list = t.players.filter(x => cv.ids.includes(x.id)).sort((a, b) => byDor(a.id, b.id));
-    const counts = () => `<b>${L.tit.length}</b> titulares · <b>${L.sup.length}</b> suplentes`;
+    const tmax = modOf(team);
+    const counts = () => `<b>${L.tit.length}</b> de ${tmax} titulares · <b>${L.sup.length}</b> suplentes`;
     return { kicker, title, back,
       body: `<div class="split"><div class="stack">
         <section class="card match" aria-label="Partido"><span class="tag">${tag}</span>${score}
@@ -1171,6 +1200,7 @@ function lvScreen(team, back) {
         document.querySelectorAll('[data-lvp]').forEach(li => {
           const id = +li.dataset.lvp;
           li.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
+            if (b.dataset.st === 'tit' && !L.tit.includes(id) && L.tit.length >= tmax) return say(`En fútbol ${tmax} salen ${tmax} titulares. Pasa antes a alguno a suplente.`);
             L.tit = L.tit.filter(x => x !== id); L.sup = L.sup.filter(x => x !== id);
             (b.dataset.st === 'tit' ? L.tit : L.sup).push(id);
             li.querySelectorAll('[data-st]').forEach(x => x.setAttribute('aria-pressed', x === b));
@@ -1368,7 +1398,10 @@ function convScreen() {
   if (!p) return { kicker: 'Convocatoria', title: esc(team), back, body: emptyPage('cal', 'No hay próximo partido', 'Cuando haya un partido en el calendario podrás hacer la convocatoria.') };
   const k = convKey(team, p), saved = S.conv[k];
   const c = S.convDraft && S.convDraft.k === k ? S.convDraft : (S.convDraft = { k, ids: saved ? [...saved.ids] : [], hora: saved ? saved.hora : '', lugar: saved ? saved.lugar : '', nota: saved ? saved.nota : '' });
-  const allBtn = on => on ? `${ic('x')} Quitar a todos` : `${ic('check')} Convocar a todos`;
+  const max = maxConv(team), many = t.players.length > max;
+  /* Si hay más jugadores que el máximo de convocados, el botón solo sirve para quitar a todos */
+  const allBtn = on => on || many ? `${ic('x')} Quitar a todos` : `${ic('check')} Convocar a todos`;
+  const cnt = () => `${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${Math.min(max, t.players.length)}</small>`;
   const row = (x, i) => `<li><button type="button" class="player" data-cv="${x.id}" aria-pressed="${c.ids.includes(x.id)}">
     <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${x.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(x.n)}">${esc(x.n)}</span>
     <span class="pstate">${c.ids.includes(x.id) ? 'Convocado' : 'No va'}</span>${attPill(team, x.id)}</span></button></li>`;
@@ -1376,8 +1409,8 @@ function convScreen() {
     kicker: `Convocatoria · ${esc(team)}`, title: `vs ${esc(nice(p.rival))}`, back,
     body: `<div class="split"><div class="stack">
       <section class="card match" aria-label="Partido"><div class="att-top">
-        <div><span class="tag">${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ' · Hora por confirmar'} · ${p.casa ? 'Local' : 'Visitante'}</span><div class="vs-time" style="margin-top:10px" id="cvn">${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small></div><small>convocados</small></div>
-        <button type="button" class="btn gold" id="cvall"${t.players.length ? '' : ' disabled'}>${allBtn(t.players.length && t.players.every(x => c.ids.includes(x.id)))}</button></div>
+        <div><span class="tag">${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ' · Hora por confirmar'} · ${p.casa ? 'Local' : 'Visitante'}</span><div class="vs-time" style="margin-top:10px" id="cvn">${cnt()}</div><small>convocados · fútbol ${modOf(team)}, máximo ${max}</small></div>
+        <button type="button" class="btn gold" id="cvall"${t.players.length ? '' : ' disabled'}${many && !c.ids.length ? ' hidden' : ''}>${allBtn(t.players.length && t.players.every(x => c.ids.includes(x.id)))}</button></div>
         ${placeOf(p) ? `<small class="cv-place">${ic('pin')} ${esc(placeOf(p))}</small>` : ''}</section>
       <p class="muted" style="margin:0">Toca a cada jugador para convocarlo o quitarlo.</p>
       ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
@@ -1392,16 +1425,19 @@ function convScreen() {
       </form></div>`,
     bind() {
       const sync = () => { c.hora = $('#cvh').value; c.lugar = $('#cvl').value.trim(); c.nota = $('#cvo').value.trim();
-        $('#cvn').innerHTML = `${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${t.players.length}</small>`;
-        $('#cvall').innerHTML = allBtn(allOn()); };
+        $('#cvn').innerHTML = cnt();
+        $('#cvall').innerHTML = allBtn(allOn()); $('#cvall').hidden = many && !c.ids.length; };
       const allOn = () => t.players.length > 0 && t.players.every(x => c.ids.includes(x.id));
       const paint = b => { const on = c.ids.includes(+b.dataset.cv); b.setAttribute('aria-pressed', on); b.querySelector('.pstate').textContent = on ? 'Convocado' : 'No va'; };
-      document.querySelectorAll('[data-cv]').forEach(b => b.onclick = () => { const id = +b.dataset.cv; c.ids = c.ids.includes(id) ? c.ids.filter(x => x !== id) : [...c.ids, id]; paint(b); sync(); });
-      $('#cvall').onclick = () => { c.ids = allOn() ? [] : t.players.map(x => x.id); document.querySelectorAll('[data-cv]').forEach(paint); sync(); };
+      document.querySelectorAll('[data-cv]').forEach(b => b.onclick = () => {
+        const id = +b.dataset.cv;
+        if (!c.ids.includes(id) && c.ids.length >= max) return say(`En fútbol ${modOf(team)} se pueden convocar como mucho ${max} jugadores. Quita a alguno para añadir a otro.`);
+        c.ids = c.ids.includes(id) ? c.ids.filter(x => x !== id) : [...c.ids, id]; paint(b); sync(); });
+      $('#cvall').onclick = () => { c.ids = allOn() || many ? [] : t.players.map(x => x.id); document.querySelectorAll('[data-cv]').forEach(paint); sync(); };
       ['#cvh', '#cvl', '#cvo'].forEach(s => $(s).oninput = sync);
       const check = () => {
         sync(); $('#cvh').removeAttribute('aria-invalid'); $('#cvl').removeAttribute('aria-invalid');
-        const bad = !c.ids.length ? ['Elige al menos a un jugador convocado.', null] : !c.hora ? ['Pon la hora de la citación.', '#cvh'] : !c.lugar ? ['Pon el sitio de la citación.', '#cvl'] : null;
+        const bad = !c.ids.length ? ['Elige al menos a un jugador convocado.', null] : c.ids.length > max ? [`En fútbol ${modOf(team)} se pueden convocar como mucho ${max} jugadores. Quita a ${c.ids.length - max}.`, null] : !c.hora ? ['Pon la hora de la citación.', '#cvh'] : !c.lugar ? ['Pon el sitio de la citación.', '#cvl'] : null;
         $('#cverr').hidden = !bad; if (!bad) return true;
         $('#cverr').textContent = bad[0]; if (bad[1]) { $(bad[1]).setAttribute('aria-invalid', 'true'); $(bad[1]).focus(); }
         return false;
@@ -1852,7 +1888,7 @@ const BOARD = {
       const team = S.sub.slice(3);
       S.teams[team] = S.teams[team] || { cat: (EQ[team] || {}).cat || '', train: null, players: [] };
       return { kicker: `Equipos · ${EQ[team] ? EQ[team].cat : ''}`, title: esc(team), back: () => go('team'),
-        body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div>${durCard(team)}${rosterCard(team)}${statsView(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); bindDur(team); bindStats(team); } };
+        body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div><div class="team-top">${modCard(team)}${durCard(team)}</div>${rosterCard(team)}${statsView(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); bindDur(team); bindMod(team); bindStats(team); } };
     }
     const view = S.eqView === 'train' ? 'train' : 'teams';
     const vseg = `<div class="seg g-scope" role="group" aria-label="Qué ver"><button type="button" data-eqv="teams" aria-pressed="${view === 'teams'}">Equipos</button><button type="button" data-eqv="train" aria-pressed="${view === 'train'}">Entrenamientos</button></div>`;
