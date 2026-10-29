@@ -62,7 +62,7 @@ const crestOf = (e, name) => e.escudos[name] || null;
 const usName = e => (e.tabla.find(r => US.test(r.equipo)) || {}).equipo || Object.keys(e.escudos).find(n => US.test(n));
 /* Por fecha y no por jornada: un partido aplazado (p. ej. la J7 del Senior, el 30 nov) no tapa a los siguientes */
 const byDate = (a, b) => (a.fecha || '').localeCompare(b.fecha || '') || (a.hora || '99').localeCompare(b.hora || '99') || a.j - b.j;
-const nextMatch = e => e.partidos.filter(p => !p.descansa && !p.goles && p.fecha >= TODAY).sort(byDate)[0] || null;
+const nextMatch = e => e.partidos.filter(p => !p.descansa && !p.nojuega && !p.goles && p.fecha >= TODAY).sort(byDate)[0] || null;
 const played = e => e.partidos.filter(p => p.goles).sort(byDate);
 const lastMatch = e => played(e).slice(-1)[0] || null;
 const outcome = p => { const [a, b] = p.casa ? p.goles : [p.goles[1], p.goles[0]]; return a > b ? 'G' : a < b ? 'P' : 'E'; };
@@ -322,9 +322,13 @@ function buildAgenda() {
     ev.push({ iso, day: i === 0 ? 'Hoy' : dayLbl(iso), h: t.h || '--:--', kind: 'train', team, where: t.where || '', today: i === 0 });
   });
   for (const e of D.equipos) for (const p of e.partidos)
-    if (!p.descansa && p.fecha >= WEEK[0] && p.fecha <= WEEK[6]) ev.push({ iso: p.fecha, day: p.fecha === TODAY ? 'Hoy' : dayLbl(p.fecha), h: p.hora || '--:--', kind: 'match', team: e.nombre, p, e });
+    if (!p.descansa && !p.nojuega && p.fecha >= WEEK[0] && p.fecha <= WEEK[6]) ev.push({ iso: p.fecha, day: p.fecha === TODAY ? 'Hoy' : dayLbl(p.fecha), h: p.hora || '--:--', kind: 'match', team: e.nombre, p, e });
   return ev.sort((a, b) => (a.iso + a.h).localeCompare(b.iso + b.h));
 }
+/* Un partido que pasado el miércoles de su semana sigue sin hora (ni resultado) no se juega: casi siempre
+   es contra un rival que se ha retirado y la federación lo deja en el calendario. No sale como próximo ni en agendas */
+for (const e of D.equipos) for (const p of e.partidos)
+  if (!p.descansa && p.fecha && !p.hora && !p.goles && !p.estado && TODAY > addDays(p.fecha, 3 - dow(p.fecha))) { p.nojuega = true; p.estado = 'No se juega'; }
 let AGENDA = buildAgenda();
 
 function tabsFor() {
@@ -471,7 +475,7 @@ function agendaRow(e, withAct) {
 /* Partidos de todos los equipos, agrupados por fin de semana (semana de lunes a domingo) */
 const weekOf = iso => addDays(iso, 1 - dow(iso));
 function allGames() {
-  return D.equipos.flatMap(e => e.partidos.filter(p => p.fecha).map(p => ({ e, p, wk: weekOf(p.fecha) })));
+  return D.equipos.flatMap(e => e.partidos.filter(p => p.fecha && !p.nojuega).map(p => ({ e, p, wk: weekOf(p.fecha) })));
 }
 function weekLbl(wk, first) {
   const sa = toDate(first && first < addDays(wk, 5) ? first : addDays(wk, 5)), su = toDate(addDays(wk, 6));
@@ -2116,7 +2120,7 @@ const teamOrd = n => { const i = ORDEN.indexOf((EQ[n] || {}).id); return i < 0 ?
 function calItems(wk) {
   const end = addDays(wk, 6);
   const tr = trainSessions().map(x => ({ kind: 'tr', f: addDays(wk, x.d - 1), h: x.h, team: x.team, where: x.where || 'Sin campo', anul: anulado(x.team, addDays(wk, x.d - 1)) }));
-  const pa = D.equipos.flatMap(e => e.partidos.filter(p => !p.descansa && p.fecha && p.fecha >= wk && p.fecha <= end)
+  const pa = D.equipos.flatMap(e => e.partidos.filter(p => !p.descansa && !p.nojuega && p.fecha && p.fecha >= wk && p.fecha <= end)
     .map(p => ({ kind: 'pa', f: p.fecha, h: p.hora || '', team: e.nombre, rival: nice(p.rival), casa: !!p.casa, where: placeOf(p) || '', e, p })));
   return [...tr, ...pa].sort((a, b) => a.f.localeCompare(b.f) || (a.h || '99').localeCompare(b.h || '99') || (a.kind === 'pa' ? 0 : 1) - (b.kind === 'pa' ? 0 : 1) || teamOrd(a.team) - teamOrd(b.team));
 }
