@@ -1236,7 +1236,7 @@ function pizarra(team, L, players, save, e, p) {
       <div class="pz-side">
         <h3>${L.fase === 'previa' ? 'Titulares por colocar' : 'En el campo, por colocar'} · ${free.length}</h3>
         ${free.length ? `<div class="pz-free">${free.map(id => `<button type="button" class="pz-chip${sel === id ? ' on' : ''}" data-pzp="${id}" aria-pressed="${sel === id}">${face(pl(id))}<b>${esc(pl(id).n)}</b></button>`).join('')}</div>`
-          : `<p class="muted" style="margin:0">${avail().length ? 'Todos colocados. Toca a uno del campo para moverlo.' : L.fase === 'previa' ? 'Primero elige a los titulares.' : 'No hay nadie en el campo.'}</p>`}
+          : `<p class="muted" style="margin:0">${avail().length ? 'Todos colocados. Toca a uno del campo para cambiarlo o quitarlo.' : L.fase === 'previa' ? 'Primero elige a los titulares.' : 'No hay nadie en el campo.'}</p>`}
         <h3>Banquillo · ${bn.length}</h3>
         ${bn.length ? `<div class="pz-free">${bn.map(id => `<span class="pz-chip off">${face(pl(id))}<b>${esc(pl(id).n)}</b></span>`).join('')}</div>` : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>'}
         <div class="pz-btns"><button type="button" class="btn blue block" id="pz-wa"${ids.some(x => x != null) ? '' : ' disabled'}>${ic('send')} Enviar por WhatsApp</button>
@@ -1250,7 +1250,7 @@ function pizarra(team, L, players, save, e, p) {
     d.querySelectorAll('[data-pz]').forEach(b => b.onclick = async () => {
       const i = +b.dataset.pz, cur = ids[i];
       if (sel != null) { place(i, sel); sel = null; }
-      else { const id = await pickSlot(i ? 'Elige al jugador de este hueco' : 'Elige al portero', cur != null, avail().slice().sort(byDor), players);
+      else { const id = await pickSlot(i ? 'Elige al jugador de este hueco' : 'Elige al portero', cur != null, free, players);   /* solo los que aún no están en el campo */
         if (id === undefined) return; place(i, id); }
       draw(); const again = d.querySelector(`[data-pz="${i}"]`); if (again) again.focus({ preventScroll: true });
     });
@@ -1324,7 +1324,7 @@ function pickSlot(title, filled, ids, players) {
     const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${esc(title)}</h2></div>
         <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
       ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}">${pnum(pl(id), 'num', '–')}<b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b></button>`).join('')}</div>`
-        : '<p class="muted" style="margin:0">No hay ningún jugador para elegir.</p>'}
+        : `<p class="muted" style="margin:0">${filled ? 'Todos los jugadores ya están en el campo.' : 'No hay ningún jugador para elegir.'}</p>`}
       ${filled ? `<button type="button" class="btn ghost block" data-pk="">${ic('minus')} Dejar el hueco vacío</button>` : ''}`, 'dialog', () => done(pick));
     m.el.classList.add('rqd');
     m.el.querySelectorAll('[data-pk]').forEach(b => b.onclick = () => { pick = b.dataset.pk === '' ? null : +b.dataset.pk; m.close(false); });
@@ -1579,6 +1579,9 @@ function lvScreen(team, back) {
       $('#lvS').innerHTML = ss.length ? ss.map(id => tile(id, false)).join('') : '<p class="muted" style="margin:0">No queda nadie en el banquillo.</p>';
       $('#lvTn').textContent = `${L.tit.length} de ${tmax}`; $('#lvSn').textContent = L.sup.length;
       $('#lvTn').className = L.tit.length === tmax ? 'pill' : 'pill gold';
+      /* La pizarra solo se abre con los titulares ya elegidos */
+      if ($('#lvpz')) { const falta = tmax - L.tit.length; $('#lvpz').disabled = falta > 0; $('#lvpzn').hidden = falta <= 0;
+        $('#lvpzn').textContent = `Primero elige a los ${tmax} titulares abajo (${falta === 1 ? 'falta 1' : 'faltan ' + falta}).`; }
       document.querySelectorAll('[data-lvp]').forEach(b => b.onclick = () => {
         const id = +b.dataset.lvp, tit = L.tit.includes(id);
         if (!tit && L.tit.length >= tmax) return say(`Ya tienes los ${tmax} titulares. Toca antes a un titular para pasarlo a suplente.`);
@@ -1595,7 +1598,8 @@ function lvScreen(team, back) {
           <div class="fm-body"><div id="lvfmp">${formPitch(L.form || formsOf(team)[0])}</div><div class="chips fm-chips" role="radiogroup" aria-label="Formación (fútbol ${modOf(team)})">${formsOf(team).map(x =>
             `<label class="chip"><input type="radio" name="lvfm" value="${x}"${L.form === x ? ' checked' : ''}> ${x}</label>`).join('')}</div></div>
           <p class="muted" style="margin:0">Fútbol ${modOf(team)}: sin contar al portero. Sale luego en las estadísticas.</p>
-          <button type="button" class="btn outline block" id="lvpz">${ic('team')} Colocar a los titulares en el campo</button></section>` : ''}
+          <button type="button" class="btn outline block" id="lvpz">${ic('team')} Colocar a los titulares en el campo</button>
+          <p class="muted" id="lvpzn" style="margin:0" hidden></p></section>` : ''}
         <p class="muted" style="margin:0">Toca a un jugador para cambiarlo de grupo. Se guarda solo.</p>
         <section class="card lv-team tit" aria-labelledby="h-lvT"><div class="card-h"><h2 id="h-lvT">Titulares</h2><span class="pill" id="lvTn"></span></div><div class="lv-tiles" id="lvT"></div></section>
         <section class="card lv-team" aria-labelledby="h-lvS"><div class="card-h"><h2 id="h-lvS">Suplentes</h2><span class="pill blue" id="lvSn"></span></div><div class="lv-tiles" id="lvS"></div></section></div>
@@ -1607,7 +1611,7 @@ function lvScreen(team, back) {
           <p id="lverr" class="err" role="alert" hidden></p></form></div>`,
       bind() {
         grids();
-        if ($('#lvpz')) $('#lvpz').onclick = () => pizarra(team, L, t.players, save, e, p);
+        if ($('#lvpz')) $('#lvpz').onclick = () => L.tit.length === tmax && pizarra(team, L, t.players, save, e, p);
         document.querySelectorAll('[name=lvfm]').forEach(r => r.onchange = () => { L.form = r.value; save();
           $('#lvfmp').innerHTML = formPitch(L.form); $('#lvfmn').textContent = L.form; $('#lvfmn').className = 'pill'; });
         $('#lvdif').onclick = async () => {
