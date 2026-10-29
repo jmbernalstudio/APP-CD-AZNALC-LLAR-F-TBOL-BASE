@@ -151,6 +151,20 @@ function lockScroll() {
   if (open) { LOCK.y = window.scrollY; Object.assign(b, { position: 'fixed', top: `${-LOCK.y}px`, left: '0', right: '0', width: '100%' }); }
   else { Object.assign(b, { position: '', top: '', left: '', right: '', width: '' }); window.scrollTo(0, LOCK.y); }
 }
+/* Nombres de jugador: si no caben, "Nombre A." (nombre y la inicial del primer apellido), como pidió la junta */
+const shortName = n => { const w = String(n || '').trim().split(/\s+/); return w.length > 1 ? `${w[0]} ${w[1][0].toUpperCase()}.` : w[0] || ''; };
+const pn = n => `<span class="pn" data-sn="${esc(shortName(n))}">${esc(n)}</span>`;
+const fitNames = (() => { let raf = 0, mo = null;
+  const run = () => { raf = 0; if (mo) mo.disconnect();
+    document.querySelectorAll('.pn').forEach(el => { const box = el.parentElement; if (!box) return;
+      const full = el.dataset.full || (el.dataset.full = el.textContent);
+      if (el.textContent !== full) el.textContent = full;
+      if (box.clientWidth && box.scrollWidth > box.clientWidth + 1) el.textContent = el.dataset.sn; });
+    if (mo) { mo.takeRecords(); mo.observe(document.body, { childList: true, subtree: true }); } };
+  const soon = () => { if (!raf) raf = requestAnimationFrame(run); };
+  mo = new MutationObserver(soon); mo.observe(document.body, { childList: true, subtree: true });
+  addEventListener('resize', soon);
+  return soon; })();
 function modal(html, role, onClose) {
   const back = document.activeElement, d = document.createElement('div');
   d.className = 'modal'; d.setAttribute('role', role); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'mdl-t');
@@ -953,7 +967,7 @@ function rosterCard(team) {
   const t = S.teams[team];
   const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n));
   return card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? `<div class="roster">${list.map(p => `<button type="button" class="tm tm-btn pcard" data-edit="${p.id}" aria-label="Editar a ${esc(p.n)}">${pnum(p, 'k', '–')}
-      <span class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.dorsal ? 'Dorsal ' + p.dorsal : 'Sin dorsal'}</small></span>
+      <span class="grow"><b title="${esc(p.n)}">${pn(p.n)}</b><small>${p.dorsal ? 'Dorsal ' + p.dorsal : 'Sin dorsal'}</small></span>
       ${attPill(team, p.id, true)}<span class="go" aria-hidden="true">${ic('chev')}</span></button>`).join('')}</div>` : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>');
 }
 function addPlayerCard(team) {
@@ -979,7 +993,7 @@ function bindRoster(team) {
 function editPlayer(team, p) {
   const t = S.teams[team];
   const ph = { foto: p.foto || null };
-  const m = modal(`<h2 id="mdl-t">${esc(p.n)}</h2>
+  const m = modal(`<h2 id="mdl-t">${pn(p.n)}</h2>
     ${playerAttHTML(team, p)}
     ${statsOn() && playerStats(p.id).pj ? `<div class="patt"><b>Liga</b>${statKpis(team, p)}</div>` : ''}
     <form id="ef" class="stack" novalidate><b style="margin-top:4px">Editar jugador</b>
@@ -1039,7 +1053,7 @@ function statsView(team) {
     <div class="seg g-scope st-sort" role="group" aria-label="Ordenar por">${SORTS.map(([k, l]) => `<button type="button" data-sts="${k}" aria-pressed="${sort === k}">${l}</button>`).join('')}</div>
     <div class="st-head" aria-hidden="true"><span>Jugador</span><span>PJ</span><span>Min.</span><span>Goles</span></div>
     <div class="st-list">${rows.map(r => `<button type="button" class="st-row" data-stp="${r.p.id}" aria-label="${esc(r.p.n)}${r.p.dorsal ? ', dorsal ' + r.p.dorsal : ''}: ${r.pj} partidos, ${r.m} minutos, ${r.g} goles">
-      ${pnum(r.p, 'k', '–')}<b class="st-n" title="${esc(r.p.n)}">${esc(r.p.n)}</b><span>${r.pj}</span><span class="${sort === 'min' ? 'on' : ''}">${r.m}'</span><span class="${sort === 'goles' ? 'on' : ''}">${r.g}</span></button>`).join('')}</div>
+      ${pnum(r.p, 'k', '–')}<b class="st-n" title="${esc(r.p.n)}">${pn(r.p.n)}</b><span>${r.pj}</span><span class="${sort === 'min' ? 'on' : ''}">${r.m}'</span><span class="${sort === 'goles' ? 'on' : ''}">${r.g}</span></button>`).join('')}</div>
     <p class="muted st-foot">PJ: partidos jugados. Partidos apuntados: ${pl.length - pend.length} de ${pl.length}.</p>`, 'st-card');
   const matches = card('h-stm', 'Partidos de liga', pl.length ? `<p class="muted" style="margin:0 0 4px">Toca un partido para ver su ficha o apuntar los minutos y los goles.</p>${pl.map(p => {
     const res = outcome(p), done = stFilled(team, p.fecha);
@@ -1084,7 +1098,7 @@ function statKpis(team, p) {
 }
 function statPlayer(team, p) {
   const e = EQ[team], pl = e ? played(e).slice().reverse().filter(x => stFilled(team, x.fecha)) : [];
-  const m = modal(`<div class="rqd-h">${pnum(p, 'st-dor', '–')}<div class="grow"><h2 id="mdl-t" class="st-h2" title="${esc(p.n)}">${esc(p.n)}</h2><small>${esc(team)}${p.dorsal ? ' · Dorsal ' + p.dorsal : ''}</small></div>
+  const m = modal(`<div class="rqd-h">${pnum(p, 'st-dor', '–')}<div class="grow"><h2 id="mdl-t" class="st-h2" title="${esc(p.n)}">${pn(p.n)}</h2><small>${esc(team)}${p.dorsal ? ' · Dorsal ' + p.dorsal : ''}</small></div>
       <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
     ${statKpis(team, p)}
     <b>Partido a partido</b>
@@ -1110,7 +1124,7 @@ function stScreen(team, back) {
   const ours = goalsUs(p), res = outcome(p);
   const row = x => { const r = d.rows[x.id], on = !!r;
     return `<li class="st-e ${on ? 'on' : ''}" data-ste="${x.id}"><button type="button" class="st-tg" aria-pressed="${on}"><span class="tick" aria-hidden="true">${ic('check')}</span>${pnum(x, 'num', '–')}
-      <span class="grow"><b title="${esc(x.n)}">${esc(x.n)}</b><small class="pstate">${on ? 'Ha jugado' : 'No ha jugado'}</small></span></button>
+      <span class="grow"><b title="${esc(x.n)}">${pn(x.n)}</b><small class="pstate">${on ? 'Ha jugado' : 'No ha jugado'}</small></span></button>
       <div class="st-c" ${on ? '' : 'hidden'}><label class="st-m" for="stm-${x.id}">Minutos<input type="number" id="stm-${x.id}" inputmode="numeric" min="1" max="${max}" value="${on ? r.m : full}"></label>
       <div class="st-g" role="group" aria-label="Goles de ${esc(x.n)}"><span>Goles</span><span class="st-gc"><button type="button" class="iconbtn" data-gd="-1" aria-label="Un gol menos">${ic('minus')}</button><output>${on ? r.g : 0}</output><button type="button" class="iconbtn" data-gd="1" aria-label="Un gol más">${ic('plus')}</button></span></div></div></li>`; };
   const n = () => Object.keys(d.rows).length, gl = () => Object.values(d.rows).reduce((a, r) => a + r.g, 0);
@@ -1248,14 +1262,14 @@ function pizarra(team, L, players, save, e, p) {
         <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
         ${spots.map((sp, i) => { const id = ids[i], q = id != null ? pl(id) : null;
           return `<button type="button" class="pz-s${i ? '' : ' gk'}${q ? '' : ' hole'}${sel != null ? ' wait' : ''}" data-pz="${i}" style="left:${sp.x}%;top:${sp.y}%" aria-label="${i ? 'Hueco ' + i : 'Portero'}: ${q ? esc(q.n) : 'vacío'}">
-            ${q ? face(q) : `<span class="pz-f add">${ic('plus')}</span>`}<b>${q ? esc(q.n) : i ? 'Libre' : 'Portero'}</b></button>`; }).join('')}
+            ${q ? face(q) : `<span class="pz-f add">${ic('plus')}</span>`}<b>${q ? pn(q.n) : i ? 'Libre' : 'Portero'}</b></button>`; }).join('')}
       </div>
       <div class="pz-side">
         <h3>${L.fase === 'previa' ? 'Titulares por colocar' : 'En el campo, por colocar'} · ${free.length}</h3>
-        ${free.length ? `<div class="pz-free">${free.map(id => `<button type="button" class="pz-chip${sel === id ? ' on' : ''}" data-pzp="${id}" aria-pressed="${sel === id}">${face(pl(id))}<b>${esc(pl(id).n)}</b></button>`).join('')}</div>`
+        ${free.length ? `<div class="pz-free">${free.map(id => `<button type="button" class="pz-chip${sel === id ? ' on' : ''}" data-pzp="${id}" aria-pressed="${sel === id}">${face(pl(id))}<b>${pn(pl(id).n)}</b></button>`).join('')}</div>`
           : `<p class="muted" style="margin:0">${avail().length ? 'Todos colocados. Toca a uno del campo para cambiarlo o quitarlo.' : L.fase === 'previa' ? 'Primero elige a los titulares.' : 'No hay nadie en el campo.'}</p>`}
         <h3>Banquillo · ${bn.length}</h3>
-        ${bn.length ? `<div class="pz-free">${bn.map(id => `<span class="pz-chip off">${face(pl(id))}<b>${esc(pl(id).n)}</b></span>`).join('')}</div>` : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>'}
+        ${bn.length ? `<div class="pz-free">${bn.map(id => `<span class="pz-chip off">${face(pl(id))}<b>${pn(pl(id).n)}</b></span>`).join('')}</div>` : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>'}
         <div class="pz-btns"><button type="button" class="btn blue block" id="pz-wa"${ids.some(x => x != null) ? '' : ' disabled'}>${ic('send')} Enviar por WhatsApp</button>
         ${ids.some(x => x != null) ? `<button type="button" class="btn ghost block" id="pz-clr">${ic('undo')} Vaciar la pizarra</button>` : ''}</div></div></div></div>`;
     d.querySelector('#pz-x').onclick = close;
@@ -1340,8 +1354,8 @@ async function pzPoster(team, L, players, e, p) {
   else if (p.hora) text(p.hora, W / 2, cy0 + 4, 800, 76, INK, 260, 'center');
   else text('Hora por confirmar', W / 2, cy0 + 4, 700, 28, MUTED, 220, 'center');
   text(`${L.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + placeOf(p) : ''}`, W / 2, PAD + HEAD - 40, 500, 28, MUTED, FW - 72, 'center');
-  /* La formación, como el selector de la pantalla */
-  if (form) { card(PAD, PAD + HEAD + 24, FW, 84, 28); text(form, PAD + 36, PAD + HEAD + 24 + 44, 700, 34, INK, FW - 72); }
+  /* La formación, en una barra blanca sin sombra */
+  if (form) { rr(PAD, PAD + HEAD + 24, FW, 84, 28, '#FFFFFF'); text(`Formación: ${form}`, PAD + 36, PAD + HEAD + 24 + 44, 700, 34, INK, FW - 72); }
   /* Campo */
   const fx = PAD, fy = PAD + HEAD + 24 + FMH;
   rr(fx, fy, FW, FH, 28, GRASS); path(fx, fy, FW, FH, 28); x.strokeStyle = '#A9D5B7'; x.lineWidth = 6; x.stroke();
@@ -1354,12 +1368,13 @@ async function pzPoster(team, L, players, e, p) {
     if (id == null) { x.setLineDash([10, 8]); x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.strokeStyle = '#8E97A8'; x.lineWidth = 4; x.stroke(); x.setLineDash([]); return; }
     const col = i ? BLUE : INK;   /* el portero, en negro */
     face(id, cx, cy, R, col);
-    x.font = font(700, 28); const nm = pl(id).n, tw = Math.min(x.measureText(nm).width, PW) + 28;
+    x.font = font(700, 28); let nm = pl(id).n; if (x.measureText(nm).width > PW) nm = shortName(nm); const tw = Math.min(x.measureText(nm).width, PW) + 28;
     rr(cx - tw / 2, cy + R + 12, tw, 42, 21, col); text(nm, cx, cy + R + 34, 700, 28, '#FFFFFF', PW, 'center'); });
   /* Banquillo */
   if (BENCH) { const by = fy + FH + 24; text(`Banquillo · ${bench.length}`, PAD, by + 26, 800, 32, INK, FW);
     const cw = FW / 3; bench.forEach((id, k) => { const cx = PAD + (k % 3) * cw, cy = by + 70 + Math.floor(k / 3) * 64 + 26;
-      rr(cx, cy - 26, cw - 12, 52, 26, '#FFFFFF'); face(id, cx + 26, cy, 20); text(pl(id).n, cx + 56, cy + 1, 700, 24, INK, cw - 80); }); }
+      rr(cx, cy - 26, cw - 12, 52, 26, '#FFFFFF'); face(id, cx + 26, cy, 20); x.font = font(700, 24);
+      text(x.measureText(pl(id).n).width > cw - 80 ? shortName(pl(id).n) : pl(id).n, cx + 56, cy + 1, 700, 24, INK, cw - 80); }); }
   return new Promise(ok2 => cv.toBlob(b => ok2(b), 'image/png'));
 }
 /* Elegir jugador para un hueco de la pizarra: devuelve su id, null para dejar el hueco vacío, o undefined si se cierra */
@@ -1369,7 +1384,7 @@ function pickSlot(title, filled, ids, players) {
     const pl = id => players.find(x => x.id === id) || { n: 'Jugador', dorsal: null };
     const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${esc(title)}</h2></div>
         <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
-      ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}">${pnum(pl(id), 'num', '–')}<b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b></button>`).join('')}</div>`
+      ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}">${pnum(pl(id), 'num', '–')}<b title="${esc(pl(id).n)}">${pn(pl(id).n)}</b></button>`).join('')}</div>`
         : `<p class="muted" style="margin:0">${filled ? 'Todos los jugadores ya están en el campo.' : 'No hay ningún jugador para elegir.'}</p>`}
       ${filled ? `<button type="button" class="btn ghost block" data-pk="">${ic('minus')} Dejar el hueco vacío</button>` : ''}`, 'dialog', () => done(pick));
     m.el.classList.add('rqd');
@@ -1383,7 +1398,7 @@ function pickPlayer(title, sub, ids, players) {
     const pl = id => players.find(x => x.id === id) || { n: 'Jugador', dorsal: null };
     const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${esc(title)}</h2>${sub ? `<small>${esc(sub)}</small>` : ''}</div>
         <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
-      ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}">${pnum(pl(id), 'num', '–')}<b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b></button>`).join('')}</div>`
+      ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}">${pnum(pl(id), 'num', '–')}<b title="${esc(pl(id).n)}">${pn(pl(id).n)}</b></button>`).join('')}</div>`
         : '<p class="muted" style="margin:0">No hay ningún jugador para elegir.</p>'}`, 'dialog', () => done(pick));
     m.el.classList.add('rqd');
     m.el.querySelectorAll('[data-pk]').forEach(b => b.onclick = () => { pick = +b.dataset.pk; m.close(false); });
@@ -1617,7 +1632,7 @@ function lvScreen(team, back) {
     const tmax = modOf(team);
     /* Dos grupos: se toca a un jugador para pasarlo de uno a otro */
     const tile = (id, tit) => `<button type="button" class="lv-tile" data-lvp="${id}" aria-label="${esc(nm(id))}: ${tit ? 'titular. Toca para pasarlo a suplente' : 'suplente. Toca para sacarlo de titular'}">
-      ${pnum(pl(id), 'num', '–')}<b title="${esc(nm(id))}">${esc(nm(id))}</b><small>${tit ? 'A suplente' : 'A titular'}</small></button>`;
+      ${pnum(pl(id), 'num', '–')}<b title="${esc(nm(id))}">${pn(nm(id))}</b><small>${tit ? 'A suplente' : 'A titular'}</small></button>`;
     const holes = n => Array.from({ length: n }, () => `<span class="lv-tile hole" aria-hidden="true"><span class="num"></span><b>Libre</b><small>Hueco</small></span>`).join('');
     const grids = () => {
       const tt = L.tit.slice().sort(byDor), ss = L.sup.slice().sort(byDor);
@@ -1683,7 +1698,7 @@ function lvScreen(team, back) {
       body: `<div class="split"><div class="stack">
         <section class="card match" aria-label="Resultado"><span class="tag">${tag} · Final</span>${score}</section>
         ${card('h-lvm', 'Minutos y goles', rows.length ? `<div class="st-head lv-h" aria-hidden="true"><span>Jugador</span><span></span><span>Min.</span><span>Goles</span></div><div class="st-list">${rows.map(r => `<div class="st-row lv-row">${pnum(pl(r.id), 'k', '–')}
-          <span class="st-n"><b title="${esc(pl(r.id).n)}">${esc(pl(r.id).n)}</b><small>${L.tit.includes(r.id) ? 'Titular' : 'Suplente'}</small></span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>
+          <span class="st-n"><b title="${esc(pl(r.id).n)}">${pn(pl(r.id).n)}</b><small>${L.tit.includes(r.id) ? 'Titular' : 'Suplente'}</small></span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>
           <p class="muted st-foot">Ya están sumados a las estadísticas de cada jugador.</p>` : '<p class="muted" style="margin:0">No jugó nadie.</p>')}
         <div class="btn-row lv-add"><button type="button" class="btn blue" data-lvadd="gol">${ic('plus')} Gol nuestro</button><button type="button" class="btn outline" data-lvadd="golr">${ic('plus')} Gol del rival</button></div>
         <div class="btn-row lv-add"><button type="button" class="btn outline" data-lvadd="cambio">${ic('swap')} Cambio</button><button type="button" class="btn outline" data-lvadd="tarjeta">${ic('card')} Tarjeta</button></div>
@@ -1708,7 +1723,7 @@ function lvScreen(team, back) {
   const playing = L.fase === 'juego', last = L.parte >= L.partes;
   const ctl = playing ? `<button type="button" class="btn gold block" id="lvend">${ic('stop')} ${last ? 'Finalizar partido' : `Finalizar ${parteLbl(L.parte)}`}</button>`
     : `<button type="button" class="btn gold block" id="lvgo">${ic('play')} Iniciar ${parteLbl(L.parte + 1)}</button>`;
-  const prow = (id, field) => `<div class="lv-p">${pnum(pl(id), 'k', '–')}<b class="st-n" title="${esc(pl(id).n)}">${esc(pl(id).n)}</b>
+  const prow = (id, field) => `<div class="lv-p">${pnum(pl(id), 'k', '–')}<b class="st-n" title="${esc(pl(id).n)}">${pn(pl(id).n)}</b>
     <span class="lv-tags">${'<i class="lv-c ama" title="Tarjeta amarilla"></i>'.repeat(Math.min(lvYellow(L, id), 1))}${L.rojas.includes(id) ? '<i class="lv-c roja" title="Tarjeta roja"></i>' : ''}${lvGoals(L, id) ? `<span class="lv-gl">${ic('ball')}${lvGoals(L, id) > 1 ? lvGoals(L, id) : ''}</span>` : ''}</span>
     <span class="lv-m" data-lvm="${id}">${lvMins(L, id)}'</span></div>`;
   const actions = [['gol', 'ball', 'Gol nuestro'], ['golr', 'ball', 'Gol del rival'], ['cambio', 'swap', 'Cambio'], ['ama', 'card', 'Amarilla'], ['roja', 'card', 'Roja']];
@@ -1809,7 +1824,7 @@ function fpScreen(team, back) {
   const head = `<section class="card match" aria-label="Resultado"><span class="tag">${dateLbl(f)} · ${p.casa ? 'Local' : 'Visitante'}${res ? ' · ' + (res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado') : ''}</span>${sc}</section>`;
   const view = S.fpView || 'res';
   const seg = `<div class="seg g-scope gm-seg fp-seg" role="group" aria-label="Qué ver del partido">${[['res', 'Convocatoria'], ['gol', 'Goles'], ['jug', 'Jugadores']].map(([k, l]) => `<button type="button" data-fpv="${k}" aria-pressed="${view === k}">${l}</button>`).join('')}</div>`;
-  const prow = (id, right, sub) => `<div class="lv-p">${pnum(pl(id), 'k', '–')}<span class="st-n fp-n"><b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b>${sub ? `<small>${sub}</small>` : ''}</span><span></span><span class="lv-m">${right}</span></div>`;
+  const prow = (id, right, sub) => `<div class="lv-p">${pnum(pl(id), 'k', '–')}<span class="st-n fp-n"><b title="${esc(pl(id).n)}">${pn(pl(id).n)}</b>${sub ? `<small>${sub}</small>` : ''}</span><span></span><span class="lv-m">${right}</span></div>`;
   let body = '';
   if (view === 'res') {
     const ids = cv ? cv.ids.filter(id => t.players.some(x => x.id === id)) : A ? [...A.tit, ...A.sup] : [];
@@ -1834,7 +1849,7 @@ function fpScreen(team, back) {
   if (view === 'jug') {
     const rows = t.players.filter(x => statOf(x.id, f)).map(x => ({ x, ...statOf(x.id, f) })).sort((u, v) => v.m - u.m || byDor(u.x.id, v.x.id));
     body = card('h-fpj', `Han jugado · ${rows.length}`, rows.length ? `<div class="st-head lv-h" aria-hidden="true"><span>Jugador</span><span></span><span>Min.</span><span>Goles</span></div><div class="st-list">${rows.map(r => `<div class="st-row lv-row">${pnum(r.x, 'k', '–')}
-        <span class="st-n"><b title="${esc(r.x.n)}">${esc(r.x.n)}</b>${A ? `<small>${A.tit.includes(r.x.id) ? 'Titular' : 'Suplente'}</small>` : ''}</span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>`
+        <span class="st-n"><b title="${esc(r.x.n)}">${pn(r.x.n)}</b>${A ? `<small>${A.tit.includes(r.x.id) ? 'Titular' : 'Suplente'}</small>` : ''}</span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>`
       : '<p class="muted" style="margin:0">Todavía no se han apuntado los minutos de este partido.</p>');
   }
   const btns = `<div class="fp-btns">${a ? `<button type="button" class="btn outline block" id="fplv">${ic(A ? 'list' : 'play')} ${A ? 'Ver acta del directo' : 'Seguir el directo'}</button>` : ''}
@@ -1927,7 +1942,7 @@ function convScreen() {
   const allBtn = on => on || many ? `${ic('x')} Quitar a todos` : `${ic('check')} Convocar a todos`;
   const cnt = () => `${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${Math.min(max, t.players.length)}</small>`;
   const row = (x, i) => `<li><button type="button" class="player" data-cv="${x.id}" aria-pressed="${c.ids.includes(x.id)}">
-    <span class="tick" aria-hidden="true">${ic('check')}</span>${pnum(x, 'num', i + 1)}<span class="pinfo"><span class="pname" title="${esc(x.n)}">${esc(x.n)}</span>
+    <span class="tick" aria-hidden="true">${ic('check')}</span>${pnum(x, 'num', i + 1)}<span class="pinfo"><span class="pname" title="${esc(x.n)}">${pn(x.n)}</span>
     <span class="pstate">${c.ids.includes(x.id) ? 'Convocado' : 'No va'}</span>${attPill(team, x.id)}</span></button></li>`;
   return {
     kicker: `Convocatoria · ${esc(team)}`, title: `vs ${esc(nice(p.rival))}`, back,
@@ -2104,7 +2119,7 @@ const COACH = {
       <p class="muted" style="margin:0">Toca a cada jugador que ha venido. Se guarda solo.</p>
       ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
       <ul class="players">${t.players.map((p, i) => `<li><button type="button" class="player" data-p="${p.id}" aria-pressed="${a.has(p.id)}">
-        <span class="tick" aria-hidden="true">${ic('check')}</span>${pnum(p, 'num', i + 1)}<span class="pinfo"><span class="pname" title="${esc(p.n)}">${esc(p.n)}</span>
+        <span class="tick" aria-hidden="true">${ic('check')}</span>${pnum(p, 'num', i + 1)}<span class="pinfo"><span class="pname" title="${esc(p.n)}">${pn(p.n)}</span>
         <span class="pstate">${a.has(p.id) ? 'Ha venido' : 'Sin marcar'}</span></span></button></li>`).join('')}</ul></div>
       ${attendanceCard(S.team, 'h-at2')}</div>`;
     const plv = S.plView === 'stats' ? 'stats' : 'roster';
