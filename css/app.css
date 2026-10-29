@@ -1030,10 +1030,10 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 @media (max-width: 760px) { .cal-bar { flex-direction: column; align-items: stretch; } .cal-bar .seg { width: 100%; } }
 .cal-key { margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .88rem; }
 .tt-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); flex: none; }
-.tt-dot.pa { background: var(--gold); margin-left: 8px; }
-.tt-c { border-left: 4px solid var(--ink); }
-.tt-c.pa { border-left-color: var(--gold); background: var(--gold-soft); cursor: pointer; }
-.tt-c.pa:hover { background: var(--club-soft); }
+.tt-dot.pa { background: var(--club); margin-left: 8px; }
+.tt-c.pa { background: var(--club-soft); cursor: pointer; }
+.tt-c.pa b { color: var(--club); }
+.tt-c.pa:hover { background: #D5DFFF; }
 /* Calendario como tabla, con bordes */
 .tt-week { gap: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
 .tt-week .tt-wr { gap: 0; align-items: stretch; }
@@ -1053,8 +1053,8 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .mini.tt-cr img { width: 16px; height: 16px; }
 .tt-h.nh { font-size: .72rem; padding-left: 2px !important; padding-right: 2px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tt-c[data-anu] { cursor: pointer; }
-.tt-c[data-anu]:hover { background: var(--club-soft); }
-.tt-c.anul { border-left-color: var(--bad); background: var(--bad-soft); }
+.tt-c[data-anu]:hover { background: #E6E9F0; }
+.tt-c.anul { background: var(--bad-soft); }
 .tt-c.anul b { text-decoration: line-through; color: var(--muted); }
 .tt-c.anul small { color: var(--bad-ink); }
 .cal-tip { margin: -6px 0 0; font-size: .86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

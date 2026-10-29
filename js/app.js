@@ -2165,7 +2165,7 @@ async function calPoster(wk) {
   const topLoose = HEAD + DAYH, topGrid = topLoose + (nLoose ? nLoose * LOOSE + 16 : 0), H = topGrid + (h1 - h0) * PXH + PAD + 16;
   const cv = document.createElement('canvas'), x = cv.getContext('2d');
   cv.width = W; cv.height = H;
-  const BLUE = '#0034DF', GOLD = '#FDCB2B', GOLDS = '#FFF4CC', INK = '#0B0B0B', MUTED = '#5B6475', LINE = '#E3E6EE', BG = '#F3F5FA';
+  const BLUE = '#0034DF', SOFT = '#E5EBFF', INK = '#0B0B0B', MUTED = '#5B6475', LINE = '#E3E6EE', BG = '#F3F5FA';
   const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
   const text = (t, tx, y, w, px, color, maxW, align = 'left') => {
     x.font = font(w, px); while (px > 12 && x.measureText(t).width > maxW) x.font = font(w, --px);
@@ -2182,9 +2182,8 @@ async function calPoster(wk) {
   /* Un bloque: raya de color a la izquierda, equipo, y debajo el campo o el rival con los dos escudos */
   const block = (it, bx, by, bw, bh) => {
     const pa = it.kind === 'pa';
-    rr(bx, by, bw, bh, 12, pa ? GOLDS : '#FFFFFF'); x.strokeStyle = pa ? GOLD : LINE; x.lineWidth = 2; x.stroke();
-    rr(bx, by, 8, bh, 4, pa ? GOLD : INK);
-    const ix = bx + 18, iw = bw - 26, small = bh < 70;
+    rr(bx, by, bw, bh, 12, pa ? SOFT : BG);
+    const ix = bx + 14, iw = bw - 24, small = bh < 70;
     /* Columna estrecha (citas a la vez): el nombre en varias líneas, la hora y los escudos debajo */
     if (bw < 190 && !small) {
       x.font = font(700, 18); const lines = []; let cur = '';
@@ -2213,7 +2212,7 @@ async function calPoster(wk) {
   text('C.D. Aznalcóllar Fútbol Base', PAD + 150, PAD + 40, 600, 26, '#FFFFFF', 700);
   text(`Calendario · semana del ${calWeekLbl(wk)}`, PAD + 150, PAD + 82, 800, 40, '#FFFFFF', 1000);
   x.fillStyle = '#FFFFFF'; x.fillRect(W - PAD - 330, PAD + 50, 20, 20); text('Entreno', W - PAD - 300, PAD + 60, 700, 24, '#FFFFFF', 120);
-  x.fillStyle = GOLD; x.fillRect(W - PAD - 160, PAD + 50, 20, 20); text('Partido', W - PAD - 130, PAD + 60, 700, 24, '#FFFFFF', 120);
+  x.fillStyle = SOFT; x.fillRect(W - PAD - 160, PAD + 50, 20, 20); text('Partido', W - PAD - 130, PAD + 60, 700, 24, '#FFFFFF', 120);
   /* Rejilla: fondo blanco, días arriba, horas a la izquierda */
   rr(PAD, HEAD, W - PAD * 2, H - HEAD - PAD, 24, '#FFFFFF');
   const colX = i => PAD + GUT + i * COLW;
