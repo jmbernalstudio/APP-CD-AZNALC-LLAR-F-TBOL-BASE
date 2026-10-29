@@ -1312,7 +1312,7 @@ async function pzPoster(team, L, players, e, p) {
   const ids = spots.map((_, i) => ok.includes((L.pz || { ids: [] }).ids[i]) ? L.pz.ids[i] : null);
   const bench = (L.fase === 'previa' ? L.sup : [...new Set([...L.tit, ...L.sup])].filter(id => !L.campo.includes(id))).filter(id => !ids.includes(id))
     .sort((a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99));
-  const W = 1080, PAD = 48, HEAD = 380, FMH = form ? 84 + 24 : 0, FW = W - PAD * 2, FH = Math.round(FW * 90 / 68), BENCH = bench.length ? 70 + Math.ceil(bench.length / 3) * 64 : 0;
+  const W = 1080, PAD = 48, HEAD = 380, FMH = form ? 84 + 24 : 0, FW = W - PAD * 2, FH = Math.round(FW * 90 / 68), BENCH = bench.length ? 70 + Math.ceil(bench.length / 3) * 100 : 0;
   const H = PAD + HEAD + 24 + FMH + FH + (BENCH ? 24 + BENCH : 0) + PAD;
   const cv = document.createElement('canvas'), x = cv.getContext('2d'); cv.width = W; cv.height = H;
   const BLUE = '#0034DF', GRASS = '#E9F6EE', INK = '#0B0B0B', MUTED = '#5B6582', SOFT = '#E6EBFD';   /* campo claro como el dibujo de la formación */
@@ -1355,7 +1355,7 @@ async function pzPoster(team, L, players, e, p) {
   else text('Hora por confirmar', W / 2, cy0 + 4, 700, 28, MUTED, 220, 'center');
   text(`${L.casa ? 'Local' : 'Visitante'}${placeOf(p) ? ' · ' + placeOf(p) : ''}`, W / 2, PAD + HEAD - 40, 500, 28, MUTED, FW - 72, 'center');
   /* La formación, en una barra blanca sin sombra */
-  if (form) { rr(PAD, PAD + HEAD + 24, FW, 84, 28, '#FFFFFF'); text(`Formación: ${form}`, PAD + 36, PAD + HEAD + 24 + 44, 700, 34, INK, FW - 72); }
+  if (form) { rr(PAD, PAD + HEAD + 24, FW, 84, 28, BLUE); text(`Formación: ${form}`, PAD + 36, PAD + HEAD + 24 + 44, 700, 34, '#FFFFFF', FW - 72); }
   /* Campo */
   const fx = PAD, fy = PAD + HEAD + 24 + FMH;
   rr(fx, fy, FW, FH, 28, GRASS); path(fx, fy, FW, FH, 28); x.strokeStyle = '#A9D5B7'; x.lineWidth = 6; x.stroke();
@@ -1372,9 +1372,10 @@ async function pzPoster(team, L, players, e, p) {
     rr(cx - tw / 2, cy + R + 12, tw, 42, 21, col); text(nm, cx, cy + R + 34, 700, 28, '#FFFFFF', PW, 'center'); });
   /* Banquillo */
   if (BENCH) { const by = fy + FH + 24; text(`Banquillo · ${bench.length}`, PAD, by + 26, 800, 32, INK, FW);
-    const cw = FW / 3; bench.forEach((id, k) => { const cx = PAD + (k % 3) * cw, cy = by + 70 + Math.floor(k / 3) * 64 + 26;
-      rr(cx, cy - 26, cw - 12, 52, 26, '#FFFFFF'); face(id, cx + 26, cy, 20); x.font = font(700, 24);
-      text(x.measureText(pl(id).n).width > cw - 80 ? shortName(pl(id).n) : pl(id).n, cx + 56, cy + 1, 700, 24, INK, cw - 80); }); }
+    /* fichas tan altas como la barra de la formación */
+    const cw = FW / 3; bench.forEach((id, k) => { const cx = PAD + (k % 3) * cw, cy = by + 70 + Math.floor(k / 3) * 100 + 42;
+      rr(cx, cy - 42, cw - 12, 84, 42, '#FFFFFF'); face(id, cx + 44, cy, 30); x.font = font(700, 28);
+      text(x.measureText(pl(id).n).width > cw - 110 ? shortName(pl(id).n) : pl(id).n, cx + 86, cy + 1, 700, 28, INK, cw - 110); }); }
   return new Promise(ok2 => cv.toBlob(b => ok2(b), 'image/png'));
 }
 /* Elegir jugador para un hueco de la pizarra: devuelve su id, null para dejar el hueco vacío, o undefined si se cierra */
