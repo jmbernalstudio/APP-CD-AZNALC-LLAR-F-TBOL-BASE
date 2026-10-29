@@ -1,6 +1,6 @@
 /* Generado por herramientas/actualizar.py desde rfaf.es y educationleague.es. No editar a mano. */
 window.DATOS = {
- "actualizado": "2026-10-28T13:14:59+00:00",
+ "actualizado": "2026-10-29T13:31:17+00:00",
  "equipos": [
   {
    "id": "senior",
@@ -6418,12 +6418,6 @@ window.DATOS = {
      "fecha": "2026-11-01",
      "partidos": [
       {
-       "l": "BRENES BALOMPIE \"B\"",
-       "v": "C.D. CASTILBLANCO F.C.",
-       "f": "2026-10-28",
-       "h": "18:30"
-      },
-      {
        "l": "C.D. AZNALCOLLAR FUTBOL BASE",
        "v": "A.D. SAN JOSE \"B\"",
        "f": "2026-10-30",
@@ -6452,6 +6446,12 @@ window.DATOS = {
        "v": "U.D. VILLAVERDE \"B\"",
        "f": "2026-10-31",
        "h": "13:00"
+      },
+      {
+       "l": "BRENES BALOMPIE \"B\"",
+       "v": "C.D. CASTILBLANCO F.C.",
+       "f": "2026-11-04",
+       "h": "18:30"
       }
      ]
     },
@@ -10684,12 +10684,12 @@ window.DATOS = {
     {
      "pos": 2,
      "equipo": "CA Aznalcázar",
-     "pts": 3,
-     "j": 1,
-     "g": 1,
+     "pts": 6,
+     "j": 2,
+     "g": 2,
      "e": 0,
      "p": 0,
-     "dif": 5
+     "dif": 7
     },
     {
      "pos": 3,
@@ -10735,11 +10735,11 @@ window.DATOS = {
      "pos": 7,
      "equipo": "CD Atco. San Martín",
      "pts": 0,
-     "j": 1,
+     "j": 2,
      "g": 0,
      "e": 0,
-     "p": 1,
-     "dif": -3
+     "p": 2,
+     "dif": -5
     },
     {
      "pos": 8,
@@ -10846,6 +10846,10 @@ window.DATOS = {
       {
        "l": "CD Atco. San Martín",
        "v": "CA Aznalcázar",
+       "g": [
+        3,
+        5
+       ],
        "f": "2026-10-23",
        "h": "18:30"
       }
