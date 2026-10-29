@@ -1001,3 +1001,4 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .fp-btns:empty { display: none; }
 .fp-seg { width: 100%; max-width: 30rem; }
 .st-split > .stack { min-width: 0; }
+.lv-add { flex-wrap: nowrap; } .lv-add .btn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
