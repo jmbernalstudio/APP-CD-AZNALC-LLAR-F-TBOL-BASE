@@ -26,6 +26,12 @@ const I = {
   down: '<path d="M6 9l6 6 6-6"/>',
   eq: '<path d="M6 10h12M6 14h12"/>',
   minus: '<path d="M5 12h14"/>',
+  ball: '<circle cx="12" cy="12" r="9"/><path d="M12 7.5l4.3 3.1-1.6 5h-5.4l-1.6-5z"/>',
+  card: '<rect x="7" y="3.5" width="10" height="17" rx="2"/>',
+  swap: '<path d="M7 4v16M4 17l3 3 3-3M17 20V4M14 7l3-3 3 3"/>',
+  undo: '<path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+  play: '<path d="M8 5v14l11-7z"/>',
+  stop: '<rect x="6" y="6" width="12" height="12" rx="2"/>',
   whistle: '<circle cx="9" cy="14" r="5"/><path d="M12.5 10.5L20 6v4l-5 2"/>'
 };
 const ic = n => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${I[n]}</svg>`;
@@ -70,7 +76,7 @@ function crestBadge(e, name, cls = 'mini') {
     : `<span class="${cls}" style="background:var(--navy)" aria-hidden="true">${initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, ''))}</span>`;
 }
 const S = {
-  role: 'coach', tab: 'home', sub: null, conv: {}, stats: {},
+  role: 'coach', tab: 'home', sub: null, conv: {}, stats: {}, actas: {},
   /* live = true cuando hay sesión iniciada en el servidor del club (js/servidor.js) */
   live: false, me: { id: null, nombre: 'Paco Martín' }, board: 'Ana Ruiz',
   coach: 'Paco', team: 'Alevín 2º año',
@@ -503,9 +509,11 @@ function openMatch(e, p) {
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
     ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
     ${p.campo && !p.casa ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}
+    ${lvAvail(e, p) ? `<button type="button" class="btn blue block" id="mx-lv">${ic(actaOf(e.nombre, p.fecha) && actaOf(e.nombre, p.fecha).fase === 'fin' ? 'list' : 'play')} ${(() => { const a = actaOf(e.nombre, p.fecha); return !a || a.fase === 'previa' ? 'Directo del partido' : a.fase === 'fin' ? 'Ver acta del partido' : 'Seguir el directo'; })()}</button>` : ''}
     ${p.goles && S.teams[e.nombre] && statsOn() ? `<button type="button" class="btn outline block" id="mx-st">${ic('clock')} ${stFilled(e.nombre, p.fecha) ? 'Ver minutos y goles' : 'Apuntar minutos y goles'}</button>` : ''}
     <button type="button" class="btn outline block" id="mx-wa">${ic('send')} Enviar por WhatsApp</button>`, 'dialog', () => {});
   m.el.classList.add('rqd', 'mx');
+  const lv = m.el.querySelector('#mx-lv'); if (lv) lv.onclick = () => { m.close(false); openLv(e.nombre, p.fecha); };
   const st = m.el.querySelector('#mx-st'); if (st) st.onclick = () => { m.close(false); S.team = e.nombre; openSt(e.nombre, p.fecha); };
   m.el.querySelector('#mx-wa').onclick = () => { m.close(false); shareMatch(e, p); };
   m.el.querySelector('[data-v="0"]').focus();
@@ -966,7 +974,12 @@ function statPlayer(team, p) {
 }
 /* Pantalla para apuntar quién jugó, cuántos minutos y sus goles en un partido */
 function stScreen(team, back) {
-  const t = S.teams[team], e = EQ[team], p = e && played(e).find(x => x.fecha === S.stDate);
+  const t = S.teams[team], e = EQ[team];
+  /* El partido con resultado de la federación o, si aún no ha salido, con el del directo */
+  let p = e && e.partidos.find(x => x.fecha === S.stDate && !x.descansa);
+  const acta = p && actaOf(team, p.fecha);
+  if (p && !p.goles && acta && acta.fase === 'fin') p = { ...p, goles: p.casa ? [acta.nos, acta.ellos] : [acta.ellos, acta.nos] };
+  if (p && !p.goles) p = null;
   if (!p) return { kicker: 'Minutos y goles', title: esc(team), back, body: emptyPage('cal', 'No encontramos ese partido', 'Vuelve atrás y elige otro partido.') };
   const du = durOf(team), full = du.partes * du.min, max = full + 30, k = `${team} ${p.fecha}`;
   const d = S.stDraft && S.stDraft.k === k ? S.stDraft
@@ -1028,6 +1041,233 @@ function stScreen(team, back) {
       };
     }
   };
+}
+
+/* ---------- DIRECTO DEL PARTIDO ---------- */
+/* El entrenador elige titulares y suplentes, pone el cronómetro en marcha y apunta goles, tarjetas y cambios con su minuto.
+   El reloj va por la hora real, así que sigue aunque se bloquee el móvil o se cierre la app.
+   Al acabar, los minutos y goles de cada jugador pasan a las estadísticas. */
+const lvKey = (team, f) => `directo ${team} ${f}`;
+const lvStrip = L => { const { hist, ...r } = L; return r; };
+const actaOf = (team, f) => (S.actas || {})[`${team} ${f}`] || null;
+function lvLoad(team, p) {
+  let L = null; try { L = JSON.parse(localStorage.getItem(lvKey(team, p.fecha)) || 'null'); } catch (_) {}
+  const srv = actaOf(team, p.fecha);
+  if (srv && (!L || (srv.v || 0) > (L.v || 0))) L = { ...srv, hist: [] };
+  if (L) return L;
+  const du = durOf(team), cv = S.conv[convKey(team, p)];
+  return { v: 0, fase: 'previa', parte: 0, partes: du.partes, min: du.min, rival: nice(p.rival), casa: !!p.casa,
+    tit: [], sup: cv ? [...cv.ids] : [], campo: [], rojas: [], acc: 0, ini: null, desde: {}, seg: {}, ev: [], nos: 0, ellos: 0, hist: [] };
+}
+function lvSave(team, f, L) {
+  L.v = Date.now();
+  try { localStorage.setItem(lvKey(team, f), JSON.stringify(L)); } catch (_) {}
+  (S.actas = S.actas || {})[`${team} ${f}`] = lvStrip(L);
+  if (API() && !(S.live && S.directoOff)) API().directo(team, f, lvStrip(L)).catch(() => {});
+}
+const lvPart = L => L.fase === 'juego' && L.ini ? Math.max(0, (Date.now() - L.ini) / 1000) : 0;
+const lvCap = L => L.acc + Math.min(lvPart(L), L.min * 60);  /* segundos que cuentan para los minutos (sin el añadido) */
+const lvMin = L => {
+  if (L.fase !== 'juego') return `${L.parte * L.min}`;
+  const m = Math.floor(lvPart(L) / 60) + 1, base = (L.parte - 1) * L.min;
+  return m > L.min ? `${base + L.min}+${m - L.min}` : `${base + m}`;
+};
+const mmss = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+const lvClock = L => L.fase === 'juego' ? mmss((L.parte - 1) * L.min * 60 + lvPart(L)) : mmss(L.parte * L.min * 60);
+const lvSeg = (L, id) => (L.seg[id] || 0) + (L.fase === 'juego' && L.campo.includes(id) ? lvCap(L) - (L.desde[id] || 0) : 0);
+const lvMins = (L, id) => Math.floor(lvSeg(L, id) / 60);
+const lvSnap = L => { L.hist = [...(L.hist || []).slice(-29), JSON.stringify(lvStrip(L))]; };
+const lvGoals = (L, id) => L.ev.filter(x => x.t === 'gol' && x.id === id).length;
+const lvYellow = (L, id) => L.ev.filter(x => x.t === 'ama' && x.id === id).length;
+const parteLbl = n => `${n}ª parte`;
+function openLv(team, fecha) { S.lvFrom = S.tab; S.lvDate = fecha; S.lv = null; if (S.role === 'coach') S.team = team; go('team', S.role === 'coach' ? 'lv' : 'lv:' + team); }
+/* Un partido tiene directo si es el próximo, si es de hoy o de ayer, o si ya se empezó */
+const lvAvail = (e, p) => !!S.teams[e.nombre] && !p.descansa && (!!actaOf(e.nombre, p.fecha) || (!p.goles && (p === nextMatch(e) || (p.fecha <= TODAY && p.fecha >= addDays(TODAY, -1)))));
+function pickPlayer(title, sub, ids, players) {
+  return new Promise(done => {
+    let pick = null;
+    const pl = id => players.find(x => x.id === id) || { n: 'Jugador', dorsal: null };
+    const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${esc(title)}</h2>${sub ? `<small>${esc(sub)}</small>` : ''}</div>
+        <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+      ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}"><span class="num" aria-hidden="true">${pl(id).dorsal || '–'}</span><b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b></button>`).join('')}</div>`
+        : '<p class="muted" style="margin:0">No hay ningún jugador para elegir.</p>'}`, 'dialog', () => done(pick));
+    m.el.classList.add('rqd');
+    m.el.querySelectorAll('[data-pk]').forEach(b => b.onclick = () => { pick = +b.dataset.pk; m.close(false); });
+    (m.el.querySelector('[data-pk]') || m.el.querySelector('[data-v]')).focus();
+  });
+}
+function confirmar(title, text, label) {
+  return new Promise(done => {
+    const m = modal(`<h2 id="mdl-t">${esc(title)}</h2><p>${esc(text)}</p>
+      <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="button" class="btn blue" data-v="1">${ic('check')} ${esc(label)}</button></div>`, 'alertdialog', done);
+    m.el.querySelector('[data-v="1"]').focus();
+  });
+}
+/* Lo que ha pasado, del último al primero */
+function lvTimeline(L, nm) {
+  const txt = x => x.t === 'ini' ? `Empieza la ${parteLbl(x.parte)}` : x.t === 'fin' ? (x.parte < L.partes ? `Final de la ${parteLbl(x.parte)}` : 'Final del partido')
+    : x.t === 'gol' ? `Gol de ${nm(x.id)}` : x.t === 'golr' ? `Gol del ${L.rival}` : x.t === 'ama' ? `Tarjeta amarilla a ${nm(x.id)}`
+    : x.t === 'roja' ? `Tarjeta roja a ${nm(x.id)}${x.doble ? ' (segunda amarilla)' : ''}` : `Entra ${nm(x.in)} y sale ${nm(x.out)}`;
+  const icon = x => x.t === 'gol' || x.t === 'golr' ? 'ball' : x.t === 'ama' || x.t === 'roja' ? 'card' : x.t === 'cambio' ? 'swap' : 'whistle';
+  if (!L.ev.length) return '<p class="muted" style="margin:0">Todavía no ha pasado nada.</p>';
+  return `<ol class="lv-tl">${L.ev.slice().reverse().map(x => `<li class="lv-x ${x.t}"><span class="lv-mn">${x.min}'</span><span class="lv-ic" aria-hidden="true">${ic(icon(x))}</span><span class="grow">${esc(txt(x))}</span></li>`).join('')}</ol>`;
+}
+/* Minutos y goles que pasan a las estadísticas al acabar */
+function lvRows(L) {
+  const ids = [...new Set([...L.tit, ...L.ev.filter(x => x.t === 'cambio').map(x => x.in)])];
+  return ids.map(id => ({ id, m: Math.max(1, Math.round((L.seg[id] || 0) / 60)), g: lvGoals(L, id) }));
+}
+async function lvToStats(team, f, L) {
+  const filas = lvRows(L), t = S.teams[team];
+  const quitar = t.players.filter(x => statOf(x.id, f) && !filas.some(r => r.id === x.id)).map(x => x.id);
+  if (API()) await API().estadisticas(f, filas, quitar);
+  filas.forEach(r => { (S.stats[r.id] = S.stats[r.id] || {})[f] = { m: r.m, g: r.g }; });
+  quitar.forEach(id => { delete S.stats[id][f]; });
+}
+function lvScreen(team, back) {
+  const e = EQ[team], t = S.teams[team], p = e && e.partidos.find(x => x.fecha === S.lvDate && !x.descansa);
+  if (!p) return { kicker: 'Directo', title: esc(team), back, body: emptyPage('cal', 'No encontramos ese partido', 'Vuelve atrás y elige otro partido.') };
+  const k = `${team} ${p.fecha}`;
+  if (!S.lv || S.lv.k !== k) S.lv = { k, L: lvLoad(team, p) };
+  const L = S.lv.L, f = p.fecha;
+  const pl = id => t.players.find(x => x.id === id) || { id, n: 'Jugador', dorsal: null };
+  const nm = id => pl(id).n;
+  const byDor = (a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99) || pl(a).n.localeCompare(pl(b).n, 'es');
+  const save = () => lvSave(team, f, L);
+  const us = 'Aznalcóllar', them = L.rival;
+  const score = `<div class="lv-sc"><b title="${esc(L.casa ? us : them)}">${esc(L.casa ? us : them)}</b><span class="lv-g">${L.casa ? L.nos : L.ellos}<i>–</i>${L.casa ? L.ellos : L.nos}</span><b title="${esc(L.casa ? them : us)}">${esc(L.casa ? them : us)}</b></div>`;
+  const tag = `${dateLbl(f)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}`;
+  const kicker = `Directo · ${esc(team)}`, title = `vs ${esc(them)}`;
+
+  /* --- Antes de empezar: titulares y suplentes --- */
+  if (L.fase === 'previa') {
+    const st = id => L.tit.includes(id) ? 'tit' : L.sup.includes(id) ? 'sup' : 'no';
+    const list = [...t.players].sort((a, b) => byDor(a.id, b.id));
+    const counts = () => `<b>${L.tit.length}</b> titulares · <b>${L.sup.length}</b> suplentes`;
+    return { kicker, title, back,
+      body: `<div class="split"><div class="stack">
+        <section class="card match" aria-label="Partido"><span class="tag">${tag}</span>${score}
+          <small class="cv-place">${ic('clock')} ${L.partes} partes de ${L.min} minutos</small></section>
+        <p class="muted" style="margin:0">Antes de empezar, elige quién sale de titular y quién se queda en el banquillo.</p>
+        ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
+        <ul class="st-es">${list.map(x => `<li class="st-e lv-pre" data-lvp="${x.id}"><div class="lv-who"><span class="num" aria-hidden="true">${x.dorsal || '–'}</span><b title="${esc(x.n)}">${esc(x.n)}</b></div>
+          <div class="seg lv-3" role="group" aria-label="${esc(x.n)}">${[['tit', 'Titular'], ['sup', 'Suplente'], ['no', 'No va']].map(([v, l]) => `<button type="button" data-st="${v}" aria-pressed="${st(x.id) === v}">${l}</button>`).join('')}</div></li>`).join('')}</ul></div>
+        <form id="lvf" class="card stack st-save" novalidate aria-labelledby="h-lvs"><h2 id="h-lvs" style="margin:0;font-size:1.1rem">Empezar el partido</h2>
+          <p class="muted" style="margin:0" id="lvcnt" aria-live="polite">${counts()}</p>
+          <p class="muted" style="margin:0">Pulsa “Iniciar partido” cuando el árbitro pite el comienzo. El cronómetro empieza a contar.</p>
+          <p id="lverr" class="err" role="alert" hidden></p>
+          <button type="submit" class="btn blue block">${ic('play')} Iniciar partido</button></form></div>`,
+      bind() {
+        document.querySelectorAll('[data-lvp]').forEach(li => {
+          const id = +li.dataset.lvp;
+          li.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
+            L.tit = L.tit.filter(x => x !== id); L.sup = L.sup.filter(x => x !== id);
+            if (b.dataset.st === 'tit') L.tit.push(id); if (b.dataset.st === 'sup') L.sup.push(id);
+            li.querySelectorAll('[data-st]').forEach(x => x.setAttribute('aria-pressed', x === b));
+            $('#lvcnt').innerHTML = counts(); save();
+          });
+        });
+        $('#lvf').onsubmit = ev => {
+          ev.preventDefault();
+          if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular.'; $('#lverr').hidden = false; return; }
+          lvSnap(L); L.parte = 1; L.fase = 'juego'; L.ini = Date.now(); L.campo = [...L.tit].sort(byDor); L.campo.forEach(id => { L.desde[id] = 0; });
+          L.ev.push({ t: 'ini', parte: 1, min: '0' }); save(); render(); say('¡Empieza el partido!');
+        };
+      } };
+  }
+
+  /* --- Partido acabado: el acta --- */
+  if (L.fase === 'fin') {
+    const rows = lvRows(L).sort((a, b) => b.m - a.m || byDor(a.id, b.id));
+    return { kicker: `Acta · ${esc(team)}`, title, back,
+      body: `<div class="split"><div class="stack">
+        <section class="card match" aria-label="Resultado"><span class="tag">${tag} · Final</span>${score}</section>
+        ${card('h-lvm', 'Minutos y goles', rows.length ? `<div class="st-head lv-h" aria-hidden="true"><span>Jugador</span><span></span><span>Min.</span><span>Goles</span></div><div class="st-list">${rows.map(r => `<div class="st-row lv-row"><span class="k">${pl(r.id).dorsal || '–'}</span>
+          <span class="st-n"><b title="${esc(pl(r.id).n)}">${esc(pl(r.id).n)}</b><small>${L.tit.includes(r.id) ? 'Titular' : 'Suplente'}</small></span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>
+          <p class="muted st-foot">Ya están sumados a las estadísticas de cada jugador.</p>` : '<p class="muted" style="margin:0">No jugó nadie.</p>')}
+        <button type="button" class="btn outline block" id="lvfix">${ic('pen')} Corregir minutos y goles</button></div>
+        ${card('h-lvt', 'Lo que pasó', lvTimeline(L, nm))}</div>`,
+      bind() { $('#lvfix').onclick = () => { S.stDate = f; S.stDraft = null; go('team', S.role === 'coach' ? 'st' : 'st:' + team); }; } };
+  }
+
+  /* --- En juego o en el descanso --- */
+  const banca = () => [...new Set([...L.tit, ...L.sup])].filter(id => !L.campo.includes(id) && !L.rojas.includes(id)).sort(byDor);
+  const playing = L.fase === 'juego', last = L.parte >= L.partes;
+  const ctl = playing ? `<button type="button" class="btn gold block" id="lvend">${ic('stop')} ${last ? 'Finalizar partido' : `Finalizar ${parteLbl(L.parte)}`}</button>`
+    : `<button type="button" class="btn gold block" id="lvgo">${ic('play')} Iniciar ${parteLbl(L.parte + 1)}</button>`;
+  const prow = (id, field) => `<div class="lv-p"><span class="k">${pl(id).dorsal || '–'}</span><b class="st-n" title="${esc(pl(id).n)}">${esc(pl(id).n)}</b>
+    <span class="lv-tags">${'<i class="lv-c ama" title="Tarjeta amarilla"></i>'.repeat(Math.min(lvYellow(L, id), 1))}${L.rojas.includes(id) ? '<i class="lv-c roja" title="Tarjeta roja"></i>' : ''}${lvGoals(L, id) ? `<span class="lv-gl">${ic('ball')}${lvGoals(L, id) > 1 ? lvGoals(L, id) : ''}</span>` : ''}</span>
+    <span class="lv-m" data-lvm="${id}">${lvMins(L, id)}'</span></div>`;
+  const actions = [['gol', 'ball', 'Gol nuestro'], ['golr', 'ball', 'Gol del rival'], ['cambio', 'swap', 'Cambio'], ['ama', 'card', 'Amarilla'], ['roja', 'card', 'Roja']];
+  return { kicker, title, back,
+    body: `<div class="split"><div class="stack">
+      <section class="card match lv-top" aria-label="Marcador"><div class="lv-ph"><span class="tag">${playing ? parteLbl(L.parte) : last ? 'Final' : 'Descanso'}</span><span class="lv-clock" id="lv-clock" role="timer" aria-label="Tiempo de partido">${lvClock(L)}</span></div>
+        ${score}${ctl}</section>
+      <div class="lv-acts">${actions.map(([a, i, l]) => `<button type="button" class="lv-a ${a}" data-lva="${a}"><span class="lv-ai" aria-hidden="true">${ic(i)}</span><span>${l}</span></button>`).join('')}
+        <button type="button" class="lv-a undo" id="lvundo"${L.hist && L.hist.length ? '' : ' disabled'}><span class="lv-ai" aria-hidden="true">${ic('undo')}</span><span>Deshacer</span></button></div>
+      ${card('h-lvc', `En el campo · ${L.campo.length}`, L.campo.length ? L.campo.slice().sort(byDor).map(id => prow(id, true)).join('') : '<p class="muted" style="margin:0">No hay nadie en el campo.</p>')}
+      ${card('h-lvb', `Banquillo · ${banca().length}`, banca().length ? banca().map(id => prow(id, false)).join('') : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>')}
+      ${L.rojas.length ? card('h-lvr', 'Expulsados', L.rojas.map(id => prow(id, false)).join('')) : ''}</div>
+      ${card('h-lvt', 'Lo que ha pasado', lvTimeline(L, nm))}</div>`,
+    bind() {
+      clearInterval(S.lvTick);
+      if (playing) {
+        S.lvTick = setInterval(() => {
+          if (!$('#lv-clock')) return clearInterval(S.lvTick);
+          $('#lv-clock').textContent = lvClock(L);
+          document.querySelectorAll('[data-lvm]').forEach(x => { x.textContent = lvMins(L, +x.dataset.lvm) + "'"; });
+        }, 1000);
+        try { if ('wakeLock' in navigator && !S.lvLock) navigator.wakeLock.request('screen').then(l => { S.lvLock = l; l.onrelease = () => { S.lvLock = null; }; }).catch(() => {}); } catch (_) {}
+      }
+      const done = msg => { save(); render(); if (msg) say(msg); };
+      if ($('#lvgo')) $('#lvgo').onclick = () => {
+        lvSnap(L); L.parte++; L.fase = 'juego'; L.ini = Date.now(); L.campo.forEach(id => { L.desde[id] = L.acc; });
+        L.ev.push({ t: 'ini', parte: L.parte, min: String((L.parte - 1) * L.min) }); done(`Empieza la ${parteLbl(L.parte)}`);
+      };
+      if ($('#lvend')) $('#lvend').onclick = async () => {
+        if (last && !(await confirmar('¿Finalizar el partido?', 'Se guardan el resultado, los minutos y los goles de cada jugador en las estadísticas.', 'Sí, finalizar'))) return;
+        lvSnap(L);
+        const c = lvCap(L), mn = lvMin(L);
+        L.campo.forEach(id => { L.seg[id] = (L.seg[id] || 0) + c - (L.desde[id] || 0); });
+        L.acc = c; L.ini = null; L.fase = last ? 'fin' : 'pausa';
+        L.ev.push({ t: 'fin', parte: L.parte, min: mn });
+        if (!last) return done(`Final de la ${parteLbl(L.parte)}`);
+        try { await lvToStats(team, f, L); L.hist = []; done('Partido finalizado. Minutos y goles guardados en las estadísticas.'); }
+        catch (_) { done('Partido finalizado. Las estadísticas no se han podido guardar: usa “Corregir minutos y goles”.'); }
+      };
+      $('#lvundo').onclick = () => {
+        const prev = L.hist.pop(); if (!prev) return;
+        const h = L.hist; Object.keys(L).forEach(x => delete L[x]); Object.assign(L, JSON.parse(prev), { hist: h }); done('Deshecho');
+      };
+      document.querySelectorAll('[data-lva]').forEach(b => b.onclick = async () => {
+        const a = b.dataset.lva, mn = lvMin(L);
+        if (a === 'golr') { lvSnap(L); L.ellos++; L.ev.push({ t: 'golr', min: mn }); return done(`Gol del ${them} en el minuto ${mn}`); }
+        if (a === 'gol') {
+          const id = await pickPlayer('¿Quién ha marcado?', `Minuto ${mn}`, L.campo.slice().sort(byDor), t.players); if (id == null) return;
+          lvSnap(L); L.nos++; L.ev.push({ t: 'gol', id, min: mn }); return done(`Gol de ${pl(id).n} en el minuto ${mn}`);
+        }
+        if (a === 'ama' || a === 'roja') {
+          const id = await pickPlayer(a === 'ama' ? '¿A quién le sacan amarilla?' : '¿A quién le sacan roja?', `Minuto ${mn}`, [...L.campo.slice().sort(byDor), ...banca()], t.players); if (id == null) return;
+          lvSnap(L);
+          const doble = a === 'ama' && lvYellow(L, id) >= 1;
+          L.ev.push({ t: 'ama' === a ? 'ama' : 'roja', id, min: mn });
+          if (a === 'roja' || doble) {
+            if (doble) L.ev.push({ t: 'roja', id, min: mn, doble: true });
+            if (L.campo.includes(id)) { if (playing) L.seg[id] = (L.seg[id] || 0) + lvCap(L) - (L.desde[id] || 0); L.campo = L.campo.filter(x => x !== id); }
+            L.rojas.push(id);
+          }
+          return done(`${a === 'ama' && !doble ? 'Amarilla' : 'Roja'} a ${pl(id).n} en el minuto ${mn}`);
+        }
+        if (a === 'cambio') {
+          const out = await pickPlayer('¿Quién sale?', `Cambio · minuto ${mn}`, L.campo.slice().sort(byDor), t.players); if (out == null) return;
+          const inn = await pickPlayer('¿Quién entra?', `Sale ${pl(out).n}`, banca(), t.players); if (inn == null) return;
+          lvSnap(L);
+          if (playing) { const c = lvCap(L); L.seg[out] = (L.seg[out] || 0) + c - (L.desde[out] || 0); L.desde[inn] = c; } else L.desde[inn] = L.acc;
+          L.campo = L.campo.map(x => x === out ? inn : x);
+          L.ev.push({ t: 'cambio', out, in: inn, min: mn }); return done(`Entra ${pl(inn).n} y sale ${pl(out).n}`);
+        }
+      });
+    } };
 }
 
 /* ---------- CONVOCATORIA ---------- */
@@ -1172,7 +1412,7 @@ function convScreen() {
 function matchSlide(team) {
   const nm = EQ[team] && nextMatch(EQ[team]), cv = nm && S.conv[convKey(team, nm)];
   return `${scoreHTML(team)}
-    <div class="match-btns">${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.casa ? '' : nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
+    <div class="match-btns">${nm && nm.fecha === TODAY ? `<button type="button" class="btn white" data-lv-team="${esc(team)}">${ic('play')} Directo del partido</button>` : ''}${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.casa ? '' : nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
 }
 function matchTag(team) { const nm = EQ[team] && nextMatch(EQ[team]); return nm ? dateLbl(nm.fecha) : ''; }
 function matchCarousel() {
@@ -1185,6 +1425,7 @@ function matchCarousel() {
 }
 function bindCarousel() {
   document.querySelectorAll('[data-conv-team]').forEach(b => b.onclick = () => { S.team = b.dataset.convTeam; go('team', 'conv'); });
+  document.querySelectorAll('[data-lv-team]').forEach(b => b.onclick = () => openLv(b.dataset.lvTeam, nextMatch(EQ[b.dataset.lvTeam]).fecha));
   const car = $('#mcar'); if (!car) return;
   const teams = Object.keys(S.teams), slides = [...car.children], dots = [...document.querySelectorAll('[data-dot]')];
   let cur = +car.dataset.at;
@@ -1251,6 +1492,7 @@ const COACH = {
   team() {
     if (S.sub === 'conv') return convScreen();
     if (S.sub === 'st') return stScreen(S.team, () => { S.plView = 'stats'; go('team', 'roster'); });
+    if (S.sub === 'lv') return lvScreen(S.team, () => go(S.lvFrom && S.lvFrom !== 'team' ? S.lvFrom : 'team'));
     const t = S.teams[S.team];
     const sub = S.sub || 'list';
     const pend = pendingLists(S.team);
@@ -1590,6 +1832,7 @@ const BOARD = {
       const p = S.people.find(x => x.id === S.sub.slice(3));
       return { kicker: 'Equipos · Accesos', title: esc(p.nombre), back: () => go('team'), body: claveForm(p), bind: () => bindClave(p) };
     }
+    if (S.sub && S.sub.startsWith('lv:')) { const team = S.sub.slice(3); return lvScreen(team, () => S.lvFrom && S.lvFrom !== 'team' ? go(S.lvFrom) : go('team', 'eq:' + team)); }
     if (S.sub && S.sub.startsWith('st:')) { const team = S.sub.slice(3); return stScreen(team, () => go('team', 'eq:' + team)); }
     if (S.sub && S.sub.startsWith('eq:')) {
       const team = S.sub.slice(3);

@@ -59,6 +59,8 @@
       if (filas.length) ok(await sb.from('estadisticas').upsert(filas.map(f => ({ jugador: f.id, fecha, minutos: f.m, goles: f.g })), { onConflict: 'jugador,fecha' }));
       if (quitar.length) ok(await sb.from('estadisticas').delete().eq('fecha', fecha).in('jugador', quitar));
     },
+    /* Directo del partido (se guarda cada vez que pasa algo; el móvil también lo guarda por si falla la conexión) */
+    async directo(team, fecha, datos) { ok(await sb.from('partidos_directo').upsert({ equipo: idEq(team), fecha, datos, actualizado: new Date().toISOString() }, { onConflict: 'equipo,fecha' })); },
     async nombre(nombre) { ok(await sb.rpc('cambiar_nombre', { p_nombre: nombre })); },
     async equipos(perfil, ids) {
       ok(await sb.from('entrenador_equipo').delete().eq('perfil', perfil).not('equipo', 'in', `(${ids.join(',')})`));
@@ -152,6 +154,10 @@
       est.data.push(...r.data); if (r.data.length < 1000) break;
     }
     S.statsOff = !!est.error; S.stats = {};
+    /* Directos y actas de los partidos (si la tabla aún no existe, se sigue sin ellos) */
+    const dir = await sb.from('partidos_directo').select('equipo, fecha, datos');
+    S.directoOff = !!dir.error; S.actas = {};
+    for (const x of dir.data || []) S.actas[`${nombreEq(x.equipo)} ${x.fecha}`] = x.datos;
     for (const x of est.data) (S.stats[x.jugador] = S.stats[x.jugador] || {})[x.fecha] = { m: x.minutos, g: x.goles };
     S.attend = {};
     for (const a of asis) {
