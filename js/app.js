@@ -1143,7 +1143,7 @@ const lvYellow = (L, id) => L.ev.filter(x => x.t === 'ama' && x.id === id).lengt
 const parteLbl = n => `${n}ª parte`;
 function openLv(team, fecha) { S.lvFrom = S.tab; S.lvSub = S.sub; S.lvDate = fecha; S.lv = null; if (S.role === 'coach') S.team = team; go('team', S.role === 'coach' ? 'lv' : 'lv:' + team); }
 /* Un partido tiene directo si es el próximo, si es de hoy o de ayer, o si ya se empezó */
-const lvAvail = (e, p) => !!S.teams[e.nombre] && !p.descansa && (!!actaOf(e.nombre, p.fecha) || (!p.goles && (p === nextMatch(e) || (p.fecha <= TODAY && p.fecha >= addDays(TODAY, -1)))));
+const lvAvail = (e, p) => !!S.teams[e.nombre] && !p.descansa && (!!actaOf(e.nombre, p.fecha) || p.fecha <= TODAY || p === nextMatch(e));
 function pickPlayer(title, sub, ids, players) {
   return new Promise(done => {
     let pick = null;
@@ -1278,36 +1278,57 @@ function lvEdit(team, f, L, i, players, after) {
   };
   (m.el.querySelector('#lve-m') || m.el.querySelector('select') || m.el.querySelector('[data-v]')).focus();
 }
-/* Añadir un gol a un acta ya terminada: el marcador y las estadísticas se recalculan */
+/* Añadir un apunte a un acta ya terminada (gol, gol del rival, cambio o tarjeta): el marcador, los minutos y las estadísticas se recalculan */
 function lvAddGoal(team, f, L, t, players, after) {
   const pl = id => players.find(y => y.id === id) || { n: 'Jugador', dorsal: null };
   const ids = [...new Set([...L.tit, ...L.sup])].sort((a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99));
-  const full = L.partes * L.min, name = t === 'gol' ? 'Gol nuestro' : 'Gol del rival';
+  const opts = sel => ids.map(id => `<option value="${id}"${id === sel ? ' selected' : ''}>${pl(id).dorsal ? pl(id).dorsal + ' · ' : ''}${esc(pl(id).n)}</option>`).join('');
+  const full = L.partes * L.min, name = { gol: 'Gol nuestro', golr: 'Gol del rival', cambio: 'Cambio', tarjeta: 'Tarjeta' }[t];
+  const sub = L.sup.slice().sort((a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99))[0];
   const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${name}</h2><small>Añadir al acta</small></div>
       <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
     <form id="lvaf" class="stack" novalidate>
       <label class="f" for="lva-m">Minuto<input type="number" id="lva-m" inputmode="numeric" min="1" max="${full + 15}" placeholder="Del 1 al ${full}"></label>
-      ${t === 'gol' ? `<label class="f" for="lva-p">¿Quién marcó?<select id="lva-p">${ids.map(id => `<option value="${id}">${pl(id).dorsal ? pl(id).dorsal + ' · ' : ''}${esc(pl(id).n)}</option>`).join('')}</select></label>` : ''}
+      ${t === 'gol' ? `<label class="f" for="lva-p">¿Quién marcó?<select id="lva-p">${opts()}</select></label>` : ''}
+      ${t === 'tarjeta' ? `<label class="f" for="lva-c">Tarjeta<select id="lva-c"><option value="ama">Amarilla</option><option value="roja">Roja</option></select></label><label class="f" for="lva-p">¿A quién?<select id="lva-p">${opts()}</select></label>` : ''}
+      ${t === 'cambio' ? `<label class="f" for="lva-o">Sale<select id="lva-o">${opts(L.tit.slice().sort((a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99))[0])}</select></label><label class="f" for="lva-i">Entra<select id="lva-i">${opts(sub)}</select></label>` : ''}
       <p id="lvaerr" class="err" role="alert" hidden></p>
       <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="submit" class="btn blue">${ic('check')} Añadir</button></div>
     </form>`, 'dialog', () => {});
   m.el.classList.add('rqd');
+  const err = txt => { const e = m.el.querySelector('#lvaerr'); e.textContent = txt; e.hidden = false; };
+  const val = sel => +m.el.querySelector(sel).value;
   m.el.querySelector('#lvaf').onsubmit = async ev => {
     ev.preventDefault();
-    const mm = +m.el.querySelector('#lva-m').value, e = m.el.querySelector('#lvaerr');
-    if (!(mm >= 1 && mm <= full + 15)) { e.textContent = `Escribe el minuto del gol, del 1 al ${full}.`; e.hidden = false; return; }
+    const mm = val('#lva-m');
+    if (!(mm >= 1 && mm <= full + 15)) return err(`Escribe el minuto, del 1 al ${full}.`);
     const p = Math.min(L.partes, Math.ceil(mm / L.min)), lo = (p - 1) * L.min + 1;
     const ini = L.ev.find(y => y.t === 'ini' && y.p === p), fin = L.ev.find(y => y.t === 'fin' && y.p === p);
     const a = ini ? ini.s : (p - 1) * L.min * 60, z = fin ? fin.s : a + L.min * 60;
-    const x = { t, p, s: Math.min(z, Math.max(a, a + (mm - lo) * 60 + 30)), min: mm > p * L.min ? `${p * L.min}+${mm - p * L.min}` : String(mm) };
-    if (t === 'gol') x.id = +m.el.querySelector('#lva-p').value;
+    const x = { t, p, s: Math.min(z, Math.max(a, a + (mm - lo + 1) * 60)), min: mm > p * L.min ? `${p * L.min}+${mm - p * L.min}` : String(mm) };
+    if (t === 'gol') x.id = val('#lva-p');
+    if (t === 'tarjeta') { x.t = m.el.querySelector('#lva-c').value; x.id = val('#lva-p'); }
+    if (t === 'cambio') { x.out = val('#lva-o'); x.in = val('#lva-i'); if (x.out === x.in) return err('El que sale y el que entra tienen que ser distintos.'); }
+    /* Si no cuadra con el resto (p. ej. sale alguien que no estaba en el campo), no se apunta */
+    const prev = JSON.stringify(lvStrip(L));
+    lvSnap(L); L.ev.push(x);
+    if (!lvRebuild(L)) { const h = L.hist; h.pop(); Object.keys(L).forEach(k => delete L[k]); Object.assign(L, JSON.parse(prev), { hist: h }); return err('Así no cuadra: en ese minuto el que sale tiene que estar en el campo y el que entra, en el banquillo.'); }
     m.close(false);
-    const c = await askComo(t === 'gol' ? `¿Cómo fue el gol de ${pl(x.id).n}?` : '¿Cómo nos marcaron?', `Minuto ${x.min}`);
-    if (c) x.como = c;
-    lvSnap(L); L.ev.push(x); lvRebuild(L);
-    after(t === 'gol' ? `Gol de ${pl(x.id).n} añadido. Marcador actualizado.` : 'Gol del rival añadido. Marcador actualizado.');
+    if (t === 'gol' || t === 'golr') { const c = await askComo(t === 'gol' ? `¿Cómo fue el gol de ${pl(x.id).n}?` : '¿Cómo nos marcaron?', `Minuto ${x.min}`); if (c) x.como = c; }
+    after(t === 'gol' ? `Gol de ${pl(x.id).n} añadido. Marcador actualizado.` : t === 'golr' ? 'Gol del rival añadido. Marcador actualizado.'
+      : t === 'cambio' ? `Cambio añadido: entra ${pl(x.in).n}. Minutos actualizados.` : `Tarjeta ${x.t === 'ama' ? 'amarilla' : 'roja'} a ${pl(x.id).n} añadida.`);
   };
   m.el.querySelector('#lva-m').focus();
+}
+/* Rellenar en diferido: el partido queda acabado con la duración completa, y luego se añaden goles, cambios y tarjetas */
+function lvDiferido(L) {
+  L.ev = L.ev.filter(x => x.t !== 'ini' && x.t !== 'fin');
+  for (let p = 1; p <= L.partes; p++) {
+    L.ev.push({ t: 'ini', parte: p, min: String((p - 1) * L.min), s: (p - 1) * L.min * 60, p });
+    L.ev.push({ t: 'fin', parte: p, min: String(p * L.min), s: p * L.min * 60, p });
+  }
+  L.parte = L.partes; L.fase = 'fin'; L.ini = null; L.acc = L.partes * L.min * 60; L.diferido = true;
+  lvRebuild(L);
 }
 /* Borrar el directo entero: vuelve a "sin empezar" y quita los minutos y goles que guardó de ese partido */
 async function lvDelete(team, f) {
@@ -1347,7 +1368,8 @@ function lvScreen(team, back) {
   const kicker = `${L.fase === 'previa' ? 'Rellenar datos' : 'Directo'} · ${esc(team)}`, title = `vs ${esc(them)}`;
 
   /* --- Antes de empezar: hace falta la convocatoria, y de ella salen titulares y suplentes --- */
-  const cv = S.conv[convKey(team, p)];
+  /* Un partido ya jugado sin convocatoria se rellena con toda la plantilla */
+  const cv = S.conv[convKey(team, p)] || (f < TODAY ? { ids: t.players.map(x => x.id), todos: true } : null);
   if (L.fase === 'previa' && !cv) {
     const canConv = S.role === 'coach' && p === nextMatch(e);
     return { kicker, title, back,
@@ -1362,8 +1384,8 @@ function lvScreen(team, back) {
     const tmax = modOf(team);
     /* Dos grupos: se toca a un jugador para pasarlo de uno a otro */
     const tile = (id, tit) => `<button type="button" class="lv-tile" data-lvp="${id}" aria-label="${esc(nm(id))}: ${tit ? 'titular. Toca para pasarlo a suplente' : 'suplente. Toca para sacarlo de titular'}">
-      ${pnum(pl(id), 'num', '–')}<b title="${esc(nm(id))}">${esc(nm(id))}</b><small>${tit ? 'Pasar a suplente' : 'Sacar de titular'}</small></button>`;
-    const holes = n => Array.from({ length: n }, () => `<span class="lv-tile hole" aria-hidden="true"><span class="num"></span><b>Libre</b><small>Toca un suplente</small></span>`).join('');
+      ${pnum(pl(id), 'num', '–')}<b title="${esc(nm(id))}">${esc(nm(id))}</b><small>${tit ? 'A suplente' : 'A titular'}</small></button>`;
+    const holes = n => Array.from({ length: n }, () => `<span class="lv-tile hole" aria-hidden="true"><span class="num"></span><b>Libre</b><small>Hueco</small></span>`).join('');
     const grids = () => {
       const tt = L.tit.slice().sort(byDor), ss = L.sup.slice().sort(byDor);
       $('#lvT').innerHTML = tt.map(id => tile(id, true)).join('') + holes(Math.max(0, tmax - tt.length));
@@ -1381,19 +1403,28 @@ function lvScreen(team, back) {
     return { kicker, title, back,
       body: `<div class="split"><div class="stack">
         <section class="card match" aria-label="Partido"><span class="tag">${tag}</span>${score}
-          <small class="cv-place">${ic('clock')} ${L.partes} partes de ${L.min} minutos · ${cv.ids.length} convocados</small></section>
+          <small class="cv-place">${ic('clock')} ${L.partes} partes de ${L.min} minutos · ${cv.todos ? 'toda la plantilla' : cv.ids.length + ' convocados'}</small></section>
         <p class="muted" style="margin:0">Toca a un jugador para cambiarlo de grupo. Se guarda solo.</p>
         <section class="card lv-team tit" aria-labelledby="h-lvT"><div class="card-h"><h2 id="h-lvT">Titulares</h2><span class="pill" id="lvTn"></span></div><div class="lv-tiles" id="lvT"></div></section>
         <section class="card lv-team" aria-labelledby="h-lvS"><div class="card-h"><h2 id="h-lvS">Suplentes</h2><span class="pill blue" id="lvSn"></span></div><div class="lv-tiles" id="lvS"></div></section></div>
-        <form id="lvf" class="card stack st-save" novalidate aria-labelledby="h-lvs"><h2 id="h-lvs" style="margin:0;font-size:1.1rem">Partido en directo</h2>
-          <p class="muted" style="margin:0">Cuando el árbitro pite el comienzo, pulsa “Iniciar el directo” y el cronómetro empezará a contar.</p>
-          <p id="lverr" class="err" role="alert" hidden></p>
-          <button type="submit" class="btn blue block">${ic('play')} Iniciar el directo</button></form></div>`,
+        <form id="lvf" class="card stack st-save" novalidate aria-labelledby="h-lvs"><h2 id="h-lvs" style="margin:0;font-size:1.1rem">¿Cómo lo quieres rellenar?</h2>
+          ${f >= TODAY ? `<p class="muted" style="margin:0"><b>En directo:</b> pulsa “Iniciar el directo” cuando el árbitro pite el comienzo y ve apuntando goles, cambios y tarjetas.</p>
+          <button type="submit" class="btn blue block">${ic('play')} Iniciar el directo</button>` : ''}
+          <p class="muted" style="margin:0"><b>Después del partido:</b> con lo que hayas apuntado en la libreta. Pon goles, cambios y tarjetas con su minuto.</p>
+          <button type="button" class="btn ${f >= TODAY ? 'outline' : 'blue'} block" id="lvdif">${ic('pen')} Rellenar tras el partido</button>
+          <p id="lverr" class="err" role="alert" hidden></p></form></div>`,
       bind() {
         grids();
+        $('#lvdif').onclick = async () => {
+          if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular: toca a un jugador de los suplentes.'; $('#lverr').hidden = false; return; }
+          lvSnap(L); lvDiferido(L); L.hist = []; save();
+          try { await lvToStats(team, f, L); } catch (_) {}
+          render(); say('Listo. Ahora añade los goles, cambios y tarjetas con su minuto.');
+        };
         $('#lvf').onsubmit = ev => {
           ev.preventDefault();
           if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular: toca a un jugador de los suplentes.'; $('#lverr').hidden = false; return; }
+          if (f < TODAY) return;
           lvSnap(L); L.parte = 1; L.fase = 'juego'; L.ini = Date.now(); L.campo = [...L.tit].sort(byDor); L.campo.forEach(id => { L.desde[id] = 0; });
           L.ev.push({ t: 'ini', parte: 1, min: '0', s: 0, p: 1 }); save(); render(); say('¡Empieza el partido!');
         };
@@ -1410,8 +1441,9 @@ function lvScreen(team, back) {
           <span class="st-n"><b title="${esc(pl(r.id).n)}">${esc(pl(r.id).n)}</b><small>${L.tit.includes(r.id) ? 'Titular' : 'Suplente'}</small></span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>
           <p class="muted st-foot">Ya están sumados a las estadísticas de cada jugador.</p>` : '<p class="muted" style="margin:0">No jugó nadie.</p>')}
         <div class="btn-row lv-add"><button type="button" class="btn blue" data-lvadd="gol">${ic('plus')} Gol nuestro</button><button type="button" class="btn outline" data-lvadd="golr">${ic('plus')} Gol del rival</button></div>
+        <div class="btn-row lv-add"><button type="button" class="btn outline" data-lvadd="cambio">${ic('swap')} Cambio</button><button type="button" class="btn outline" data-lvadd="tarjeta">${ic('card')} Tarjeta</button></div>
         <button type="button" class="btn outline block" id="lvfix">${ic('pen')} Corregir minutos y goles</button>
-        <button type="button" class="btn red block" id="lvdel">${ic('trash')} Borrar el directo</button></div>
+        <button type="button" class="btn red block" id="lvdel">${ic('trash')} ${L.diferido ? 'Borrar el acta' : 'Borrar el directo'}</button></div>
         ${card('h-lvt', 'Lo que pasó', lvTimeline(L, nm, true))}</div>`,
       bind() {
         $('#lvfix').onclick = () => { S.stDate = f; S.stDraft = null; go('team', S.role === 'coach' ? 'st' : 'st:' + team); };
