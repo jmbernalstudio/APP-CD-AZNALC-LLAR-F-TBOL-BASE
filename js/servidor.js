@@ -51,6 +51,11 @@
     },
     async foto(perfil, foto) { ok(await sb.from('perfiles').update({ foto }).eq('id', perfil)); },
     async clave(perfil, clave) { ok(await sb.rpc('cambiar_clave', { p_perfil: perfil, p_clave: clave })); },
+    /* Anular (on = true) o recuperar el entreno de un equipo un día concreto. Solo la junta */
+    async anularEntreno(team, fecha, on) {
+      if (on) ok(await sb.from('entrenos_anulados').upsert({ equipo: idEq(team), fecha }, { onConflict: 'equipo,fecha' }));
+      else ok(await sb.from('entrenos_anulados').delete().eq('equipo', idEq(team)).eq('fecha', fecha));
+    },
     async modalidad(team, n) { ok(await sb.from('equipos').update({ modalidad: n }).eq('id', idEq(team))); },
     async duracion(team, partes, min) { ok(await sb.from('equipos').update({ partes, minutos_parte: min }).eq('id', idEq(team))); },
     async borrarUsuario(perfil) { ok(await sb.rpc('borrar_usuario', { p_perfil: perfil })); },
@@ -150,6 +155,9 @@
     const fot = await sb.from('jugadores').select('id, foto').eq('activo', true);
     S.fotosOff = !!fot.error;
     for (const j of fot.data || []) if (j.foto) { const t = S.teams[equipoDe[j.id]], x = t && t.players.find(y => y.id === j.id); if (x) x.foto = j.foto; }
+    /* Entrenos anulados por la junta (si la tabla aún no existe, se sigue sin ellos) */
+    const anu = await sb.from('entrenos_anulados').select('equipo, fecha');
+    S.anulOff = !!anu.error; S.anulados = new Set((anu.data || []).map(a => `${nombreEq(a.equipo)} ${a.fecha}`));
     /* Convocatorias de la temporada (también las pasadas, para la ficha de cada partido) (si la tabla aún no existe, se sigue sin ellas) */
     S.conv = {};
     const conv = await sb.from('convocatorias').select('equipo, fecha, jugadores, hora, lugar, nota');
