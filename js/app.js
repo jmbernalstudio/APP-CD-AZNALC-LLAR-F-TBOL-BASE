@@ -2151,7 +2151,7 @@ function trainView() {
     <button type="button" data-tt="week" aria-pressed="${sel === 'week'}">Semana</button>${DIAS.map((d, i) =>
     `<button type="button" data-tt="${i + 1}" aria-pressed="${sel === String(i + 1)}">${d} ${toDate(dayIso(i)).getDate()}</button>`).join('')}</div>`;
   const nTr = all.filter(x => x.kind === 'tr' && !x.anul).length, nPa = all.filter(x => x.kind === 'pa').length;
-  const top = `${nav}<div class="cal-bar">${seg}<button type="button" class="btn blue" id="calx"${all.length ? '' : ' disabled'}>${ic('send')} Exportar semana</button></div>
+  const top = `${nav}<div class="cal-bar">${seg}<button type="button" class="btn blue" id="calx" data-day="${sel}"${(sel === 'week' ? all : all.filter(x => x.f === dayIso(+sel - 1))).length ? '' : ' disabled'}>${ic('send')} ${sel === 'week' ? 'Exportar semana' : 'Exportar día'}</button></div>
     <p class="muted cal-key"><span class="tt-dot"></span>Entrenamientos · ${nTr}<span class="tt-dot pa"></span>Partidos · ${nPa}</p>
     <p class="muted cal-tip">Toca un entrenamiento para anularlo esta semana.</p>`;
   if (!all.length) return top + emptyPage('cal', 'Nada esta semana', 'No hay entrenamientos ni partidos. Usa las flechas para ver otra semana.', 'g');
@@ -2205,88 +2205,104 @@ function trainView() {
   return `${top}<div class="tt-desk">${card('h-ttw', 'Semana por hora de empiece', weekStarts())}</div>
     <div class="tt-mob stack">${days.map((x, i) => card(`h-tt${i}`, `${x.dn} · ${x.list.length} ${x.list.length === 1 ? 'cita' : 'citas'}`, dayList(x.list))).join('')}</div>`;
 }
-/* Imagen del calendario de la semana al estilo Google Calendar: una columna por día, las horas en vertical
-   y cada cita como un bloque (los que van a la vez, uno al lado del otro). Lo que no tiene hora va arriba, como "todo el día" */
-async function calPoster(wk) {
+/* Imagen del calendario tal como se ve en el ordenador: la semana por hora de empiece (una fila por hora, una columna por día)
+   o un día (una fila por equipo y las horas en horizontal; cada cita ocupa todo su tiempo) */
+async function calPoster(wk, day) {
   await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
-  const all = calItems(wk).filter(it => !it.anul), mins = h => { const [a, b] = h.split(':').map(Number); return a * 60 + (b || 0); };
-  const timed = all.filter(it => it.h).map(it => ({ ...it, a: mins(it.h), z: mins(it.h) + (it.kind === 'tr' ? trainMin(it.team) : matchMin(it.team)) })), loose = all.filter(it => !it.h);
-  const W = 2200, GUT = 110, PAD = 40, COLW = (W - PAD * 2 - GUT) / 7, HEAD = 190, DAYH = 90, LOOSE = 92, PXH = 130;
-  const nLoose = Math.max(0, ...DIAS.map((_, i) => loose.filter(it => it.f === addDays(wk, i)).length));
-  const h0 = timed.length ? Math.floor(Math.min(...timed.map(t => t.a)) / 60) : 9, h1 = timed.length ? Math.ceil(Math.max(...timed.map(t => t.z)) / 60) : 21;
-  const topLoose = HEAD + DAYH, topGrid = topLoose + (nLoose ? nLoose * LOOSE + 16 : 0), H = topGrid + (h1 - h0) * PXH + PAD + 16;
+  const all = calItems(wk).filter(it => !day || it.f === day);
+  const endOf = it => it.h ? hhmm(hm2min(it.h) + (it.kind === 'tr' ? trainMin(it.team) : matchMin(it.team))) : '';
+  const SHORT = { prebenjamin: 'Prebenj. 2º' }, shortT = t => SHORT[(EQ[t] || {}).id] || t.replace(' año', '');
+  const BLUE = '#0034DF', SOFT = '#E6EBFD', INK = '#0B0B0B', MUTED = '#5B6475', LINE = '#BFC6D4', HEADBG = '#F3F5F9', BG = '#EEF1F7', BAD = '#FDE7EA', BADINK = '#B42318', TODAYBG = '#F7F9FF';
+  const W = 2200, PAD = 40, HEAD = 190;
   const cv = document.createElement('canvas'), x = cv.getContext('2d');
-  cv.width = W; cv.height = H;
-  const BLUE = '#0034DF', SOFT = '#E5EBFF', INK = '#0B0B0B', MUTED = '#5B6475', LINE = '#BFC6D4', BG = '#F3F5FA';
   const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
-  const text = (t, tx, y, w, px, color, maxW, align = 'left') => {
-    x.font = font(w, px); while (px > 12 && x.measureText(t).width > maxW) x.font = font(w, --px);
+  const text = (t, tx, y, w, px, color, maxW, align = 'left', strike) => {
+    x.font = font(w, px);
     if (x.measureText(t).width > maxW) { while (t.length > 1 && x.measureText(t + '…').width > maxW) t = t.slice(0, -1); t += '…'; }
     x.fillStyle = color; x.textAlign = align; x.textBaseline = 'middle'; x.fillText(t, tx, y);
+    if (strike) { const tw = x.measureText(t).width, sx = align === 'center' ? tx - tw / 2 : tx; x.fillRect(sx, y - 1, tw, 3); }
   };
-  const rr = (rx, ry, rw, rh, rad, color) => { rad = Math.min(rad, rh / 2, rw / 2); x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad);
-    x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); x.fillStyle = color; x.fill(); };
-  const line = (x1, y1, x2, y2) => { x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.strokeStyle = LINE; x.lineWidth = 2; x.stroke(); };
+  const path = (rx, ry, rw, rh, rad) => { rad = Math.min(rad, rh / 2, rw / 2); x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad);
+    x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); };
+  const rr = (rx, ry, rw, rh, rad, color) => { path(rx, ry, rw, rh, rad); x.fillStyle = color; x.fill(); };
+  const line = (x1, y1, x2, y2, c = LINE, lw = 2) => { x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.strokeStyle = c; x.lineWidth = lw; x.stroke(); };
   const crest = await loadImg('icons/escudo.png'), crests = {};
   await Promise.all([...new Set(all.filter(it => it.kind === 'pa').map(it => crestOf(it.e, it.p.rival)).filter(Boolean))].map(async src => { crests[src] = await loadImg(src); }));
   const badge = (img, cx, cy, sz) => { x.beginPath(); x.arc(cx, cy, sz / 2 + 4, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
     if (img) { const k = Math.min(sz / img.width, sz / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); } };
-  /* Un bloque: raya de color a la izquierda, equipo, y debajo el campo o el rival con los dos escudos */
-  const block = (it, bx, by, bw, bh) => {
+  /* Una tarjeta como en la pantalla: entrenamiento en azul claro, partido con borde azul y escudos, anulado en rojo claro */
+  const cardH = it => it.kind === 'pa' ? 120 : 76;
+  const block = (it, bx, by, bw, bh, sub) => {
     const pa = it.kind === 'pa';
-    rr(bx, by, bw, bh, 12, pa ? SOFT : BG); if (pa) { x.strokeStyle = BLUE; x.lineWidth = 3; x.stroke(); }
-    const ix = bx + 14, iw = bw - 24, small = bh < 70;
-    /* Columna estrecha (citas a la vez): el nombre en varias líneas, la hora y los escudos debajo */
-    if (bw < 190 && !small) {
-      x.font = font(700, 18); const lines = []; let cur = '';
-      for (const w of it.team.split(' ')) { const t = cur ? cur + ' ' + w : w; if (cur && x.measureText(t).width > iw) { lines.push(cur); cur = w; } else cur = t; }
-      lines.push(cur);
-      let ly = by + 20;
-      lines.slice(0, 3).forEach(t => { text(t, ix, ly, 700, 18, INK, iw); ly += 22; });
-      if (it.h) { text(it.h, ix, ly + 2, 700, 17, BLUE, iw); ly += 24; }
-      if (it.kind === 'pa' && ly + 26 < by + bh) { const th = crests[crestOf(it.e, it.p.rival)] || null, [l, v] = it.casa ? [crest, th] : [th, crest]; badge(l, ix + 11, ly + 8, 18); badge(v, ix + 39, ly + 8, 18); }
-      else if (it.kind === 'tr' && ly + 10 < by + bh) text(it.where, ix, ly + 2, 500, 15, MUTED, iw);
-      return;
-    }
-    text(it.team, ix, by + (small ? bh / 2 : 24), 700, 24, INK, iw);
-    if (small) return;
-    if (pa) {
-      const th = crests[crestOf(it.e, it.p.rival)] || null, [l, v] = it.casa ? [crest, th] : [th, crest];
-      badge(l, ix + 13, by + 58, 22); badge(v, ix + 45, by + 58, 22);
-      if (bh >= 110) { if (it.h) text(it.h, ix + 70, by + 58, 700, 20, BLUE, iw - 70); text(`${it.casa ? 'Local' : 'Visitante'} · ${it.rival}`, ix, by + 94, 500, 19, MUTED, iw); }
-      else text(`${it.h ? it.h + ' · ' : ''}${it.rival}`, ix + 70, by + 58, 500, 19, MUTED, iw - 70);
-    } else text(`${it.h}–${trainEnd(it.team, it.h)} · ${it.where}`, ix, by + 54, 500, 19, MUTED, iw);
+    rr(bx, by, bw, bh, 14, it.anul ? BAD : SOFT); if (pa) { path(bx, by, bw, bh, 14); x.strokeStyle = BLUE; x.lineWidth = 3; x.stroke(); }
+    const ix = bx + 14, iw = bw - 26;
+    text(shortT(it.team), ix, by + 26, 700, 25, pa ? BLUE : it.anul ? MUTED : INK, iw, 'left', it.anul);
+    if (it.anul) return text('Anulado', ix, by + 54, 500, 20, BADINK, iw);
+    text(sub(it), ix, by + 54, 500, 20, MUTED, iw);
+    if (pa && bh >= 110) { const th = crests[crestOf(it.e, it.p.rival)] || null, [l, v] = it.casa ? [crest, th] : [th, crest];
+      badge(l, ix + 13, by + 90, 22); badge(v, ix + 45, by + 90, 22); text(it.rival, ix + 68, by + 90, 600, 20, BLUE, iw - 68); }
   };
-  x.fillStyle = BG; x.fillRect(0, 0, W, H);
-  /* Cabecera */
-  rr(PAD, PAD, W - PAD * 2, 120, 32, BLUE);
-  if (crest) { const k = Math.min(84 / crest.width, 84 / crest.height); x.drawImage(crest, PAD + 36, PAD + 60 - crest.height * k / 2, crest.width * k, crest.height * k); }
-  text('C.D. Aznalcóllar Fútbol Base', PAD + 150, PAD + 40, 600, 26, '#FFFFFF', 700);
-  text(`Calendario · semana del ${calWeekLbl(wk)}`, PAD + 150, PAD + 82, 800, 40, '#FFFFFF', 1000);
-  x.fillStyle = '#FFFFFF'; x.fillRect(W - PAD - 430, PAD + 50, 20, 20); text('Entrenamiento', W - PAD - 400, PAD + 60, 700, 24, '#FFFFFF', 220);
-  x.fillStyle = SOFT; x.fillRect(W - PAD - 160, PAD + 50, 20, 20); text('Partido', W - PAD - 130, PAD + 60, 700, 24, '#FFFFFF', 120);
-  /* Rejilla: fondo blanco, días arriba, horas a la izquierda */
-  rr(PAD, HEAD, W - PAD * 2, H - HEAD - PAD, 24, '#FFFFFF');
-  const colX = i => PAD + GUT + i * COLW;
-  /* Columna de las horas con fondo */
-  x.save(); x.beginPath(); x.rect(PAD, HEAD, GUT, H - HEAD - PAD); x.clip(); rr(PAD, HEAD, GUT + 24, H - HEAD - PAD, 24, '#F3F5F9'); x.restore();
-  DIAS_D.forEach((dn, i) => { const f = addDays(wk, i), today = f === TODAY;
-    text(dn.toUpperCase(), colX(i) + COLW / 2, HEAD + 30, 700, 18, today ? BLUE : MUTED, COLW - 16, 'center');
-    if (today) { x.beginPath(); x.arc(colX(i) + COLW / 2, HEAD + 64, 22, 0, Math.PI * 2); x.fillStyle = BLUE; x.fill(); }
-    text(String(toDate(f).getDate()), colX(i) + COLW / 2, HEAD + 65, 800, 30, today ? '#FFFFFF' : INK, COLW - 16, 'center'); });
-  for (let i = 0; i <= 7; i++) if (i > 0 && i < 7) line(colX(i), HEAD + 10, colX(i), H - PAD - 10);
-  line(PAD + GUT, HEAD + DAYH, W - PAD, HEAD + DAYH);
-  if (nLoose) {
-    text('Sin hora', PAD + GUT - 14, topLoose + LOOSE / 2, 600, 18, MUTED, GUT - 20, 'right');
-    DIAS.forEach((_, i) => loose.filter(it => it.f === addDays(wk, i)).forEach((it, k) => block(it, colX(i) + 6, topLoose + 8 + k * LOOSE, COLW - 12, LOOSE - 10)));
-    line(PAD + GUT, topGrid - 8, W - PAD, topGrid - 8);
+  const header = (title, H) => {
+    x.fillStyle = BG; x.fillRect(0, 0, W, H);
+    rr(PAD, PAD, W - PAD * 2, 120, 32, BLUE);
+    if (crest) { const k = Math.min(84 / crest.width, 84 / crest.height); x.drawImage(crest, PAD + 36, PAD + 60 - crest.height * k / 2, crest.width * k, crest.height * k); }
+    text('C.D. Aznalcóllar Fútbol Base', PAD + 150, PAD + 40, 600, 26, '#FFFFFF', 900);
+    text(title, PAD + 150, PAD + 82, 800, 40, '#FFFFFF', 1300);
+    rr(W - PAD - 470, PAD + 46, 28, 28, 7, SOFT); text('Entrenamiento', W - PAD - 430, PAD + 60, 700, 24, '#FFFFFF', 220);
+    rr(W - PAD - 190, PAD + 46, 28, 28, 7, SOFT); path(W - PAD - 187, PAD + 49, 22, 22, 5); x.strokeStyle = BLUE; x.lineWidth = 4; x.stroke(); text('Partido', W - PAD - 150, PAD + 60, 700, 24, '#FFFFFF', 120);
+  };
+  const TH = 64, CP = 10;
+  if (!day) {
+    /* Semana: una fila por hora de empiece; cada fila tan alta como su celda más llena */
+    const FC = 150, COLW = (W - PAD * 2 - FC) / 7, X0 = PAD + FC;
+    const hs = [...new Set(all.map(it => it.h))].sort((a, b) => (a || '99').localeCompare(b || '99'));
+    const rows = hs.map(h => { const cells = DIAS.map((_, i) => all.filter(it => it.h === h && it.f === addDays(wk, i)));
+      return { h, cells, hgt: Math.max(...cells.map(c => c.reduce((s, it) => s + cardH(it) + CP, CP))) }; });
+    const top = HEAD + TH, H = top + rows.reduce((s, r) => s + r.hgt, 0) + PAD + 2;
+    cv.width = W; cv.height = H; header(`Calendario · semana del ${calWeekLbl(wk)}`, H);
+    const TB = { x: PAD, y: HEAD, w: W - PAD * 2, h: H - HEAD - PAD };
+    x.save(); path(TB.x, TB.y, TB.w, TB.h, 22); x.clip();
+    x.fillStyle = '#FFFFFF'; x.fillRect(TB.x, TB.y, TB.w, TB.h);
+    x.fillStyle = HEADBG; x.fillRect(TB.x, TB.y, TB.w, TH); x.fillRect(TB.x, TB.y, FC, TB.h);
+    DIAS.forEach((_, i) => { if (addDays(wk, i) === TODAY) { x.fillStyle = BLUE; x.fillRect(X0 + i * COLW, TB.y, COLW, TH); x.fillStyle = TODAYBG; x.fillRect(X0 + i * COLW, top, COLW, TB.h - TH); } });
+    text('Empieza', PAD + FC / 2, HEAD + TH / 2, 700, 24, INK, FC - 16, 'center');
+    DIAS_D.forEach((dn, i) => { const f = addDays(wk, i); text(`${dn} ${toDate(f).getDate()}`, X0 + i * COLW + COLW / 2, HEAD + TH / 2, 700, 24, f === TODAY ? '#FFFFFF' : INK, COLW - 16, 'center'); });
+    let y = top;
+    rows.forEach(r => { line(TB.x, y, TB.x + TB.w, y);
+      text(r.h || 'Sin hora', PAD + FC / 2, y + r.hgt / 2, 800, r.h ? 30 : 22, BLUE, FC - 16, 'center');
+      r.cells.forEach((c, i) => { let cy = y + CP; c.forEach(it => { block(it, X0 + i * COLW + CP, cy, COLW - CP * 2, cardH(it),
+        it2 => it2.kind === 'pa' ? `${it2.p.goles ? scoreTxt(it2.p) + ' · ' : ''}${it2.casa ? 'Local' : 'Visitante'}${it2.h ? ' · hasta ' + endOf(it2) : ''}` : `hasta ${endOf(it2)} · ${it2.where}`); cy += cardH(it) + CP; }); });
+      y += r.hgt; });
+    line(TB.x, top, TB.x + TB.w, top);
+    for (let i = 0; i <= 7; i++) line(X0 + i * COLW, TB.y, X0 + i * COLW, TB.y + TB.h);
+    x.restore(); path(TB.x, TB.y, TB.w, TB.h, 22); x.strokeStyle = LINE; x.lineWidth = 2; x.stroke();
+    return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
   }
-  for (let h = h0; h <= h1; h++) { const y = topGrid + (h - h0) * PXH; if (h < h1) text(`${String(h).padStart(2, '0')}:00`, PAD + GUT - 14, y + 2, 600, 20, MUTED, GUT - 20, 'right'); if (h > h0) line(PAD + GUT, y, W - PAD, y); }
-  /* Citas con hora: las que se pisan se reparten el ancho de la columna */
-  DIAS.forEach((_, i) => {
-    for (const it of calLanes(timed.filter(it => it.f === addDays(wk, i)))) { const lw = (COLW - 12) / it.n;
-      block(it, colX(i) + 6 + it.lane * lw, topGrid + (it.a / 60 - h0) * PXH + 3, lw - 6, (it.z - it.a) / 60 * PXH - 6); }
-  });
+  /* Un día: una fila por equipo y las horas en horizontal, en casillas de media hora */
+  const timed = all.filter(it => it.h).map(it => ({ ...it, a: hm2min(it.h), z: hm2min(endOf(it)) })), loose = all.filter(it => !it.h);
+  const t0 = timed.length ? Math.floor(Math.min(...timed.map(t => t.a)) / 60) * 60 : 960, t1 = timed.length ? Math.ceil(Math.max(...timed.map(t => t.z)) / 60) * 60 : 1020;
+  const FC = 260, n = (t1 - t0) / 30, X0 = PAD + FC, SW = (W - PAD * 2 - FC) / n, px = m => X0 + (m - t0) / 30 * SW;
+  const teams = [...new Set(all.map(it => it.team))].sort((a, b) => teamOrd(a) - teamOrd(b));
+  const rows = teams.map(t => { const mine = calLanes(timed.filter(it => it.team === t)), sin = loose.filter(it => it.team === t);
+    const lane = Math.max(...mine.map(it => cardH(it)), 76) + CP * 2; return { t, mine, sin, lane, hgt: Math.max(1, ...mine.map(it => it.n)) * lane + (sin.length ? 96 : 0) }; });
+  const top = HEAD + TH, H = top + rows.reduce((s, r) => s + r.hgt, 0) + PAD + 2;
+  cv.width = W; cv.height = H; header(`Calendario · ${longDate(day)}`, H);
+  const TB = { x: PAD, y: HEAD, w: W - PAD * 2, h: H - HEAD - PAD };
+  x.save(); path(TB.x, TB.y, TB.w, TB.h, 22); x.clip();
+  x.fillStyle = '#FFFFFF'; x.fillRect(TB.x, TB.y, TB.w, TB.h);
+  x.fillStyle = HEADBG; x.fillRect(TB.x, TB.y, TB.w, TH); x.fillRect(TB.x, TB.y, FC, TB.h);
+  text('Equipo', PAD + FC / 2, HEAD + TH / 2, 700, 24, INK, FC - 16, 'center');
+  for (let k = 0; k < n; k++) text(hhmm(t0 + k * 30), X0 + k * SW + SW / 2, HEAD + TH / 2, 800, 21, BLUE, SW - 6, 'center');
+  for (let k = 0; k <= n; k++) line(X0 + k * SW, TB.y, X0 + k * SW, TB.y + TB.h);
+  let y = top;
+  rows.forEach(r => { line(TB.x, y, TB.x + TB.w, y);
+    text(r.t, PAD + 18, y + r.hgt / 2, 700, 25, INK, FC - 30);
+    r.mine.forEach(it => block(it, px(it.a) + 5, y + it.lane * r.lane + CP, px(it.z) - px(it.a) - 10, cardH(it),
+      it2 => it2.kind === 'pa' ? `${it2.h}–${endOf(it2)} · ${it2.casa ? 'Local' : 'Visitante'}` : `${it2.h}–${endOf(it2)} · ${it2.where}`));
+    r.sin.forEach((it, k) => block(it, X0 + CP + k * 330, y + r.hgt - 96 + CP, 320, 76, () => 'Sin hora'));
+    y += r.hgt; });
+  line(TB.x, top, TB.x + TB.w, top);
+  x.restore(); path(TB.x, TB.y, TB.w, TB.h, 22); x.strokeStyle = LINE; x.lineWidth = 2; x.stroke();
   return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
 }
 function gamesScreen() {
@@ -2342,9 +2358,9 @@ const BOARD = {
       document.querySelectorAll('[data-eqv]').forEach(b => b.onclick = () => { S.eqView = b.dataset.eqv; render(); });
       document.querySelectorAll('[data-tt]').forEach(b => b.onclick = () => { S.ttDay = b.dataset.tt; render(); });
       document.querySelectorAll('[data-cw]').forEach(b => b.onclick = () => { S.calWk = b.dataset.cw; render(); });
-      if ($('#calx')) $('#calx').onclick = () => { const wk = S.calWk || weekOf(TODAY);
-        shareImage({ title: 'Calendario de la semana', wait: 'Preparando la imagen…', build: () => calPoster(wk), name: fileName('calendario', 'club', wk),
-          alt: `Calendario del club, semana del ${calWeekLbl(wk)}`, msg: '', what: 'la imagen' }); };
+      if ($('#calx')) $('#calx').onclick = () => { const wk = S.calWk || weekOf(TODAY), d = $('#calx').dataset.day, f = d === 'week' ? null : addDays(wk, +d - 1);
+        shareImage({ title: f ? 'Calendario del día' : 'Calendario de la semana', wait: 'Preparando la imagen…', build: () => calPoster(wk, f), name: fileName('calendario', 'club', f || wk),
+          alt: f ? `Calendario del club, ${longDate(f)}` : `Calendario del club, semana del ${calWeekLbl(wk)}`, msg: '', what: 'la imagen' }); };
       bindMatches();
       document.querySelectorAll('[data-anu]').forEach(el => {
         const run = async () => {
