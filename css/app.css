@@ -1067,3 +1067,4 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .tt-week .tt-wr > span { border-right-color: #BFC6D4; border-bottom-color: #BFC6D4; }
 .tt .tt-row { border-bottom-color: #BFC6D4; }
 .tt .tt-row .tt-h { border-right-color: #BFC6D4; }
+.last-t { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .last b { flex: none; } .last svg { flex: none; }
