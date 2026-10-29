@@ -1023,3 +1023,14 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .lv-team.tit .lv-tile.hole .num { background: transparent; border: 2px dashed #fff; }
 .lv-team.tit .lv-tile.hole small { color: #fff; }
 #lvdif { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Calendario de la junta: entrenamientos y partidos */
+.cal-bar { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.cal-bar .seg { flex: 1 1 auto; min-width: 0; }
+.cal-bar .btn { flex: none; }
+@media (max-width: 760px) { .cal-bar { flex-direction: column; align-items: stretch; } .cal-bar .seg { width: 100%; } }
+.cal-key { margin: 0; display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .88rem; }
+.tt-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); flex: none; }
+.tt-dot.pa { background: var(--gold); margin-left: 8px; }
+.tt-c { border-left: 4px solid var(--ink); }
+.tt-c.pa { border-left-color: var(--gold); background: var(--gold-soft); cursor: pointer; }
+.tt-c.pa:hover { background: var(--club-soft); }

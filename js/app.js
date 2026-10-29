@@ -2099,30 +2099,93 @@ function trainSessions() {
   return D.equipos.map(e => e.nombre).concat(Object.keys(S.teams).filter(n => !EQ[n]))
     .flatMap(team => sesiones(trainOf(team)).map(x => ({ team, d: x.d, h: x.h || '', where: x.where || '' })));
 }
+/* Calendario de la junta: entrenamientos (cada semana igual) y partidos de todos los equipos, semana a semana */
+const teamOrd = n => { const i = ORDEN.indexOf((EQ[n] || {}).id); return i < 0 ? 99 : i; };
+function calItems(wk) {
+  const end = addDays(wk, 6);
+  const tr = trainSessions().map(x => ({ kind: 'tr', f: addDays(wk, x.d - 1), h: x.h, team: x.team, where: x.where || 'Sin campo' }));
+  const pa = D.equipos.flatMap(e => e.partidos.filter(p => !p.descansa && p.fecha && p.fecha >= wk && p.fecha <= end)
+    .map(p => ({ kind: 'pa', f: p.fecha, h: p.hora || '', team: e.nombre, rival: nice(p.rival), casa: !!p.casa, where: placeOf(p) || '', e, p })));
+  return [...tr, ...pa].sort((a, b) => a.f.localeCompare(b.f) || (a.h || '99').localeCompare(b.h || '99') || (a.kind === 'pa' ? 0 : 1) - (b.kind === 'pa' ? 0 : 1) || teamOrd(a.team) - teamOrd(b.team));
+}
+const calWeekLbl = wk => { const a = toDate(wk), z = toDate(addDays(wk, 6));
+  return a.getMonth() === z.getMonth() ? `${a.getDate()} – ${z.getDate()} ${MES[z.getMonth()]}` : `${a.getDate()} ${MES[a.getMonth()]} – ${z.getDate()} ${MES[z.getMonth()]}`; };
+function calCell(x) {
+  if (x.kind === 'tr') return `<div class="tt-c"><b title="${esc(x.team)}">${esc(x.team)}</b><small>Entreno · ${esc(x.where)}</small></div>`;
+  return `<div class="tt-c pa" data-match="${x.e.id}|${x.p.j}" role="button" tabindex="0" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}"><b title="${esc(x.team)}">${esc(x.team)}</b>
+    <small title="vs ${esc(x.rival)}">${x.p.goles ? scoreTxt(x.p) + ' · ' : ''}${x.casa ? 'Local' : 'Visitante'} · vs ${esc(x.rival)}</small></div>`;
+}
 function trainRows(list) {
   const hours = [...new Set(list.map(x => x.h))].sort((a, b) => (a || '99').localeCompare(b || '99'));
-  return hours.map(h => `<div class="tt-row"><span class="tt-h">${h || 'Sin hora'}</span><div class="tt-cells">${list.filter(x => x.h === h).map(x =>
-    `<div class="tt-c"><b title="${esc(x.team)}">${esc(x.team)}</b><small>${esc(x.where || 'Sin campo')}</small></div>`).join('')}</div></div>`).join('');
+  return hours.map(h => `<div class="tt-row"><span class="tt-h">${h || 'Sin hora'}</span><div class="tt-cells">${list.filter(x => x.h === h).map(calCell).join('')}</div></div>`).join('');
 }
 function trainView() {
-  const all = trainSessions(), sel = S.ttDay || String(dow(TODAY));
+  const now = weekOf(TODAY), wk = S.calWk || now, all = calItems(wk);
+  const sel = S.ttDay || (wk === now ? String(dow(TODAY)) : 'week');
+  const dayIso = i => addDays(wk, i);
+  const nav = `<div class="wk-nav card">
+      <button type="button" class="iconbtn" data-cw="${addDays(wk, -7)}" aria-label="Semana anterior">${ic('back')}</button>
+      <div class="wk-t"><small>${wk === now ? 'Esta semana' : wk === addDays(now, 7) ? 'La semana que viene' : wk === addDays(now, -7) ? 'La semana pasada' : wk < now ? 'Semana pasada' : 'Próximamente'}</small><b>${calWeekLbl(wk)}</b></div>
+      <button type="button" class="iconbtn" data-cw="${addDays(wk, 7)}" aria-label="Semana siguiente">${ic('chev')}</button>
+      ${wk !== now ? `<button type="button" class="more wk-now" data-cw="${now}">Volver a esta semana</button>` : ''}</div>`;
   const seg = `<div class="seg g-scope seg-x" role="group" aria-label="Elige el día">
     <button type="button" data-tt="week" aria-pressed="${sel === 'week'}">Semana</button>${DIAS.map((d, i) =>
-    `<button type="button" data-tt="${i + 1}" aria-pressed="${sel === String(i + 1)}">${d}</button>`).join('')}</div>`;
-  if (!all.length) return seg + emptyPage('cal', 'Todavía no hay entrenamientos', 'Ponlos en cada equipo, en Equipos > el equipo > Entrenamientos.', 'g');
+    `<button type="button" data-tt="${i + 1}" aria-pressed="${sel === String(i + 1)}">${d} ${toDate(dayIso(i)).getDate()}</button>`).join('')}</div>`;
+  const nTr = all.filter(x => x.kind === 'tr').length, nPa = all.filter(x => x.kind === 'pa').length;
+  const top = `${nav}<div class="cal-bar">${seg}<button type="button" class="btn blue" id="calx"${all.length ? '' : ' disabled'}>${ic('send')} Exportar semana</button></div>
+    <p class="muted cal-key"><span class="tt-dot"></span>Entrenamientos · ${nTr}<span class="tt-dot pa"></span>Partidos · ${nPa}</p>`;
+  if (!all.length) return top + emptyPage('cal', 'Nada esta semana', 'No hay entrenamientos ni partidos. Usa las flechas para ver otra semana.', 'g');
   if (sel !== 'week') {
-    const d = +sel, list = all.filter(x => x.d === d);
-    return `${seg}${list.length ? card('h-tt', `${DIAS_D[d - 1]} · ${list.length} equipo${list.length === 1 ? '' : 's'}`, `<div class="tt">${trainRows(list)}</div>`)
-      : emptyPage('cal', `Nadie entrena el ${DIAS_D[d - 1].toLowerCase()}`, 'Elige otro día o mira la semana entera.', 'g')}`;
+    const d = +sel, list = all.filter(x => x.f === dayIso(d - 1));
+    return `${top}${list.length ? card('h-tt', `${DIAS_D[d - 1]} ${toDate(dayIso(d - 1)).getDate()} · ${list.length} ${list.length === 1 ? 'cita' : 'citas'}`, `<div class="tt">${trainRows(list)}</div>`)
+      : emptyPage('cal', `Nada el ${DIAS_D[d - 1].toLowerCase()}`, 'Elige otro día o mira la semana entera.', 'g')}`;
   }
   /* Semana: en el ordenador, una tabla por horas y días; en el móvil, un bloque por día */
   const hours = [...new Set(all.map(x => x.h))].sort((a, b) => (a || '99').localeCompare(b || '99'));
-  const grid = `<div class="tt-week" role="table" aria-label="Entrenamientos de la semana"><div class="tt-wr th" role="row"><span role="columnheader"></span>${DIAS_D.map(d => `<span role="columnheader">${d}</span>`).join('')}</div>
-    ${hours.map(h => `<div class="tt-wr" role="row"><span class="tt-h" role="rowheader">${h || 'Sin hora'}</span>${DIAS_D.map((_, i) => `<span role="cell">${all.filter(x => x.d === i + 1 && x.h === h).map(x =>
-      `<span class="tt-c"><b title="${esc(x.team)}">${esc(x.team)}</b><small>${esc(x.where || 'Sin campo')}</small></span>`).join('')}</span>`).join('')}</div>`).join('')}</div>`;
-  const days = DIAS_D.map((dn, i) => ({ dn, list: all.filter(x => x.d === i + 1) })).filter(x => x.list.length);
-  return `${seg}<div class="tt-desk">${card('h-ttw', 'Semana completa', grid)}</div>
-    <div class="tt-mob stack">${days.map((x, i) => card(`h-tt${i}`, `${x.dn} · ${x.list.length} equipo${x.list.length === 1 ? '' : 's'}`, `<div class="tt">${trainRows(x.list)}</div>`)).join('')}</div>`;
+  const grid = `<div class="tt-week" role="table" aria-label="Calendario de la semana"><div class="tt-wr th" role="row"><span role="columnheader"></span>${DIAS_D.map((d, i) => `<span role="columnheader">${d} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
+    ${hours.map(h => `<div class="tt-wr" role="row"><span class="tt-h" role="rowheader">${h || 'Sin hora'}</span>${DIAS_D.map((_, i) => `<span role="cell">${all.filter(x => x.f === dayIso(i) && x.h === h).map(calCell).join('')}</span>`).join('')}</div>`).join('')}</div>`;
+  const days = DIAS_D.map((dn, i) => ({ dn: `${dn} ${toDate(dayIso(i)).getDate()}`, list: all.filter(x => x.f === dayIso(i)) })).filter(x => x.list.length);
+  return `${top}<div class="tt-desk">${card('h-ttw', 'Semana completa', grid)}</div>
+    <div class="tt-mob stack">${days.map((x, i) => card(`h-tt${i}`, `${x.dn} · ${x.list.length} ${x.list.length === 1 ? 'cita' : 'citas'}`, `<div class="tt">${trainRows(x.list)}</div>`)).join('')}</div>`;
+}
+/* Imagen del calendario de la semana, para mandarla por WhatsApp */
+async function calPoster(wk) {
+  await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
+  const all = calItems(wk), days = DIAS_D.map((dn, i) => ({ dn, f: addDays(wk, i), list: all.filter(x => x.f === addDays(wk, i)) })).filter(x => x.list.length);
+  const W = 1080, ROW = 92, HEAD = 250, DAYH = 100;
+  const H = HEAD + days.reduce((a, d) => a + DAYH + d.list.length * ROW + 24, 0) + 48;
+  const cv = document.createElement('canvas'), x = cv.getContext('2d');
+  cv.width = W; cv.height = H;
+  const BLUE = '#0034DF', GOLD = '#FDCB2B', INK = '#0B0B0B', MUTED = '#5B6475', BG = '#F3F5FA';
+  const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
+  const text = (t, tx, y, w, px, color, maxW, align = 'left') => {
+    x.font = font(w, px); while (px > 14 && x.measureText(t).width > maxW) x.font = font(w, --px);
+    x.fillStyle = color; x.textAlign = align; x.textBaseline = 'middle'; x.fillText(t, tx, y);
+  };
+  const rr = (rx, ry, rw, rh, rad, color) => { x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad);
+    x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); x.fillStyle = color; x.fill(); };
+  const crest = await loadImg('icons/escudo.png').catch(() => null);
+  x.fillStyle = BG; x.fillRect(0, 0, W, H);
+  rr(48, 48, W - 96, 170, 40, BLUE);
+  if (crest) { const k = Math.min(110 / crest.width, 110 / crest.height); x.drawImage(crest, 96, 133 - crest.height * k / 2, crest.width * k, crest.height * k); }
+  text('C.D. Aznalcóllar Fútbol Base', 236, 105, 600, 30, '#FFFFFF', W - 330);
+  text(`Semana del ${calWeekLbl(wk)}`, 236, 158, 800, 50, '#FFFFFF', W - 330);
+  let y = HEAD;
+  for (const d of days) {
+    const h = DAYH + d.list.length * ROW;
+    rr(48, y, W - 96, h, 36, '#FFFFFF');
+    text(longDate(d.f), 88, y + 52, 800, 38, INK, W - 176);
+    d.list.forEach((it, i) => {
+      const ry = y + DAYH + i * ROW - 8;
+      rr(80, ry, W - 160, ROW - 14, 22, BG);
+      rr(80, ry, 12, ROW - 14, 6, it.kind === 'pa' ? GOLD : INK);
+      text(it.h || 'Sin hora', 116, ry + (ROW - 14) / 2, 800, 32, BLUE, 130);
+      text(it.team, 260, ry + 26, 700, 30, INK, W - 260 - 112);
+      text(it.kind === 'pa' ? `Partido · ${it.casa ? 'Local' : 'Visitante'} · vs ${it.rival}` : `Entreno · ${it.where}`, 260, ry + 58, 500, 24, MUTED, W - 260 - 112);
+    });
+    y += h + 24;
+  }
+  return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
 }
 function gamesScreen() {
   return { kicker: S.role === 'coach' ? 'Fines de semana' : 'Todos los equipos', title: 'Partidos', body: gamesView(),
@@ -2172,13 +2235,18 @@ const BOARD = {
         body: `<div class="stack"><div class="team-top">${trainCard(team)}${addPlayerCard(team)}</div><div class="team-top">${modCard(team)}${durCard(team)}</div>${rosterCard(team)}${statsView(team)}</div>`, bind: () => { bindTrain(team); bindRoster(team); bindDur(team); bindMod(team); bindStats(team); } };
     }
     const view = S.eqView === 'train' ? 'train' : 'teams';
-    const vseg = `<div class="seg g-scope" role="group" aria-label="Qué ver"><button type="button" data-eqv="teams" aria-pressed="${view === 'teams'}">Equipos</button><button type="button" data-eqv="train" aria-pressed="${view === 'train'}">Entrenamientos</button></div>`;
+    const vseg = `<div class="seg g-scope" role="group" aria-label="Qué ver"><button type="button" data-eqv="teams" aria-pressed="${view === 'teams'}">Equipos</button><button type="button" data-eqv="train" aria-pressed="${view === 'train'}">Calendario</button></div>`;
     const bindV = () => {
       document.querySelectorAll('[data-eqv]').forEach(b => b.onclick = () => { S.eqView = b.dataset.eqv; render(); });
       document.querySelectorAll('[data-tt]').forEach(b => b.onclick = () => { S.ttDay = b.dataset.tt; render(); });
+      document.querySelectorAll('[data-cw]').forEach(b => b.onclick = () => { S.calWk = b.dataset.cw; render(); });
+      if ($('#calx')) $('#calx').onclick = () => { const wk = S.calWk || weekOf(TODAY);
+        shareImage({ title: 'Calendario de la semana', wait: 'Preparando la imagen…', build: () => calPoster(wk), name: fileName('calendario', 'club', wk),
+          alt: `Calendario del club, semana del ${calWeekLbl(wk)}`, msg: '', what: 'la imagen' }); };
+      bindMatches();
       document.querySelectorAll('.seg-x [aria-pressed="true"]').forEach(b => { const s = b.parentElement; s.scrollLeft = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2; });
     };
-    if (view === 'train') return { kicker: 'Club · Quién entrena cada día', title: 'Entrenamientos', body: `<div class="stack">${vseg}${trainView()}</div>`, bind: bindV };
+    if (view === 'train') return { kicker: 'Club · Entrenamientos y partidos', title: 'Calendario', body: `<div class="stack">${vseg}${trainView()}</div>`, bind: bindV };
     const all = D.equipos.flatMap(e => played(e));
     const wins = all.filter(p => outcome(p) === 'G').length;
     const week = AGENDA.filter(x => x.kind === 'match');
