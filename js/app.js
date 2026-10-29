@@ -1229,9 +1229,11 @@ function pizarra(team, L, players, save, e, p) {
       <div class="pz-h"><div class="pz-vs">${crestBadge(e, L.casa ? us : p.rival, 'mini pz-cr')}<b title="${esc(L.casa ? us : them)}">${esc(L.casa ? us : them)}</b><span>vs</span><b title="${esc(L.casa ? them : us)}">${esc(L.casa ? them : us)}</b>${crestBadge(e, L.casa ? p.rival : us, 'mini pz-cr')}</div>
         <button type="button" class="iconbtn" id="pz-x" aria-label="Cerrar la pizarra">${ic('x')}</button></div>
       <p class="pz-sub"><b id="pz-t">Pizarra</b> · ${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}</p>
-      ${formsOf(team).length ? `<div class="pz-fm"><label for="pz-fm">Formación</label><select id="pz-fm">${formsOf(team).map(x => `<option${x === form ? ' selected' : ''}>${x}</option>`).join('')}</select></div>` : ''}
       <p class="pz-tip${sel != null ? ' on' : ''}" role="status">${sel != null ? `Ahora toca el hueco donde va <b>${esc(pl(sel).n)}</b>.` : '1. Toca un jugador de abajo · 2. Toca su hueco en el campo'}</p>
-      <div class="pz-body"><div class="pz-field" role="group" aria-label="Campo">
+      <div class="pz-body">${formsOf(team).length ? `<section class="card fm pz-fm" aria-labelledby="h-pzfm"><div class="card-h"><h2 id="h-pzfm">Formación</h2><span class="pill">${esc(form)}</span></div>
+        <div class="chips fm-chips" role="radiogroup" aria-label="Formación (fútbol ${modOf(team)})">${formsOf(team).map(x =>
+          `<label class="chip"><input type="radio" name="pzfm" value="${x}"${x === form ? ' checked' : ''}> ${x}</label>`).join('')}</div></section>` : ''}
+      <div class="pz-field" role="group" aria-label="Campo">
         <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
         ${spots.map((sp, i) => { const id = ids[i], q = id != null ? pl(id) : null;
           return `<button type="button" class="pz-s${q ? '' : ' hole'}${sel != null ? ' wait' : ''}" data-pz="${i}" style="left:${sp.x}%;top:${sp.y}%" aria-label="${i ? 'Hueco ' + i : 'Portero'}: ${q ? esc(q.n) : 'vacío'}">
@@ -1247,8 +1249,8 @@ function pizarra(team, L, players, save, e, p) {
         ${ids.some(x => x != null) ? `<button type="button" class="btn ghost block" id="pz-clr">${ic('undo')} Vaciar la pizarra</button>` : ''}</div></div></div></div>`;
     d.querySelector('#pz-x').onclick = close;
     /* Cambiar la formación: los jugadores siguen en el mismo orden y pasan a las posiciones nuevas */
-    if (d.querySelector('#pz-fm')) d.querySelector('#pz-fm').onchange = ev => { form = L.form = ev.target.value; spots = pzSpots(form); n = spots.length; save(); draw();
-      d.querySelector('#pz-fm').focus(); };
+    d.querySelectorAll('[name=pzfm]').forEach(r => r.onchange = () => { form = L.form = r.value; spots = pzSpots(form); n = spots.length; save(); draw();
+      const again = d.querySelector(`[name=pzfm][value="${form}"]`); if (again) again.focus({ preventScroll: true }); });
     if (d.querySelector('#pz-clr')) d.querySelector('#pz-clr').onclick = () => { L.pz.ids = []; sel = null; save(); draw(); };
     d.querySelector('#pz-wa').onclick = () => shareImage({ title: 'Alineación', wait: 'Preparando la imagen…', build: () => pzPoster(team, L, players, e, p),
       name: fileName('alineacion', team, p.fecha), alt: `Alineación del ${team} contra ${them}`, msg: '', what: 'la imagen' });
