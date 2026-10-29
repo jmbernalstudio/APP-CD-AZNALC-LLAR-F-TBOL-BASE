@@ -1132,13 +1132,104 @@ function confirmar(title, text, label) {
   });
 }
 /* Lo que ha pasado, del último al primero */
-function lvTimeline(L, nm) {
+const LV_EDIT = ['gol', 'golr', 'ama', 'roja', 'cambio'];
+function lvTimeline(L, nm, edit) {
   const txt = x => x.t === 'ini' ? `Empieza la ${parteLbl(x.parte)}` : x.t === 'fin' ? (x.parte < L.partes ? `Final de la ${parteLbl(x.parte)}` : 'Final del partido')
     : x.t === 'gol' ? `Gol de ${nm(x.id)}` : x.t === 'golr' ? `Gol del ${L.rival}` : x.t === 'ama' ? `Tarjeta amarilla a ${nm(x.id)}`
     : x.t === 'roja' ? `Tarjeta roja a ${nm(x.id)}${x.doble ? ' (segunda amarilla)' : ''}` : `Entra ${nm(x.in)} y sale ${nm(x.out)}`;
   const icon = x => x.t === 'gol' || x.t === 'golr' ? 'ball' : x.t === 'ama' || x.t === 'roja' ? 'card' : x.t === 'cambio' ? 'swap' : 'whistle';
   if (!L.ev.length) return '<p class="muted" style="margin:0">Todavía no ha pasado nada.</p>';
-  return `<ol class="lv-tl">${L.ev.slice().reverse().map(x => `<li class="lv-x ${x.t}"><span class="lv-mn">${x.min}'</span><span class="lv-ic" aria-hidden="true">${ic(icon(x))}</span><span class="grow">${esc(txt(x))}</span></li>`).join('')}</ol>`;
+  const row = x => `<span class="lv-mn">${x.min}'</span><span class="lv-ic" aria-hidden="true">${ic(icon(x))}</span><span class="grow">${esc(txt(x))}</span>`;
+  return `${edit ? '<p class="muted lv-hint">Toca un apunte para corregirlo o borrarlo.</p>' : ''}<ol class="lv-tl">${L.ev.map((x, i) => [x, i]).reverse().map(([x, i]) => `<li class="lv-x ${x.t}">${edit && LV_EDIT.includes(x.t)
+    ? `<button type="button" class="lv-xb" data-evi="${i}" aria-label="Corregir: ${esc(txt(x))}, minuto ${x.min}">${row(x)}<span class="lv-pen" aria-hidden="true">${ic('pen')}</span></button>` : row(x)}</li>`).join('')}</ol>`;
+}
+/* Rehace el estado (campo, minutos, marcador, expulsados) a partir de los apuntes, después de corregir alguno.
+   Cada apunte guarda su segundo de partido (s) y su parte (p); los del descanso llevan b. Devuelve false si algo no cuadra */
+const lvRank = x => x.t === 'ini' ? 0 : x.b ? 3 : x.t === 'fin' ? 2 : 1;
+function lvRebuild(L) {
+  L.ev.forEach((x, i) => { x._i = i; if (x.p == null) x.p = x.parte || 1; if (x.s == null) x.s = Math.max(0, (parseInt(x.min, 10) || 0) * 60 - 30); });
+  L.ev.sort((a, b) => a.p - b.p || lvRank(a) - lvRank(b) || a.s - b.s || a._i - b._i);
+  L.ev.forEach(x => delete x._i);
+  let campo = [...L.tit], on = false, ok = true;
+  const seg = {}, desde = {}, rojas = [];
+  const out = (id, s) => { if (on) seg[id] = (seg[id] || 0) + s - (desde[id] || 0); };
+  let nos = 0, ellos = 0;
+  for (const x of L.ev) {
+    if (x.t === 'ini') { on = true; campo.forEach(id => { desde[id] = x.s; }); }
+    else if (x.t === 'fin') { campo.forEach(id => out(id, x.s)); on = false; }
+    else if (x.t === 'gol') nos++;
+    else if (x.t === 'golr') ellos++;
+    else if (x.t === 'cambio') {
+      if (!campo.includes(x.out) || campo.includes(x.in) || rojas.includes(x.in)) { ok = false; continue; }
+      out(x.out, x.s); desde[x.in] = x.s; campo = campo.map(id => id === x.out ? x.in : id);
+    } else if (x.t === 'roja' && !rojas.includes(x.id)) {
+      if (campo.includes(x.id)) { out(x.id, x.s); campo = campo.filter(id => id !== x.id); }
+      rojas.push(x.id);
+    }
+  }
+  Object.assign(L, { campo, seg, desde, rojas, nos, ellos });
+  return ok;
+}
+/* Ventana para corregir o borrar un apunte del directo */
+function lvEdit(team, f, L, i, players, after) {
+  const x = L.ev[i], pl = id => players.find(y => y.id === id) || { n: 'Jugador', dorsal: null };
+  const ids = [...new Set([...L.tit, ...L.sup])].sort((a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99));
+  const opts = sel => ids.map(id => `<option value="${id}" ${id === sel ? 'selected' : ''}>${pl(id).dorsal ? pl(id).dorsal + ' · ' : ''}${esc(pl(id).n)}</option>`).join('');
+  const lo = (x.p - 1) * L.min + 1, hi = x.p * L.min + 15;
+  const num = String(x.min).split('+').reduce((a, b) => a + (parseInt(b, 10) || 0), 0);
+  const name = { gol: 'Gol nuestro', golr: 'Gol del rival', ama: 'Tarjeta amarilla', roja: 'Tarjeta roja', cambio: 'Cambio' }[x.t];
+  const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${name}</h2><small>Corregir · ${x.b ? 'en el descanso' : parteLbl(x.p)}</small></div>
+      <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+    <form id="lvef" class="stack" novalidate>
+      ${x.b ? '' : `<label class="f" for="lve-m">Minuto<input type="number" id="lve-m" inputmode="numeric" min="${lo}" max="${hi}" value="${num}"></label>`}
+      ${x.t === 'cambio' ? `<label class="f" for="lve-o">Sale<select id="lve-o">${opts(x.out)}</select></label><label class="f" for="lve-i">Entra<select id="lve-i">${opts(x.in)}</select></label>`
+        : x.t === 'golr' ? '' : `<label class="f" for="lve-p">Jugador<select id="lve-p">${opts(x.id)}</select></label>`}
+      <p id="lveerr" class="err" role="alert" hidden></p>
+      <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="submit" class="btn blue">${ic('check')} Guardar</button></div>
+    </form>
+    <button type="button" class="btn red block" id="lvedel">${ic('trash')} Borrar este apunte</button>`, 'dialog', () => {});
+  m.el.classList.add('rqd');
+  const err = t => { m.el.querySelector('#lveerr').textContent = t; m.el.querySelector('#lveerr').hidden = false; };
+  /* Aplica el cambio; si deja el partido sin cuadrar (p. ej. sale alguien que no estaba en el campo), se deshace */
+  const apply = (fn, msg) => {
+    const prev = JSON.stringify(lvStrip(L)); lvSnap(L); fn();
+    if (!lvRebuild(L)) { const h = L.hist; h.pop(); Object.keys(L).forEach(k => delete L[k]); Object.assign(L, JSON.parse(prev), { hist: h }); return err('Así no cuadra con los demás cambios del partido. Revisa quién estaba en el campo en ese momento.'); }
+    m.close(false); after(msg);
+  };
+  m.el.querySelector('#lvef').onsubmit = ev => {
+    ev.preventDefault();
+    let mm = null;
+    if (!x.b) { mm = +m.el.querySelector('#lve-m').value; if (!(mm >= lo && mm <= hi)) return err(`En la ${parteLbl(x.p)} el minuto va del ${lo} al ${x.p * L.min} (o un poco más si hubo añadido).`); }
+    const o = x.t === 'cambio' ? +m.el.querySelector('#lve-o').value : null, n = x.t === 'cambio' ? +m.el.querySelector('#lve-i').value : null;
+    if (x.t === 'cambio' && o === n) return err('El que sale y el que entra tienen que ser distintos.');
+    apply(() => {
+      if (mm != null) {
+        const ini = L.ev.find(y => y.t === 'ini' && y.p === x.p), fin = L.ev.find(y => y.t === 'fin' && y.p === x.p);
+        const a = ini ? ini.s : (x.p - 1) * L.min * 60, z = fin ? fin.s : L.fase === 'juego' && L.parte === x.p ? lvCap(L) : a + L.min * 60;
+        x.s = Math.min(z, Math.max(a, a + (mm - lo) * 60 + 30));
+        x.min = mm > x.p * L.min ? `${x.p * L.min}+${mm - x.p * L.min}` : String(mm);
+      }
+      if (x.t === 'cambio') { x.out = o; x.in = n; } else if (x.t !== 'golr') x.id = +m.el.querySelector('#lve-p').value;
+    }, 'Apunte corregido');
+  };
+  m.el.querySelector('#lvedel').onclick = async () => {
+    m.close(false);
+    if (!(await ask('¿Borrar este apunte?', `Se quitará “${name}” del minuto ${x.min}.`, 'Sí, borrar'))) return;
+    const prev = JSON.stringify(lvStrip(L)); lvSnap(L); L.ev.splice(L.ev.indexOf(x), 1);
+    if (!lvRebuild(L)) { const h = L.hist; h.pop(); Object.keys(L).forEach(k => delete L[k]); Object.assign(L, JSON.parse(prev), { hist: h }); return say('No se puede borrar: los cambios de después dependen de él. Borra antes esos cambios.'); }
+    after('Apunte borrado');
+  };
+  (m.el.querySelector('#lve-m') || m.el.querySelector('select') || m.el.querySelector('[data-v]')).focus();
+}
+/* Borrar el directo entero: vuelve a "sin empezar" y quita los minutos y goles que guardó de ese partido */
+async function lvDelete(team, f) {
+  if (!(await ask('¿Borrar el directo?', 'Se borra todo lo apuntado en este partido (titulares, goles, tarjetas, cambios y minutos) y queda como si no se hubiera empezado.', 'Sí, borrar el directo'))) return;
+  const ids = S.teams[team].players.filter(x => statOf(x.id, f)).map(x => x.id);
+  try { if (API()) { if (!(S.live && S.directoOff)) await API().borrarDirecto(team, f); if (ids.length && statsOn()) await API().estadisticas(f, [], ids); } }
+  catch (_) { return say('No se ha podido borrar. Revisa la conexión.'); }
+  try { localStorage.removeItem(lvKey(team, f)); } catch (_) {}
+  delete S.actas[`${team} ${f}`]; ids.forEach(id => { delete S.stats[id][f]; });
+  S.lv = null; clearInterval(S.lvTick); render(); say('Directo borrado. El partido vuelve a estar sin empezar.');
 }
 /* Minutos y goles que pasan a las estadísticas al acabar */
 function lvRows(L) {
@@ -1211,7 +1302,7 @@ function lvScreen(team, back) {
           ev.preventDefault();
           if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular.'; $('#lverr').hidden = false; return; }
           lvSnap(L); L.parte = 1; L.fase = 'juego'; L.ini = Date.now(); L.campo = [...L.tit].sort(byDor); L.campo.forEach(id => { L.desde[id] = 0; });
-          L.ev.push({ t: 'ini', parte: 1, min: '0' }); save(); render(); say('¡Empieza el partido!');
+          L.ev.push({ t: 'ini', parte: 1, min: '0', s: 0, p: 1 }); save(); render(); say('¡Empieza el partido!');
         };
       } };
   }
@@ -1225,9 +1316,17 @@ function lvScreen(team, back) {
         ${card('h-lvm', 'Minutos y goles', rows.length ? `<div class="st-head lv-h" aria-hidden="true"><span>Jugador</span><span></span><span>Min.</span><span>Goles</span></div><div class="st-list">${rows.map(r => `<div class="st-row lv-row"><span class="k">${pl(r.id).dorsal || '–'}</span>
           <span class="st-n"><b title="${esc(pl(r.id).n)}">${esc(pl(r.id).n)}</b><small>${L.tit.includes(r.id) ? 'Titular' : 'Suplente'}</small></span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>
           <p class="muted st-foot">Ya están sumados a las estadísticas de cada jugador.</p>` : '<p class="muted" style="margin:0">No jugó nadie.</p>')}
-        <button type="button" class="btn outline block" id="lvfix">${ic('pen')} Corregir minutos y goles</button></div>
-        ${card('h-lvt', 'Lo que pasó', lvTimeline(L, nm))}</div>`,
-      bind() { $('#lvfix').onclick = () => { S.stDate = f; S.stDraft = null; go('team', S.role === 'coach' ? 'st' : 'st:' + team); }; } };
+        <button type="button" class="btn outline block" id="lvfix">${ic('pen')} Corregir minutos y goles</button>
+        <button type="button" class="btn red block" id="lvdel">${ic('trash')} Borrar el directo</button></div>
+        ${card('h-lvt', 'Lo que pasó', lvTimeline(L, nm, true))}</div>`,
+      bind() {
+        $('#lvfix').onclick = () => { S.stDate = f; S.stDraft = null; go('team', S.role === 'coach' ? 'st' : 'st:' + team); };
+        $('#lvdel').onclick = () => lvDelete(team, f);
+        /* Corregir un apunte del acta: se vuelven a calcular los minutos y goles de las estadísticas */
+        document.querySelectorAll('[data-evi]').forEach(b => b.onclick = () => lvEdit(team, f, L, +b.dataset.evi, t.players, async msg => {
+          save(); try { await lvToStats(team, f, L); } catch (_) {} render(); say(msg);
+        }));
+      } };
   }
 
   /* --- En juego o en el descanso --- */
@@ -1247,8 +1346,9 @@ function lvScreen(team, back) {
         <button type="button" class="lv-a undo" id="lvundo"${L.hist && L.hist.length ? '' : ' disabled'}><span class="lv-ai" aria-hidden="true">${ic('undo')}</span><span>Deshacer</span></button></div>
       ${card('h-lvc', `En el campo · ${L.campo.length}`, L.campo.length ? L.campo.slice().sort(byDor).map(id => prow(id, true)).join('') : '<p class="muted" style="margin:0">No hay nadie en el campo.</p>')}
       ${card('h-lvb', `Banquillo · ${banca().length}`, banca().length ? banca().map(id => prow(id, false)).join('') : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>')}
-      ${L.rojas.length ? card('h-lvr', 'Expulsados', L.rojas.map(id => prow(id, false)).join('')) : ''}</div>
-      ${card('h-lvt', 'Lo que ha pasado', lvTimeline(L, nm))}</div>`,
+      ${L.rojas.length ? card('h-lvr', 'Expulsados', L.rojas.map(id => prow(id, false)).join('')) : ''}
+      <button type="button" class="btn red block" id="lvdel">${ic('trash')} Borrar el directo</button></div>
+      ${card('h-lvt', 'Lo que ha pasado', lvTimeline(L, nm, true))}</div>`,
     bind() {
       clearInterval(S.lvTick);
       if (playing) {
@@ -1260,9 +1360,11 @@ function lvScreen(team, back) {
         try { if ('wakeLock' in navigator && !S.lvLock) navigator.wakeLock.request('screen').then(l => { S.lvLock = l; l.onrelease = () => { S.lvLock = null; }; }).catch(() => {}); } catch (_) {}
       }
       const done = msg => { save(); render(); if (msg) say(msg); };
+      $('#lvdel').onclick = () => lvDelete(team, f);
+      document.querySelectorAll('[data-evi]').forEach(b => b.onclick = () => lvEdit(team, f, L, +b.dataset.evi, t.players, done));
       if ($('#lvgo')) $('#lvgo').onclick = () => {
         lvSnap(L); L.parte++; L.fase = 'juego'; L.ini = Date.now(); L.campo.forEach(id => { L.desde[id] = L.acc; });
-        L.ev.push({ t: 'ini', parte: L.parte, min: String((L.parte - 1) * L.min) }); done(`Empieza la ${parteLbl(L.parte)}`);
+        L.ev.push({ t: 'ini', parte: L.parte, min: String((L.parte - 1) * L.min), s: L.acc, p: L.parte }); done(`Empieza la ${parteLbl(L.parte)}`);
       };
       if ($('#lvend')) $('#lvend').onclick = async () => {
         if (last && !(await confirmar('¿Finalizar el partido?', 'Se guardan el resultado, los minutos y los goles de cada jugador en las estadísticas.', 'Sí, finalizar'))) return;
@@ -1270,7 +1372,7 @@ function lvScreen(team, back) {
         const c = lvCap(L), mn = lvMin(L);
         L.campo.forEach(id => { L.seg[id] = (L.seg[id] || 0) + c - (L.desde[id] || 0); });
         L.acc = c; L.ini = null; L.fase = last ? 'fin' : 'pausa';
-        L.ev.push({ t: 'fin', parte: L.parte, min: mn });
+        L.ev.push({ t: 'fin', parte: L.parte, min: mn, s: c, p: L.parte });
         if (!last) return done(`Final de la ${parteLbl(L.parte)}`);
         try { await lvToStats(team, f, L); L.hist = []; done('Partido finalizado. Minutos y goles guardados en las estadísticas.'); }
         catch (_) { done('Partido finalizado. Las estadísticas no se han podido guardar: usa “Corregir minutos y goles”.'); }
@@ -1280,19 +1382,19 @@ function lvScreen(team, back) {
         const h = L.hist; Object.keys(L).forEach(x => delete L[x]); Object.assign(L, JSON.parse(prev), { hist: h }); done('Deshecho');
       };
       document.querySelectorAll('[data-lva]').forEach(b => b.onclick = async () => {
-        const a = b.dataset.lva, mn = lvMin(L);
-        if (a === 'golr') { lvSnap(L); L.ellos++; L.ev.push({ t: 'golr', min: mn }); return done(`Gol del ${them} en el minuto ${mn}`); }
+        const a = b.dataset.lva, mn = lvMin(L), at = playing ? { s: lvCap(L), p: L.parte } : { s: L.acc, p: L.parte, b: true };
+        if (a === 'golr') { lvSnap(L); L.ellos++; L.ev.push({ t: 'golr', min: mn, ...at }); return done(`Gol del ${them} en el minuto ${mn}`); }
         if (a === 'gol') {
           const id = await pickPlayer('¿Quién ha marcado?', `Minuto ${mn}`, L.campo.slice().sort(byDor), t.players); if (id == null) return;
-          lvSnap(L); L.nos++; L.ev.push({ t: 'gol', id, min: mn }); return done(`Gol de ${pl(id).n} en el minuto ${mn}`);
+          lvSnap(L); L.nos++; L.ev.push({ t: 'gol', id, min: mn, ...at }); return done(`Gol de ${pl(id).n} en el minuto ${mn}`);
         }
         if (a === 'ama' || a === 'roja') {
           const id = await pickPlayer(a === 'ama' ? '¿A quién le sacan amarilla?' : '¿A quién le sacan roja?', `Minuto ${mn}`, [...L.campo.slice().sort(byDor), ...banca()], t.players); if (id == null) return;
           lvSnap(L);
           const doble = a === 'ama' && lvYellow(L, id) >= 1;
-          L.ev.push({ t: 'ama' === a ? 'ama' : 'roja', id, min: mn });
+          L.ev.push({ t: 'ama' === a ? 'ama' : 'roja', id, min: mn, ...at });
           if (a === 'roja' || doble) {
-            if (doble) L.ev.push({ t: 'roja', id, min: mn, doble: true });
+            if (doble) L.ev.push({ t: 'roja', id, min: mn, doble: true, ...at });
             if (L.campo.includes(id)) { if (playing) L.seg[id] = (L.seg[id] || 0) + lvCap(L) - (L.desde[id] || 0); L.campo = L.campo.filter(x => x !== id); }
             L.rojas.push(id);
           }
@@ -1304,7 +1406,7 @@ function lvScreen(team, back) {
           lvSnap(L);
           if (playing) { const c = lvCap(L); L.seg[out] = (L.seg[out] || 0) + c - (L.desde[out] || 0); L.desde[inn] = c; } else L.desde[inn] = L.acc;
           L.campo = L.campo.map(x => x === out ? inn : x);
-          L.ev.push({ t: 'cambio', out, in: inn, min: mn }); return done(`Entra ${pl(inn).n} y sale ${pl(out).n}`);
+          L.ev.push({ t: 'cambio', out, in: inn, min: mn, ...at }); return done(`Entra ${pl(inn).n} y sale ${pl(out).n}`);
         }
       });
     } };
