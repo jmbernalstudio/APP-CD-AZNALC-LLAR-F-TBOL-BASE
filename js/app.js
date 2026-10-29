@@ -1327,8 +1327,6 @@ async function pzPoster(team, L, players, e, p) {
   const photos = {}; await Promise.all([...ids, ...bench].filter(id => id != null && pl(id).foto).map(async id => { photos[id] = await loadImg(pl(id).foto); }));
   const logo = (img, cx, cy, sz, name) => { if (img) { const k = Math.min(sz / img.width, sz / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); }
     else { x.beginPath(); x.arc(cx, cy, sz / 2, 0, Math.PI * 2); x.fillStyle = INK; x.fill(); text(initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, '')), cx, cy + 2, 800, 36, '#FFFFFF', sz, 'center'); } };
-  /* Tarjeta blanca con la misma sombra suave que las de la app */
-  const card = (rx, ry, rw, rh, rad) => { x.save(); x.shadowColor = 'rgba(0,0,0,.16)'; x.shadowBlur = 40; x.shadowOffsetY = 14; rr(rx, ry, rw, rh, rad, '#FFFFFF'); x.restore(); };
   /* Cara del jugador: foto, si no dorsal, si no el icono de persona */
   const face = (id, cx, cy, r, bg = BLUE) => { const q = pl(id);
     x.beginPath(); x.arc(cx, cy, r + 4, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
@@ -1340,7 +1338,7 @@ async function pzPoster(team, L, players, e, p) {
       x.beginPath(); x.arc(cx, cy + r * 0.72, r * 0.58, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); } };
   x.fillStyle = '#F3F5F9'; x.fillRect(0, 0, W, H);
   /* Cabecera: la misma tarjeta del partido que se ve en la pantalla */
-  card(PAD, PAD, FW, HEAD, 48);
+  rr(PAD, PAD, FW, HEAD, 48, '#FFFFFF');   /* sin sombra en la imagen */
   x.font = font(700, 30); const pw = Math.min(x.measureText(team).width, 420) + 48;
   rr(PAD + 36, PAD + 32, pw, 60, 30, SOFT); text(team, PAD + 60, PAD + 63, 700, 30, BLUE, 420);
   const res = p.goles ? outcome(p) : null;
