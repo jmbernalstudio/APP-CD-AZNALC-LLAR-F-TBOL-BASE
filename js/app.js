@@ -741,7 +741,7 @@ const DURACION = { senior: 90, juvenil: 90, cadete: 60, infantil: 80, alevin2: 7
 const durOf = team => { const t = S.teams[team], e = EQ[team]; return t && t.dur ? t.dur : { partes: 2, min: ((e && DURACION[e.id]) || 0) / 2 }; };
 /* Fútbol 7 o fútbol 11: marca cuántos titulares hay y cuántos se pueden convocar (titulares + 7 suplentes).
    La junta lo cambia en Equipos > el equipo; si no, el de abajo */
-const MODALIDAD = { senior: 11, juvenil: 11, infantil: 7, cadete: 7, alevin2: 7, alevin1: 7, benjamin2: 7, benjamin1: 7, prebenjamin: 7, minis: 7 };
+const MODALIDAD = { senior: 11, juvenil: 11, infantil: 11, cadete: 7, alevin2: 7, alevin1: 7, benjamin2: 7, benjamin1: 7, prebenjamin: 7, minis: 7 };
 const modOf = team => (S.teams[team] && S.teams[team].mod) || (EQ[team] && MODALIDAD[EQ[team].id]) || 11;
 const maxConv = team => modOf(team) + 7;
 function modCard(team) {
