@@ -1022,3 +1022,4 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .lv-team.tit .lv-tile.hole { background: transparent; border: 2px dashed #fff; color: #fff; cursor: default; padding: 10px 4px 8px; }
 .lv-team.tit .lv-tile.hole .num { background: transparent; border: 2px dashed #fff; }
 .lv-team.tit .lv-tile.hole small { color: #fff; }
+#lvdif { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
