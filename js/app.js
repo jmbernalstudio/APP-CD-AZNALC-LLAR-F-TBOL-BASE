@@ -1139,19 +1139,29 @@ function lvScreen(team, back) {
   const tag = `${dateLbl(f)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}`;
   const kicker = `Directo · ${esc(team)}`, title = `vs ${esc(them)}`;
 
-  /* --- Antes de empezar: titulares y suplentes --- */
+  /* --- Antes de empezar: hace falta la convocatoria, y de ella salen titulares y suplentes --- */
+  const cv = S.conv[convKey(team, p)];
+  if (L.fase === 'previa' && !cv) {
+    const canConv = S.role === 'coach' && p === nextMatch(e);
+    return { kicker, title, back,
+      body: emptyPage('list', 'Primero, la convocatoria', canConv ? 'Para empezar el directo hace falta la convocatoria de este partido. Hazla y vuelve aquí para elegir titulares y suplentes.'
+        : 'Para empezar el directo hace falta la convocatoria de este partido. La hace el entrenador del equipo desde su app.', '',
+        canConv ? `<button type="button" class="btn blue" id="lvconv">${ic('list')} Hacer la convocatoria</button>` : ''),
+      bind() { if ($('#lvconv')) $('#lvconv').onclick = () => { S.team = team; S.convLv = { team, fecha: p.fecha, from: S.lvFrom }; go('team', 'conv'); }; } };
+  }
   if (L.fase === 'previa') {
-    const st = id => L.tit.includes(id) ? 'tit' : L.sup.includes(id) ? 'sup' : 'no';
-    const list = [...t.players].sort((a, b) => byDor(a.id, b.id));
+    /* Si la convocatoria ha cambiado, solo cuentan los convocados */
+    L.tit = L.tit.filter(id => cv.ids.includes(id)); L.sup = [...new Set([...L.sup.filter(id => cv.ids.includes(id)), ...cv.ids.filter(id => !L.tit.includes(id) && !L.sup.includes(id))])];
+    const st = id => L.tit.includes(id) ? 'tit' : 'sup';
+    const list = t.players.filter(x => cv.ids.includes(x.id)).sort((a, b) => byDor(a.id, b.id));
     const counts = () => `<b>${L.tit.length}</b> titulares · <b>${L.sup.length}</b> suplentes`;
     return { kicker, title, back,
       body: `<div class="split"><div class="stack">
         <section class="card match" aria-label="Partido"><span class="tag">${tag}</span>${score}
           <small class="cv-place">${ic('clock')} ${L.partes} partes de ${L.min} minutos</small></section>
-        <p class="muted" style="margin:0">Antes de empezar, elige quién sale de titular y quién se queda en el banquillo.</p>
-        ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
+        <p class="muted" style="margin:0">Estos son los ${list.length} convocados. Elige quién sale de titular y quién empieza en el banquillo.</p>
         <ul class="st-es">${list.map(x => `<li class="st-e lv-pre" data-lvp="${x.id}"><div class="lv-who"><span class="num" aria-hidden="true">${x.dorsal || '–'}</span><b title="${esc(x.n)}">${esc(x.n)}</b></div>
-          <div class="seg lv-3" role="group" aria-label="${esc(x.n)}">${[['tit', 'Titular'], ['sup', 'Suplente'], ['no', 'No va']].map(([v, l]) => `<button type="button" data-st="${v}" aria-pressed="${st(x.id) === v}">${l}</button>`).join('')}</div></li>`).join('')}</ul></div>
+          <div class="seg lv-3" role="group" aria-label="${esc(x.n)}">${[['tit', 'Titular'], ['sup', 'Suplente']].map(([v, l]) => `<button type="button" data-st="${v}" aria-pressed="${st(x.id) === v}">${l}</button>`).join('')}</div></li>`).join('')}</ul></div>
         <form id="lvf" class="card stack st-save" novalidate aria-labelledby="h-lvs"><h2 id="h-lvs" style="margin:0;font-size:1.1rem">Empezar el partido</h2>
           <p class="muted" style="margin:0" id="lvcnt" aria-live="polite">${counts()}</p>
           <p class="muted" style="margin:0">Pulsa “Iniciar partido” cuando el árbitro pite el comienzo. El cronómetro empieza a contar.</p>
@@ -1162,7 +1172,7 @@ function lvScreen(team, back) {
           const id = +li.dataset.lvp;
           li.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
             L.tit = L.tit.filter(x => x !== id); L.sup = L.sup.filter(x => x !== id);
-            if (b.dataset.st === 'tit') L.tit.push(id); if (b.dataset.st === 'sup') L.sup.push(id);
+            (b.dataset.st === 'tit' ? L.tit : L.sup).push(id);
             li.querySelectorAll('[data-st]').forEach(x => x.setAttribute('aria-pressed', x === b));
             $('#lvcnt').innerHTML = counts(); save();
           });
@@ -1402,7 +1412,11 @@ function convScreen() {
         if (!check()) return;
         const val = { ids: [...c.ids], hora: c.hora, lugar: c.lugar, nota: c.nota };
         try { API() && await API().convocatoria(team, p.fecha, val); } catch (_) { $('#cverr').textContent = 'No se ha podido guardar. Revisa la conexión.'; $('#cverr').hidden = false; return; }
-        S.conv[k] = val; S.convDraft = null; go('home'); say(`Convocatoria guardada: ${val.ids.length} jugadores. Para mandarla por WhatsApp, vuelve a abrir la convocatoria.`);
+        S.conv[k] = val; S.convDraft = null;
+        /* Si se vino desde el directo, se vuelve a él para elegir titulares */
+        const lv = S.convLv; S.convLv = null;
+        if (lv && lv.team === team && lv.fecha === p.fecha) { openLv(team, p.fecha); S.lvFrom = lv.from; return say(`Convocatoria guardada: ${val.ids.length} jugadores. Ya puedes elegir titulares y suplentes.`); }
+        go('home'); say(`Convocatoria guardada: ${val.ids.length} jugadores. Para mandarla por WhatsApp, vuelve a abrir la convocatoria.`);
       };
     }
   };
