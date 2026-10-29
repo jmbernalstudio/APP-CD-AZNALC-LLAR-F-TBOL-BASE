@@ -537,7 +537,7 @@ function openMatch(e, p) {
       <div class="wide"><dt>Campo</dt><dd>${placeOf(p) ? esc(placeOf(p)) : 'Por confirmar'}</dd></div>
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
     ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
-    ${p.campo && !p.casa ? `<a class="btn blue block" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}">${ic('pin')} Cómo llegar</a>` : ''}
+    ${p.campo && !p.casa ? `<a class="btn blue block" target="_blank" rel="noopener" href="${esc(mapsUrl(p))}">${ic('pin')} Cómo llegar</a>` : ''}
     ${lvAvail(e, p) ? `<button type="button" class="btn blue block" id="mx-lv">${ic(actaOf(e.nombre, p.fecha) && actaOf(e.nombre, p.fecha).fase === 'fin' ? 'list' : (actaOf(e.nombre, p.fecha) || {}).fase && actaOf(e.nombre, p.fecha).fase !== 'previa' ? 'play' : 'pen')} ${(() => { const a = actaOf(e.nombre, p.fecha); return !a || a.fase === 'previa' ? 'Rellenar datos' : a.fase === 'fin' ? 'Ver acta del partido' : 'Seguir el directo'; })()}</button>` : ''}
     ${fichaAvail(e, p) ? `<button type="button" class="btn outline block" id="mx-fp">${ic('list')} Ficha del partido</button>` : ''}
     ${p.goles && S.teams[e.nombre] && statsOn() && !stFilled(e.nombre, p.fecha) ? `<button type="button" class="btn outline block" id="mx-st">${ic('clock')} Apuntar minutos y goles</button>` : ''}
@@ -620,7 +620,9 @@ async function matchPoster(e, p) {
   return new Promise(ok => cv.toBlob(b => ok(b), 'image/png'));
 }
 /* Texto con la ubicación del campo (solo de visitante: de local jugamos en casa) */
-const mapsMsg = p => p.campo && !p.casa ? `*Cómo llegar y ubicación del partido:*\n\n📍 https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}` : '';
+/* En la Liga Educa, el enlace de Google Maps que trae el PDF de la liga; si no, se busca el campo por su nombre */
+const mapsUrl = p => /^https:\/\//.test(p.maps || '') ? p.maps : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}`;
+const mapsMsg = p => p.campo && !p.casa ? `*Cómo llegar y ubicación del partido:*\n\n📍 ${mapsUrl(p)}` : '';
 /* Ventana para mandar una imagen por WhatsApp. Muchos móviles (iPhone y algunos Android) quitan el texto
    cuando se comparte una imagen, así que la ubicación va en un segundo paso con un enlace de WhatsApp,
    que abre el chat con el texto ya escrito en los dos sistemas. Al compartir la imagen, el texto también queda copiado */
@@ -2136,17 +2138,6 @@ function calItems(wk) {
 }
 const calWeekLbl = wk => { const a = toDate(wk), z = toDate(addDays(wk, 6));
   return a.getMonth() === z.getMonth() ? `${a.getDate()} – ${z.getDate()} ${MES[z.getMonth()]}` : `${a.getDate()} ${MES[a.getMonth()]} – ${z.getDate()} ${MES[z.getMonth()]}`; };
-function calCell(x) {
-  if (x.kind === 'tr') return `<div class="tt-c${x.anul ? ' anul' : ''}" data-anu="${esc(x.team)}|${x.f}" role="button" tabindex="0" aria-label="${x.anul ? 'Entrenamiento anulado' : 'Entrenamiento'} del ${esc(x.team)}. Toca para ${x.anul ? 'recuperarlo' : 'anularlo'}">
-    <b title="${esc(x.team)}">${esc(x.team)}</b><small>${x.anul ? 'Entrenamiento anulado' : `${x.h ? `${x.h}–${trainEnd(x.team, x.h)} · ` : ''}${esc(x.where)}`}</small></div>`;
-  const us = crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr'), them = crestBadge(x.e, x.p.rival, 'mini tt-cr');
-  return `<div class="tt-c pa" data-match="${x.e.id}|${x.p.j}" role="button" tabindex="0" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}"><b title="${esc(x.team)}">${esc(x.team)}</b>${x.h ? `<small>${x.h}–${hhmm(hm2min(x.h) + matchMin(x.team))} · Partido</small>` : ''}
-    <span class="tt-vs">${x.casa ? us + them : them + us}<small title="vs ${esc(x.rival)}">${x.p.goles ? scoreTxt(x.p) + ' · ' : ''}${x.casa ? 'Local' : 'Visitante'} · ${esc(x.rival)}</small></span></div>`;
-}
-function trainRows(list) {
-  const hours = [...new Set(list.map(x => x.h))].sort((a, b) => (a || '99').localeCompare(b || '99'));
-  return hours.map(h => `<div class="tt-row"><span class="tt-h${h ? '' : ' nh'}">${h || 'Sin hora'}</span><div class="tt-cells">${list.filter(x => x.h === h).map(calCell).join('')}</div></div>`).join('');
-}
 function trainView() {
   const now = weekOf(TODAY), wk = S.calWk || now, all = calItems(wk);
   const sel = S.ttDay || (wk === now ? String(dow(TODAY)) : 'week');
@@ -2164,33 +2155,58 @@ function trainView() {
     <p class="muted cal-key"><span class="tt-dot"></span>Entrenamientos · ${nTr}<span class="tt-dot pa"></span>Partidos · ${nPa}</p>
     <p class="muted cal-tip">Toca un entrenamiento para anularlo esta semana.</p>`;
   if (!all.length) return top + emptyPage('cal', 'Nada esta semana', 'No hay entrenamientos ni partidos. Usa las flechas para ver otra semana.', 'g');
-  /* Rejilla por horas (como Google Calendar) de los días idx (0 = lunes) */
-  const timeGrid = (idx, all) => {
-  /* Ordenador: cada cita ocupa todo su tiempo (los entrenamientos 1 h 30, los Minis 1 h; los partidos sus partes y el descanso),
-     en franjas de media hora; lo que no tiene hora va arriba */
-  const SLOT = 30, PX = 46;
-  const timed = all.filter(x => x.h).map(x => ({ ...x, a: hm2min(x.h), z: hm2min(x.h) + (x.kind === 'tr' ? trainMin(x.team) : matchMin(x.team)) })), loose = all.filter(x => !x.h);
-  const t0 = timed.length ? Math.floor(Math.min(...timed.map(x => x.a)) / SLOT) * SLOT : 0, t1 = timed.length ? Math.ceil(Math.max(...timed.map(x => x.z)) / SLOT) * SLOT : 0;
-  const slots = (t1 - t0) / SLOT;
-  /* Los días con citas a la vez son más anchos, para que cada una se lea */
-  const byDay = idx.map(i => calLanes(timed.filter(x => x.f === dayIso(i))));
-  const cols = `grid-template-columns:var(--hcol) ${byDay.map(l => `minmax(0,${Math.max(1, ...l.map(x => x.n))}fr)`).join(' ')}`;
-  return `<div class="tt-week tg" role="table" aria-label="Calendario de la semana"><div class="tt-wr th" role="row" style="${cols}"><span role="columnheader"></span>${idx.map(i => `<span role="columnheader">${DIAS_D[i]} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
-    ${loose.length ? `<div class="tt-wr" role="row" style="${cols}"><span class="tt-h nh" role="rowheader">Sin hora</span>${idx.map(i => `<span role="cell">${loose.filter(x => x.f === dayIso(i)).map(calCell).join('')}</span>`).join('')}</div>` : ''}
-    ${slots ? `<div class="tg-body" style="--px:${PX}px;height:${slots * PX}px;${cols}"><div class="tg-hours">${Array.from({ length: slots }, (_, k) => `<span class="tt-h">${hhmm(t0 + k * SLOT)}</span>`).join('')}</div>
-      ${byDay.map(l => `<div class="tg-day">${l.map(x =>
-        `<div class="tg-ev" style="top:${(x.a - t0) / SLOT * PX + 3}px;height:${(x.z - x.a) / SLOT * PX - 6}px;left:calc(${x.lane} * 100% / ${x.n} + 4px);width:calc(100% / ${x.n} - 8px)">${calCell(x)}</div>`).join('')}</div>`).join('')}</div>` : ''}</div>`;
+  const endOf = x => x.h ? hhmm(hm2min(x.h) + (x.kind === 'tr' ? trainMin(x.team) : matchMin(x.team))) : '';
+  const span = x => x.h ? `${x.h}–${endOf(x)}` : 'Sin hora';
+  /* Una cita dentro de la tabla: la hora en grande y debajo el campo (o el rival con los escudos) */
+  const chip = (x, withTeam) => {
+    const tm = withTeam ? `<b class="tt-tm" title="${esc(x.team)}">${esc(x.team)}</b>` : '';
+    if (x.kind === 'tr') return `<div class="tt-c${x.anul ? ' anul' : ''}" data-anu="${esc(x.team)}|${x.f}" role="button" tabindex="0" aria-label="${x.anul ? 'Entrenamiento anulado' : 'Entrenamiento'} del ${esc(x.team)}, ${span(x)}. Toca para ${x.anul ? 'recuperarlo' : 'anularlo'}">
+      ${tm}<b class="tt-t">${span(x)}</b><small>${x.anul ? 'Anulado' : esc(x.where)}</small></div>`;
+    const us = crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr'), them = crestBadge(x.e, x.p.rival, 'mini tt-cr');
+    return `<div class="tt-c pa" data-match="${x.e.id}|${x.p.j}" role="button" tabindex="0" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}, ${span(x)}">
+      ${tm}<b class="tt-t">${span(x)}</b><span class="tt-vs">${x.casa ? us + them : them + us}<small>${x.p.goles ? `${scoreTxt(x.p)} · ` : ''}${x.casa ? 'Local' : 'Visitante'}</small></span><small title="${esc(x.rival)}">${esc(x.rival)}</small></div>`;
   };
+  const teamsOf = list => [...new Set(list.map(x => x.team))].sort((a, b) => teamOrd(a) - teamOrd(b));
+  /* Semana en el ordenador: una fila por equipo y una columna por día */
+  const weekTable = () => `<div class="pl" role="table" aria-label="Calendario de la semana por equipos">
+    <div class="pl-r pl-th" role="row"><span role="columnheader">Equipo</span>${DIAS_D.map((d, i) => `<span role="columnheader"${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${d} ${toDate(dayIso(i)).getDate()}</span>`).join('')}</div>
+    ${teamsOf(all).map(t => `<div class="pl-r" role="row"><span class="pl-tm" role="rowheader" title="${esc(t)}"><span>${esc(t)}</span></span>${DIAS.map((_, i) =>
+      `<span role="cell"${dayIso(i) === TODAY ? ' class="hoy"' : ''}>${all.filter(x => x.team === t && x.f === dayIso(i)).map(x => chip(x)).join('')}</span>`).join('')}</div>`).join('')}</div>`;
+  /* Un día en el ordenador: una fila por equipo y las horas en horizontal; cada cita ocupa todo su tiempo */
+  const dayGantt = list => {
+    const timed = list.filter(x => x.h).map(x => ({ ...x, a: hm2min(x.h), z: hm2min(endOf(x)) })), loose = list.filter(x => !x.h);
+    const t0 = timed.length ? Math.floor(Math.min(...timed.map(x => x.a)) / 60) * 60 : 0, t1 = timed.length ? Math.ceil(Math.max(...timed.map(x => x.z)) / 60) * 60 : 60;
+    const n = (t1 - t0) / 30, pc = m => (m - t0) / (t1 - t0) * 100;
+    return `<div class="gt" role="table" aria-label="Calendario del día por equipos" style="--n:${n}">
+      <div class="gt-r gt-th" role="row"><span role="columnheader">Equipo</span><span class="gt-ax" role="columnheader">${Array.from({ length: n }, (_, k) => `<i>${k % 2 ? '' : hhmm(t0 + k * 30)}</i>`).join('')}</span></div>
+      ${teamsOf(list).map(t => { const mine = calLanes(timed.filter(x => x.team === t)), sin = loose.filter(x => x.team === t);
+        return `<div class="gt-r" role="row"><span class="pl-tm" role="rowheader" title="${esc(t)}"><span>${esc(t)}</span></span><span class="gt-tl" role="cell" style="height:${Math.max(1, ...mine.map(x => x.n)) * 76 + (sin.length ? 70 : 0)}px">
+          ${mine.map(x => `<span class="gt-ev" style="left:${pc(x.a)}%;width:${pc(x.z) - pc(x.a)}%;top:${x.lane * 76 + 6}px;height:64px">${chip(x)}</span>`).join('')}
+          ${sin.length ? `<span class="gt-sin">${sin.map(x => chip(x)).join('')}</span>` : ''}</span></div>`; }).join('')}</div>`;
+  };
+  /* En el móvil y la tableta: lista por horas, con el principio y el final de cada cita */
+  const dayList = list => `<div class="tl">${list.map(x => `<div class="tl-r"><span class="tl-t">${x.h ? `<b>${x.h}</b><small>${endOf(x)}</small>` : '<small>Sin hora</small>'}</span>${chip(x, true)}</div>`).join('')}</div>`;
+  /* Versiones para que la junta elija (provisional) */
+  const V = S.calV || 1;
+  const weekCols = () => `<div class="kc">${DIAS_D.map((d, i) => { const l = all.filter(x => x.f === dayIso(i));
+    return `<div class="kc-c"><div class="kc-h${dayIso(i) === TODAY ? ' hoy' : ''}">${d} ${toDate(dayIso(i)).getDate()}</div>${l.map(x => chip(x, true)).join('') || '<p class="muted kc-0">Nada</p>'}</div>`; }).join('')}</div>`;
+  const wideList = list => `<div class="wl">${list.map(x => `<div class="wl-r${x.kind === 'pa' ? ' pa' : ''}${x.anul ? ' anul' : ''}" ${x.kind === 'pa' ? `data-match="${x.e.id}|${x.p.j}"` : `data-anu="${esc(x.team)}|${x.f}"`} role="button" tabindex="0">
+      <span class="wl-t">${span(x)}</span><b class="wl-tm">${esc(x.team)}</b><span class="wl-k">${x.kind === 'pa' ? `${ic('ball')} Partido` : x.anul ? 'Anulado' : 'Entrenamiento'}</span>
+      <span class="wl-w">${x.kind === 'pa' ? `${x.casa ? crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr') + crestBadge(x.e, x.p.rival, 'mini tt-cr') : crestBadge(x.e, x.p.rival, 'mini tt-cr') + crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr')}<span>${x.casa ? 'Local' : 'Visitante'} · ${esc(x.rival)}</span>` : `<span>${esc(x.where)}</span>`}</span></div>`).join('')}</div>`;
+  const weekAgenda = () => `<div class="stack">${DIAS_D.map((d, i) => ({ d: `${d} ${toDate(dayIso(i)).getDate()}`, l: all.filter(x => x.f === dayIso(i)) })).filter(x => x.l.length)
+    .map((x, i) => card(`h-wa${i}`, `${x.d} · ${x.l.length} ${x.l.length === 1 ? 'cita' : 'citas'}`, wideList(x.l))).join('')}</div>`;
+  const weekTeams = () => `<div class="tc">${teamsOf(all).map(t => card('', esc(t), `<div class="tc-l">${DIAS.map((dn, i) => all.filter(x => x.team === t && x.f === dayIso(i))
+    .map(x => `<div class="tc-r"><span class="tc-d">${dn} ${toDate(dayIso(i)).getDate()}</span>${chip(x)}</div>`).join('')).join('')}</div>`)).join('')}</div>`;
   if (sel !== 'week') {
     const d = +sel, list = all.filter(x => x.f === dayIso(d - 1));
-    return `${top}${list.length ? card('h-tt', `${DIAS_D[d - 1]} ${toDate(dayIso(d - 1)).getDate()} · ${list.length} ${list.length === 1 ? 'cita' : 'citas'}`, timeGrid([d - 1], list))
-      : emptyPage('cal', `Nada el ${DIAS_D[d - 1].toLowerCase()}`, 'Elige otro día o mira la semana entera.', 'g')}`;
+    if (list.length && V > 1) return `${top}<div class="tt-desk">${card('h-tt', `${DIAS_D[d - 1]} ${toDate(dayIso(d - 1)).getDate()} · ${list.length} citas`, wideList(list))}</div><div class="tt-mob">${card('h-ttm', 'x', dayList(list))}</div>`;
+    if (!list.length) return `${top}${emptyPage('cal', `Nada el ${DIAS_D[d - 1].toLowerCase()}`, 'Elige otro día o mira la semana entera.', 'g')}`;
+    const h = `${DIAS_D[d - 1]} ${toDate(dayIso(d - 1)).getDate()} · ${list.length} ${list.length === 1 ? 'cita' : 'citas'}`;
+    return `${top}<div class="tt-desk">${card('h-tt', h, dayGantt(list))}</div><div class="tt-mob">${card('h-ttm', h, dayList(list))}</div>`;
   }
-  /* Semana: en el ordenador, una tabla por horas y días; en el móvil, un bloque por día */
-  const grid = timeGrid([0, 1, 2, 3, 4, 5, 6], all);
   const days = DIAS_D.map((dn, i) => ({ dn: `${dn} ${toDate(dayIso(i)).getDate()}`, list: all.filter(x => x.f === dayIso(i)) })).filter(x => x.list.length);
-  return `${top}<div class="tt-desk">${card('h-ttw', 'Semana completa', grid)}</div>
-    <div class="tt-mob stack">${days.map((x, i) => card(`h-tt${i}`, `${x.dn} · ${x.list.length} ${x.list.length === 1 ? 'cita' : 'citas'}`, `<div class="tt">${trainRows(x.list)}</div>`)).join('')}</div>`;
+  return `${top}<div class="tt-desk">${V === 2 ? weekCols() : V === 3 ? weekAgenda() : V === 4 ? weekTeams() : card('h-ttw', 'Semana por equipos', weekTable())}</div>
+    <div class="tt-mob stack">${days.map((x, i) => card(`h-tt${i}`, `${x.dn} · ${x.list.length} ${x.list.length === 1 ? 'cita' : 'citas'}`, dayList(x.list))).join('')}</div>`;
 }
 /* Imagen del calendario de la semana al estilo Google Calendar: una columna por día, las horas en vertical
    y cada cita como un bloque (los que van a la vez, uno al lado del otro). Lo que no tiene hora va arriba, como "todo el día" */
