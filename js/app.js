@@ -1229,7 +1229,7 @@ function lvEdit(team, f, L, i, players, after) {
 }
 /* Borrar el directo entero: vuelve a "sin empezar" y quita los minutos y goles que guardó de ese partido */
 async function lvDelete(team, f) {
-  if (!(await ask('¿Borrar el directo?', 'Se borra todo lo apuntado en este partido (titulares, goles, tarjetas, cambios y minutos) y queda como si no se hubiera empezado.', 'Sí, borrar el directo'))) return;
+  if (!(await ask('¿Borrar el directo?', 'Se borra todo lo apuntado en este partido (titulares, goles, tarjetas, cambios y minutos) y queda como si no se hubiera empezado.', 'Sí, borrar'))) return;
   const ids = S.teams[team].players.filter(x => statOf(x.id, f)).map(x => x.id);
   try { if (API()) { if (!(S.live && S.directoOff)) await API().borrarDirecto(team, f); if (ids.length && statsOn()) await API().estadisticas(f, [], ids); } }
   catch (_) { return say('No se ha podido borrar. Revisa la conexión.'); }

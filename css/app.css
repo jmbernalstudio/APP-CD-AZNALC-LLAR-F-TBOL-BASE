@@ -972,3 +972,7 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .lv-xb { display: flex; align-items: center; gap: 10px; width: 100%; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; padding: 9px 0; min-height: 50px; }
 .lv-xb:hover .grow { color: var(--club); }
 .lv-pen { flex: none; color: var(--muted); display: grid; } .lv-pen .i { width: 18px; height: 18px; }
+.lv-row .st-n small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.st-sort { display: flex; width: 100%; max-width: 24rem; }
+.st-sort button { flex: 1 1 0; min-width: 0; padding-left: .5rem; padding-right: .5rem; }
+.modal .btn-row .btn { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
