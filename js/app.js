@@ -2182,7 +2182,7 @@ async function calPoster(wk) {
   /* Un bloque: raya de color a la izquierda, equipo, y debajo el campo o el rival con los dos escudos */
   const block = (it, bx, by, bw, bh) => {
     const pa = it.kind === 'pa';
-    rr(bx, by, bw, bh, 12, pa ? SOFT : BG);
+    rr(bx, by, bw, bh, 12, pa ? SOFT : BG); if (pa) { x.strokeStyle = BLUE; x.lineWidth = 3; x.stroke(); }
     const ix = bx + 14, iw = bw - 24, small = bh < 70;
     /* Columna estrecha (citas a la vez): el nombre en varias líneas, la hora y los escudos debajo */
     if (bw < 190 && !small) {
@@ -2216,6 +2216,8 @@ async function calPoster(wk) {
   /* Rejilla: fondo blanco, días arriba, horas a la izquierda */
   rr(PAD, HEAD, W - PAD * 2, H - HEAD - PAD, 24, '#FFFFFF');
   const colX = i => PAD + GUT + i * COLW;
+  /* Columna de las horas con fondo */
+  x.save(); x.beginPath(); x.rect(PAD, HEAD, GUT, H - HEAD - PAD); x.clip(); rr(PAD, HEAD, GUT + 24, H - HEAD - PAD, 24, '#E9ECF3'); x.restore();
   DIAS_D.forEach((dn, i) => { const f = addDays(wk, i), today = f === TODAY;
     text(dn.toUpperCase(), colX(i) + COLW / 2, HEAD + 30, 700, 18, today ? BLUE : MUTED, COLW - 16, 'center');
     if (today) { x.beginPath(); x.arc(colX(i) + COLW / 2, HEAD + 64, 22, 0, Math.PI * 2); x.fillStyle = BLUE; x.fill(); }

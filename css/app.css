@@ -1058,3 +1058,6 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .tt-c.anul b { text-decoration: line-through; color: var(--muted); }
 .tt-c.anul small { color: var(--bad-ink); }
 .cal-tip { margin: -6px 0 0; font-size: .86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Partidos con borde azul del club; la columna de las horas con fondo */
+.tt-c.pa { border: 2px solid var(--club); }
+.tt-week .tt-wr .tt-h, .tt .tt-row .tt-h, .tt-week .tt-wr.th > span { background: #E9ECF3; }
