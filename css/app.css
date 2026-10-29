@@ -1200,20 +1200,22 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .pz-body > .pz-fm { grid-column: 2; grid-row: 1; margin: 0; }
 .pz-body > .pz-side { grid-column: 2; grid-row: 2; }
 .pz-fm .fm-chips label.chip { min-height: 42px; padding: 0 14px; }
-.pz-field { position: relative; flex: 1 1 auto; min-width: 0; aspect-ratio: 68 / 90; max-height: calc(100dvh - 190px); margin: 0 auto; background: #2E8B57; border: 3px solid var(--club); border-radius: 16px; overflow: hidden; }
-.pz-field > i { position: absolute; border: 2px solid rgba(255,255,255,.75); pointer-events: none; }
+.pz-field { position: relative; flex: 1 1 auto; min-width: 0; aspect-ratio: 68 / 90; max-height: calc(100dvh - 190px); margin: 0 auto; background: #E9F6EE; border: 3px solid #A9D5B7; border-radius: 16px; overflow: hidden; }
+.pz-field > i { position: absolute; border: 2px solid #BFC6D4; pointer-events: none; }
 .pz-mid { left: 0; right: 0; top: 50%; border-width: 2px 0 0 !important; }
 .pz-circle { left: 50%; top: 50%; width: 22%; aspect-ratio: 1; border-radius: 50%; transform: translate(-50%, -50%); }
 .pz-area { left: 25%; width: 50%; height: 13%; }
 .pz-area.top { top: -2px; } .pz-area.bot { bottom: -2px; }
 .pz-s { position: absolute; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 4px; width: 24%; max-width: 120px; background: none; border: 0; padding: 0; cursor: pointer; color: #fff; }
 .pz-s b { max-width: 100%; font-size: .8rem; font-weight: 700; background: var(--club); color: #fff; padding: 2px 8px; border-radius: 99px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pz-s.hole b { background: rgba(11,11,11,.5); }
-.pz-s.wait .pz-f { outline: 3px solid #fff; outline-offset: 3px; }
+.pz-s.hole b { background: #5B6475; }
+/* El portero, en negro como en el dibujo de la formación */
+.pz-s.gk .pz-f:not(.add):not(:has(img)) { background: var(--ink); } .pz-s.gk b { background: var(--ink); }
+.pz-s.wait .pz-f { outline: 3px solid var(--club); outline-offset: 3px; }
 .pz-f { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--club); color: #fff; font-weight: 800; font-size: 1.25rem; overflow: hidden; border: 3px solid #fff; flex: none; }
 .pz-f img { width: 100%; height: 100%; object-fit: cover; }
 .pz-f.none { color: #fff; } .pz-f .i { width: 26px; height: 26px; }
-.pz-f.add { background: transparent; border: 3px dashed #fff; color: #fff; }
+.pz-f.add { background: #fff; border: 3px dashed #8E97A8; color: #5B6475; }
 .pz-s:focus-visible .pz-f { outline: 3px solid #F5C518; outline-offset: 2px; }
 .pz-side { width: 320px; flex: none; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .pz-side h3 { margin: 4px 0 0; font-size: 1rem; }
