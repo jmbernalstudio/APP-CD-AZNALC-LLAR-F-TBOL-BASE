@@ -1052,3 +1052,9 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .mini.tt-cr { width: 22px; height: 22px; font-size: .5rem; }
 .mini.tt-cr img { width: 16px; height: 16px; }
 .tt-h.nh { font-size: .72rem; padding-left: 2px !important; padding-right: 2px !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-c[data-anu] { cursor: pointer; }
+.tt-c[data-anu]:hover { background: var(--club-soft); }
+.tt-c.anul { border-left-color: var(--bad); background: var(--bad-soft); }
+.tt-c.anul b { text-decoration: line-through; color: var(--muted); }
+.tt-c.anul small { color: var(--bad-ink); }
+.cal-tip { margin: -6px 0 0; font-size: .86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

@@ -288,10 +288,12 @@ const DIAS_L = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábados'
 const dow = iso => (toDate(iso).getDay() + 6) % 7 + 1;
 const addDays = (iso, n) => { const d = toDate(iso); d.setDate(d.getDate() + n); return ISO(d); };
 const trainOf = team => S.teams[team] && S.teams[team].train && S.teams[team].train.dias.length ? S.teams[team].train : null;
-const trainsOn = (team, iso) => { const t = trainOf(team); return !!t && t.dias.includes(dow(iso)); };
+/* La junta puede anular el entreno de un equipo un día concreto (desde el Calendario) */
+const anulado = (team, iso) => !!(S.anulados && S.anulados.has(`${team} ${iso}`));
+const trainsOn = (team, iso) => { const t = trainOf(team); return !!t && t.dias.includes(dow(iso)) && !anulado(team, iso); };
 /* Cada día de entreno lleva su hora y su campo (p. ej. lunes Campo 1, miércoles Campo 2) */
 const sesiones = t => t ? (t.ses && t.ses.length ? t.ses : t.dias.map(d => ({ d, h: t.h || '', where: t.where || '' }))) : [];
-const trainAt = (team, iso) => { const t = trainOf(team); if (!t || !t.dias.includes(dow(iso))) return null; return sesiones(t).find(x => x.d === dow(iso)) || { d: dow(iso), h: t.h || '', where: t.where || '' }; };
+const trainAt = (team, iso) => { const t = trainOf(team); if (!t || !t.dias.includes(dow(iso)) || anulado(team, iso)) return null; return sesiones(t).find(x => x.d === dow(iso)) || { d: dow(iso), h: t.h || '', where: t.where || '' }; };
 const trainLbl = t => ['Entrenamiento', t.h, t.where].filter(Boolean).join(' · ');
 /* Solo se pasa lista en días de entreno: hoy si toca, o uno de las dos últimas semanas que se olvidó */
 const LOOKBACK = 14;
@@ -2103,7 +2105,7 @@ function trainSessions() {
 const teamOrd = n => { const i = ORDEN.indexOf((EQ[n] || {}).id); return i < 0 ? 99 : i; };
 function calItems(wk) {
   const end = addDays(wk, 6);
-  const tr = trainSessions().map(x => ({ kind: 'tr', f: addDays(wk, x.d - 1), h: x.h, team: x.team, where: x.where || 'Sin campo' }));
+  const tr = trainSessions().map(x => ({ kind: 'tr', f: addDays(wk, x.d - 1), h: x.h, team: x.team, where: x.where || 'Sin campo', anul: anulado(x.team, addDays(wk, x.d - 1)) }));
   const pa = D.equipos.flatMap(e => e.partidos.filter(p => !p.descansa && p.fecha && p.fecha >= wk && p.fecha <= end)
     .map(p => ({ kind: 'pa', f: p.fecha, h: p.hora || '', team: e.nombre, rival: nice(p.rival), casa: !!p.casa, where: placeOf(p) || '', e, p })));
   return [...tr, ...pa].sort((a, b) => a.f.localeCompare(b.f) || (a.h || '99').localeCompare(b.h || '99') || (a.kind === 'pa' ? 0 : 1) - (b.kind === 'pa' ? 0 : 1) || teamOrd(a.team) - teamOrd(b.team));
@@ -2111,7 +2113,8 @@ function calItems(wk) {
 const calWeekLbl = wk => { const a = toDate(wk), z = toDate(addDays(wk, 6));
   return a.getMonth() === z.getMonth() ? `${a.getDate()} – ${z.getDate()} ${MES[z.getMonth()]}` : `${a.getDate()} ${MES[a.getMonth()]} – ${z.getDate()} ${MES[z.getMonth()]}`; };
 function calCell(x) {
-  if (x.kind === 'tr') return `<div class="tt-c"><b title="${esc(x.team)}">${esc(x.team)}</b><small>Entreno · ${esc(x.where)}</small></div>`;
+  if (x.kind === 'tr') return `<div class="tt-c${x.anul ? ' anul' : ''}" data-anu="${esc(x.team)}|${x.f}" role="button" tabindex="0" aria-label="${x.anul ? 'Entreno anulado' : 'Entreno'} del ${esc(x.team)}. Toca para ${x.anul ? 'recuperarlo' : 'anularlo'}">
+    <b title="${esc(x.team)}">${esc(x.team)}</b><small>${x.anul ? 'Entreno anulado' : `Entreno · ${esc(x.where)}`}</small></div>`;
   const us = crestBadge(x.e, 'Aznalcóllar', 'mini tt-cr'), them = crestBadge(x.e, x.p.rival, 'mini tt-cr');
   return `<div class="tt-c pa" data-match="${x.e.id}|${x.p.j}" role="button" tabindex="0" aria-label="Partido del ${esc(x.team)} contra ${esc(x.rival)}"><b title="${esc(x.team)}">${esc(x.team)}</b>
     <span class="tt-vs">${x.casa ? us + them : them + us}<small title="vs ${esc(x.rival)}">${x.p.goles ? scoreTxt(x.p) + ' · ' : ''}${x.casa ? 'Local' : 'Visitante'} · ${esc(x.rival)}</small></span></div>`;
@@ -2132,9 +2135,10 @@ function trainView() {
   const seg = `<div class="seg g-scope seg-x" role="group" aria-label="Elige el día">
     <button type="button" data-tt="week" aria-pressed="${sel === 'week'}">Semana</button>${DIAS.map((d, i) =>
     `<button type="button" data-tt="${i + 1}" aria-pressed="${sel === String(i + 1)}">${d} ${toDate(dayIso(i)).getDate()}</button>`).join('')}</div>`;
-  const nTr = all.filter(x => x.kind === 'tr').length, nPa = all.filter(x => x.kind === 'pa').length;
+  const nTr = all.filter(x => x.kind === 'tr' && !x.anul).length, nPa = all.filter(x => x.kind === 'pa').length;
   const top = `${nav}<div class="cal-bar">${seg}<button type="button" class="btn blue" id="calx"${all.length ? '' : ' disabled'}>${ic('send')} Exportar semana</button></div>
-    <p class="muted cal-key"><span class="tt-dot"></span>Entrenamientos · ${nTr}<span class="tt-dot pa"></span>Partidos · ${nPa}</p>`;
+    <p class="muted cal-key"><span class="tt-dot"></span>Entrenamientos · ${nTr}<span class="tt-dot pa"></span>Partidos · ${nPa}</p>
+    <p class="muted cal-tip">Toca un entreno para anularlo esta semana.</p>`;
   if (!all.length) return top + emptyPage('cal', 'Nada esta semana', 'No hay entrenamientos ni partidos. Usa las flechas para ver otra semana.', 'g');
   if (sel !== 'week') {
     const d = +sel, list = all.filter(x => x.f === dayIso(d - 1));
@@ -2153,7 +2157,7 @@ function trainView() {
    y cada cita como un bloque (los que van a la vez, uno al lado del otro). Lo que no tiene hora va arriba, como "todo el día" */
 async function calPoster(wk) {
   await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
-  const all = calItems(wk), mins = h => { const [a, b] = h.split(':').map(Number); return a * 60 + (b || 0); };
+  const all = calItems(wk).filter(it => !it.anul), mins = h => { const [a, b] = h.split(':').map(Number); return a * 60 + (b || 0); };
   const timed = all.filter(it => it.h).map(it => ({ ...it, a: mins(it.h), z: mins(it.h) + 90 })), loose = all.filter(it => !it.h);
   const W = 2200, GUT = 110, PAD = 40, COLW = (W - PAD * 2 - GUT) / 7, HEAD = 190, DAYH = 90, LOOSE = 92, PXH = 130;
   const nLoose = Math.max(0, ...DIAS.map((_, i) => loose.filter(it => it.f === addDays(wk, i)).length));
@@ -2296,6 +2300,18 @@ const BOARD = {
         shareImage({ title: 'Calendario de la semana', wait: 'Preparando la imagen…', build: () => calPoster(wk), name: fileName('calendario', 'club', wk),
           alt: `Calendario del club, semana del ${calWeekLbl(wk)}`, msg: '', what: 'la imagen' }); };
       bindMatches();
+      document.querySelectorAll('[data-anu]').forEach(el => {
+        const run = async () => {
+          const [team, f] = el.dataset.anu.split('|'), off = anulado(team, f), day = longDate(f).toLowerCase();
+          const okd = off ? await confirmar('¿Recuperar el entreno?', `El ${team} vuelve a entrenar el ${day}. Su entrenador lo verá en la app.`, 'Sí, recuperar')
+            : await ask('¿Anular este entreno?', `El ${team} no entrenará el ${day}. Su entrenador lo verá en la app y ese día no tendrá que pasar lista.`, 'Sí, anular');
+          if (!okd) return;
+          try { API() && await API().anularEntreno(team, f, !off); } catch (_) { return say(S.live && S.anulOff ? 'Falta un paso en Supabase para poder anular entrenos.' : 'No se ha podido guardar. Revisa la conexión.'); }
+          S.anulados = S.anulados || new Set(); off ? S.anulados.delete(`${team} ${f}`) : S.anulados.add(`${team} ${f}`);
+          render(); say(off ? `Entreno del ${team} recuperado.` : `Entreno del ${team} anulado.`);
+        };
+        el.onclick = run; el.onkeydown = ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); run(); } };
+      });
       document.querySelectorAll('.seg-x [aria-pressed="true"]').forEach(b => { const s = b.parentElement; s.scrollLeft = b.offsetLeft - (s.clientWidth - b.offsetWidth) / 2; });
     };
     if (view === 'train') return { kicker: 'Club · Entrenamientos y partidos', title: 'Calendario', body: `<div class="stack">${vseg}${trainView()}</div>`, bind: bindV };
