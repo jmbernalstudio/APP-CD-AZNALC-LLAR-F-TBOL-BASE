@@ -1685,9 +1685,9 @@ function convScreen() {
 
 /* Próximo partido de cada equipo del entrenador: con varios equipos es un carrusel (arrastrar o puntos) */
 function matchSlide(team) {
-  const nm = EQ[team] && nextMatch(EQ[team]), cv = nm && S.conv[convKey(team, nm)];
+  const nm = EQ[team] && nextMatch(EQ[team]), cv = nm && S.conv[convKey(team, nm)], ac = nm && actaOf(team, nm.fecha);
   return `${scoreHTML(team)}
-    <div class="match-btns">${nm && nm.fecha === TODAY ? `<button type="button" class="btn white" data-lv-team="${esc(team)}">${ic('pen')} Datos del partido</button>` : ''}${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.casa ? '' : nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
+    <div class="match-btns">${nm && (cv || ac) ? `<button type="button" class="btn white" data-lv-team="${esc(team)}">${ic(!ac || ac.fase === 'previa' ? 'pen' : ac.fase === 'fin' ? 'list' : 'play')} ${!ac || ac.fase === 'previa' ? 'Datos del partido' : ac.fase === 'fin' ? 'Ver acta del partido' : 'Seguir el directo'}</button>` : ''}${nm ? `<button type="button" class="btn ${cv ? 'glass' : 'gold'}" data-conv-team="${esc(team)}">${ic('list')} ${cv ? `Convocatoria · ${cv.ids.length}` : 'Hacer convocatoria'}</button>` : ''}${nm && nm.casa ? '' : nm && nm.campo ? `<a class="btn white" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(nm))}">${ic('pin')}Cómo llegar</a>` : `<button type="button" class="btn glass" disabled>${ic('pin')}Campo por confirmar</button>`}</div>`;
 }
 function matchTag(team) { const nm = EQ[team] && nextMatch(EQ[team]); return nm ? dateLbl(nm.fecha) : ''; }
 function matchCarousel() {
