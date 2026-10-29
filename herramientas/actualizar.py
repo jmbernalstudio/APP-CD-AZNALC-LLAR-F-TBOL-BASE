@@ -192,6 +192,22 @@ def equipacion_educa(rival):
     return EQUIP_EDUCA.get(k) or next((v for c, v in EQUIP_EDUCA.items() if k.startswith(c + ' ') or c.startswith(k + ' ')), None)
 
 
+# Campo y enlace a Google Maps de cada rival de la Liga Educa, del mismo PDF (el enlace está en su escudo)
+UBIC_EDUCA = {k: v for k, v in json.loads((RAIZ / 'herramientas' / 'ubicaciones_educa.json').read_text(encoding='utf-8')).items() if not k.startswith('_')}
+_GENERICO = {'cd', 'cf', 'ef', 'club', 'ud', 'fc', 'c', 'f', 'sd', 'ad', 'cdm', 'cmd', 'edm', 'em', 'eemm', 'esd', 'fb', 'jd', 'de', 'del', 'la', 'los', 'el'}
+
+
+def _fichas(n):
+    n = _clave(n).replace('atletico', 'atco').replace('ayto de', 'ayto').replace('polvenir', 'porvenir')
+    return set(n.split()) - _GENERICO
+
+
+def ubicacion_educa(rival):
+    """Busca el equipo sin fijarse en siglas como CD, EF o EDM, que cambian de una web a otra"""
+    k = _fichas(rival)
+    return next((v for n, v in UBIC_EDUCA.items() if _fichas(n) == k), None) if k else None
+
+
 def equipo_rfaf(eq, pool):
     for intento in range(6):  # a veces la RFAF devuelve la lista vacía
         exe = bajar(f'{RFAF}NFG_CmpJornada_Exec?cod_primaria=1000120&codgrupo={eq["grupo"]}')
@@ -338,6 +354,11 @@ def equipo_educa(eq, pool):
         equip = None if casa else equipacion_educa(m['local'])
         if equip:
             partidos[-1]['equipacion'] = equip
+        ubic = None if casa else ubicacion_educa(m['local'])
+        if ubic:
+            partidos[-1]['campo'] = campo or ubic['lugar']
+            if ubic['maps']:
+                partidos[-1]['maps'] = ubic['maps']
 
     # La tabla de la Liga Educa está mal cerrada en el HTML: se lee del texto, buscando cada equipo por su nombre
     texto = limpio(BeautifulSoup(bajar(url_educa(eq, 'id_sec=4')), 'html.parser').get_text(' '))

@@ -1084,3 +1084,76 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .tg-ev .tt-c b { white-space: normal; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.15; font-size: .84rem; }
 .tg-ev .tt-c small { font-size: .72rem; }
 .tg { --hcol: 4rem; } @media (max-width: 600px) { .tg { --hcol: 3.1rem; } .tg-hours .tt-h { font-size: .8rem; } .tg-ev { } .tg-ev .tt-c { padding: 5px 6px; } }
+
+/* Calendario de la junta: tabla por equipos (semana), horas en horizontal (un día) y lista (móvil) */
+.pl, .gt { border: 1px solid #BFC6D4; border-radius: 14px; overflow: hidden; }
+.pl-r { display: grid; grid-template-columns: 9.5rem repeat(7, minmax(0, 1fr)); }
+.pl-r + .pl-r, .gt-r + .gt-r { border-top: 1px solid #BFC6D4; }
+.pl-r > span { min-width: 0; padding: 8px 6px; display: flex; flex-direction: column; gap: 6px; border-right: 1px solid #BFC6D4; }
+.pl-r > span:last-child { border-right: 0; }
+.pl-th > span, .gt-th > span { background: #F3F5F9; font-weight: 700; font-size: .9rem; text-align: center; justify-content: center; padding: 10px 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+.pl-th > span.hoy { background: var(--club); color: #fff; }
+.pl-r > span[role=cell].hoy { background: #F7F9FF; }
+.pl-tm { background: #F3F5F9; font-weight: 800; font-size: .95rem; justify-content: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block !important; align-self: stretch; line-height: 1.25; padding: 12px 10px !important; }
+.pl .tt-c, .gt .tt-c, .tl .tt-c { padding: 8px 10px; gap: 2px; }
+.tt-c .tt-t { font-size: .95rem; font-weight: 800; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tt-c.pa .tt-t { color: var(--club); }
+.tt-c.anul .tt-t { text-decoration: line-through; color: var(--muted); }
+.tt-c small { font-size: .82rem; }
+.tt-c .tt-tm { font-size: .98rem; }
+.tt-c.pa .tt-tm { color: var(--ink); }
+.tt-c.anul .tt-tm { text-decoration: none; color: var(--ink); }
+/* Un día */
+.gt-r { display: grid; grid-template-columns: 9.5rem minmax(0, 1fr); }
+.gt-r > .pl-tm { border-right: 1px solid #BFC6D4; }
+.gt-th > span:first-child { border-right: 1px solid #BFC6D4; }
+.gt-ax { display: grid !important; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); padding: 0 !important; text-align: left !important; }
+.gt-ax i { font-style: normal; color: var(--club); font-weight: 800; padding: 10px 0 10px 6px; border-left: 1px solid #BFC6D4; overflow: hidden; }
+.gt-ax i:nth-child(even) { border-left-style: dashed; border-left-color: #D8DDE7; }
+.gt-ax i:first-child { border-left: 0; }
+.gt-tl { position: relative; min-height: 76px; background-image: repeating-linear-gradient(to right, transparent 0, transparent calc(100% / var(--n) - 1px), #E3E7EF calc(100% / var(--n) - 1px), #E3E7EF calc(100% / var(--n))); }
+.gt-ev { position: absolute; top: 6px; bottom: 6px; display: flex; padding: 0 3px; min-width: 0; }
+.gt-ev .tt-c { flex: 1; min-width: 0; overflow: hidden; justify-content: center; }
+.gt-sin { position: relative; display: flex; gap: 6px; padding: 6px; }
+/* Lista (móvil y tableta) */
+.tl { display: flex; flex-direction: column; }
+.tl-r { display: grid; grid-template-columns: 3.6rem minmax(0, 1fr); gap: 10px; align-items: stretch; padding: 8px 0; }
+.tl-r + .tl-r { border-top: 1px solid #E3E7EF; }
+.tl-t { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; line-height: 1.2; }
+.tl-t b { font-size: 1.05rem; font-weight: 800; color: var(--club); }
+.tl-t small { color: var(--muted); font-size: .85rem; }
+.pl-tm { display: flex !important; align-items: center; justify-content: flex-start; }
+.pl-tm > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gt-sin { position: absolute; left: 0; right: 0; bottom: 0; height: 70px; }
+.gt-sin .tt-c { max-width: 16rem; }
+.pl .tt-vs small, .gt .tt-vs small { color: var(--club); font-weight: 600; }
+/* Versiones a elegir: columnas por día, lista ancha y tarjetas por equipo */
+.kc { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+.kc-c { background: #fff; border-radius: 18px; padding: 10px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.kc-h { font-weight: 800; text-align: center; padding: 8px 4px; border-radius: 12px; background: #F3F5F9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kc-h.hoy { background: var(--club); color: #fff; }
+.kc-0 { text-align: center; margin: 8px 0; font-size: .85rem; }
+.kc .tt-c { padding: 8px 10px; gap: 2px; }
+.wl { display: flex; flex-direction: column; border: 1px solid #BFC6D4; border-radius: 14px; overflow: hidden; }
+.wl-r { display: grid; grid-template-columns: 9rem 11rem 9.5rem minmax(0, 1fr); align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; min-width: 0; }
+.wl-r + .wl-r { border-top: 1px solid #BFC6D4; }
+.wl-r:hover { background: #F7F9FF; }
+.wl-r > * { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wl-t { font-weight: 800; font-size: 1.05rem; color: var(--club); }
+.wl-tm { font-size: 1.02rem; }
+.wl-k { display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 4px 12px; border-radius: 99px; background: #F3F5F9; font-weight: 700; font-size: .85rem; }
+.wl-k .i { width: 16px; height: 16px; }
+.wl-r.pa .wl-k { background: var(--club); color: #fff; }
+.wl-r.anul .wl-k { background: var(--bad-soft); color: var(--bad-ink); }
+.wl-r.anul .wl-tm, .wl-r.anul .wl-t { text-decoration: line-through; color: var(--muted); }
+.wl-w { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.wl-w > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tc { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.tc > .card { min-width: 0; }
+.tc-l { display: flex; flex-direction: column; gap: 8px; }
+.tc-r { display: grid; grid-template-columns: 4.2rem minmax(0, 1fr); gap: 10px; align-items: center; }
+.tc-d { font-weight: 800; color: var(--club); white-space: nowrap; }
+.tc .tt-c { padding: 8px 12px; gap: 2px; }
+@media (max-width: 1300px) { .tc { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pl-r > span.pl-tm { flex-direction: row; align-items: center; }
+.pl-r, .gt-r { grid-template-columns: 11rem repeat(7, minmax(0, 1fr)); } .gt-r { grid-template-columns: 11rem minmax(0, 1fr); }
