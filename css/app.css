@@ -1238,3 +1238,6 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
   .pz-s .pz-f { width: 60px; height: 60px; font-size: 1.5rem; border-width: 3px; } .pz-s .pz-f .i { width: 28px; height: 28px; } .pz-s b { font-size: .8rem; padding: 2px 8px; }
   .pz-field.f11 .pz-s .pz-f { width: 46px; height: 46px; font-size: 1.15rem; } .pz-field.f11 .pz-s .pz-f .i { width: 22px; height: 22px; } .pz-field.f11 .pz-s b { font-size: .7rem; padding: 2px 6px; } .pz-vs { font-size: .98rem; } .mini.pz-cr { width: 28px; height: 28px; } .mini.pz-cr img { width: 21px; height: 21px; } }
 .pz-in > * { flex-shrink: 0; }
+/* Cabecera de la pizarra: la misma tarjeta del partido, con el botón de cerrar arriba a la derecha */
+.pz-gm .gm-h { justify-content: flex-start; min-width: 0; } .pz-gm .gm-h .pill { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pz-gm .gm-h small { margin-left: auto; flex: none; } .pz-gm .gm-h .iconbtn { flex: none; }
