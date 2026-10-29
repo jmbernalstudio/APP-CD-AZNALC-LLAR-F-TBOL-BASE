@@ -62,6 +62,7 @@
     },
     /* Directo del partido (se guarda cada vez que pasa algo; el móvil también lo guarda por si falla la conexión) */
     async directo(team, fecha, datos) { ok(await sb.from('partidos_directo').upsert({ equipo: idEq(team), fecha, datos, actualizado: new Date().toISOString() }, { onConflict: 'equipo,fecha' })); },
+    async borrarDirecto(team, fecha) { ok(await sb.from('partidos_directo').delete().eq('equipo', idEq(team)).eq('fecha', fecha)); },
     async nombre(nombre) { ok(await sb.rpc('cambiar_nombre', { p_nombre: nombre })); },
     async equipos(perfil, ids) {
       ok(await sb.from('entrenador_equipo').delete().eq('perfil', perfil).not('equipo', 'in', `(${ids.join(',')})`));
