@@ -1211,9 +1211,9 @@ function pizarra(team, L, players, save, e, p) {
   const bench = () => (L.fase === 'previa' ? L.sup : [...new Set([...L.tit, ...L.sup])].filter(id => !L.campo.includes(id) && !(L.rojas || []).includes(id))).slice().sort(byDor);
   const slots = () => { const ok = avail(); return Array.from({ length: n }, (_, i) => ok.includes(L.pz.ids[i]) ? L.pz.ids[i] : null); };
   const face = q => q.foto ? `<span class="pz-f"><img src="${esc(q.foto)}" alt=""></span>` : q.dorsal ? `<span class="pz-f num">${q.dorsal}</span>` : `<span class="pz-f none">${ic('user')}</span>`;
-  const us = 'Aznalcóllar', them = L.rival;
+  const them = L.rival;
   const d = document.createElement('div');
-  d.className = 'pz'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-labelledby', 'pz-t');
+  d.className = 'pz'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', `Alineación contra ${nice(p.rival)}`);
   const back = document.activeElement;
   const close = () => { d.remove(); document.removeEventListener('keydown', key);
     if (L.form !== form0) render();   /* la tarjeta Formación de debajo enseña la nueva */
@@ -1226,10 +1226,8 @@ function pizarra(team, L, players, save, e, p) {
     const ids = slots(), free = avail().filter(id => !ids.includes(id)).sort(byDor), bn = bench();
     if (sel != null && !free.includes(sel) && !ids.includes(sel)) sel = null;
     d.innerHTML = `<div class="pz-in">
-      <div class="pz-h"><div class="pz-vs">${crestBadge(e, L.casa ? us : p.rival, 'mini pz-cr')}<b title="${esc(L.casa ? us : them)}">${esc(L.casa ? us : them)}</b><span>vs</span><b title="${esc(L.casa ? them : us)}">${esc(L.casa ? them : us)}</b>${crestBadge(e, L.casa ? p.rival : us, 'mini pz-cr')}</div>
-        <button type="button" class="iconbtn" id="pz-x" aria-label="Cerrar la pizarra">${ic('x')}</button></div>
-      <p class="pz-sub"><b id="pz-t">Pizarra</b> · ${dateLbl(p.fecha)}${p.hora ? ' · ' + p.hora : ''} · ${L.casa ? 'Local' : 'Visitante'}</p>
-      <p class="pz-tip${sel != null ? ' on' : ''}" role="status">${sel != null ? `Ahora toca el hueco donde va <b>${esc(pl(sel).n)}</b>.` : '1. Toca un jugador de abajo · 2. Toca su hueco en el campo'}</p>
+      ${gameCard(e, p, false).replace(/ data-match="[^"]*" role="button" tabindex="0" aria-label="[^"]*"/, '').replace('class="gm"', 'class="gm pz-gm"')
+        .replace('</small></div>', `</small><button type="button" class="iconbtn" id="pz-x" aria-label="Cerrar la pizarra">${ic('x')}</button></div>`)}
       <div class="pz-body">${formsOf(team).length ? `<section class="card fm pz-fm" aria-labelledby="h-pzfm"><div class="card-h"><h2 id="h-pzfm">Formación</h2><span class="pill">${esc(form)}</span></div>
         <div class="chips fm-chips" role="radiogroup" aria-label="Formación (fútbol ${modOf(team)})">${formsOf(team).map(x =>
           `<label class="chip"><input type="radio" name="pzfm" value="${x}"${x === form ? ' checked' : ''}> ${x}</label>`).join('')}</div></section>` : ''}
