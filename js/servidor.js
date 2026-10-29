@@ -25,6 +25,8 @@
       return ok(await sb.from('jugadores').insert({ equipo: idEq(team), nombre: p.n, dorsal: p.dorsal }).select('id').single()).id;
     },
     async editarJugador(id, n, dorsal) { ok(await sb.from('jugadores').update({ nombre: n, apellidos: '', dorsal }).eq('id', id)); },
+    /* Foto del jugador (o null para quitarla). Solo la ven, con sesión iniciada, su entrenador y la junta */
+    async fotoJugador(id, foto) { ok(await sb.from('jugadores').update({ foto }).eq('id', id)); },
     async quitarJugador(id, activo) { ok(await sb.from('jugadores').update({ activo }).eq('id', id)); },
     async peticion(r) {
       const fila = { equipo: idEq(r.team), tipo: r.kind, titulo: r.title, lugar: r.where || '', urgente: r.urgent };
@@ -144,6 +146,10 @@
       const t = S.teams[equipoDe[j.id]];
       if (t) t.players.push({ id: j.id, n: `${j.nombre} ${j.apellidos}`.trim(), dorsal: j.dorsal });
     }
+    /* Fotos de los jugadores (si la columna aún no existe, se sigue sin ellas) */
+    const fot = await sb.from('jugadores').select('id, foto').eq('activo', true);
+    S.fotosOff = !!fot.error;
+    for (const j of fot.data || []) if (j.foto) { const t = S.teams[equipoDe[j.id]], x = t && t.players.find(y => y.id === j.id); if (x) x.foto = j.foto; }
     /* Convocatorias de la temporada (también las pasadas, para la ficha de cada partido) (si la tabla aún no existe, se sigue sin ellas) */
     S.conv = {};
     const conv = await sb.from('convocatorias').select('equipo, fecha, jugadores, hora, lugar, nota');

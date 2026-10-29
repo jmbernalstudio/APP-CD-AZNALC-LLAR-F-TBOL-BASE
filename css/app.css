@@ -111,10 +111,12 @@ i.dm { background: var(--gold); } i.dt { background: var(--ink); }
 .match-btns { display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 16px; }
 /* Carrusel del próximo partido (entrenador con varios equipos) */
 .mwrap { display: flex; flex-direction: column; min-width: 0; }
-.mcar { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; cursor: grab; }
+.mcar { display: flex; gap: 12px; padding: 12px 0; margin: -12px 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; overscroll-behavior-x: contain; cursor: grab; }
 .mcar::-webkit-scrollbar { display: none; }
 .mcar.drag { scroll-snap-type: none; cursor: grabbing; user-select: none; }
-.mslide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; }
+.mslide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; scroll-snap-stop: always; display: flex; flex-direction: column; }
+/* Sin convocatoria la tarjeta tiene menos botones: el que haya queda abajo del todo */
+.mslide > .match-btns { margin-top: auto; padding-top: 16px; }
 .mdots { display: flex; justify-content: center; gap: 4px; padding-top: 6px; }
 .mdots button { width: 28px; height: 24px; border: 0; padding: 0; background: none; cursor: pointer; display: grid; place-items: center; }
 .mdots button::before { content: ""; width: 8px; height: 8px; border-radius: 4px; background: var(--club); opacity: .3; transition: width .2s, opacity .2s; }
@@ -496,7 +498,7 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .btn.red { background: var(--bad); color: #fff; }
 .modal { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, .45); display: grid; place-items: center;
   padding: 16px max(16px, env(safe-area-inset-right, 0px)) 16px max(16px, env(safe-area-inset-left, 0px)); }
-.modal .card { width: 100%; max-width: 400px; padding: 24px; }
+.modal .card { width: 100%; max-width: 400px; padding: 24px; max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; }
 .pst-img { display: block; width: auto; max-width: 100%; max-height: 52vh; max-height: 52dvh; margin: 0 auto; border-radius: 14px; }
 .modal h2 { margin: 0; font-size: 1.25rem; }
 .modal p { margin: 0 0 6px; color: var(--muted); }
@@ -638,9 +640,8 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 @media (min-width: 1080px) {
   .coach-home > .a-match, .coach-home > .a-hero, .coach-home > .a-attend { align-self: stretch; }
   .coach-home > .a-match, .coach-home > .a-attend { display: flex; flex-direction: column; }
-  .coach-home > .a-match > .match, .coach-home > .a-match .mcar { flex: 1; display: flex; flex-direction: column; }
-  .coach-home > .a-match .mcar { flex-direction: row; }
-  .coach-home > .a-match .mslide { display: flex; flex-direction: column; }
+  .coach-home > .a-match > .match { flex: 1; }
+  .coach-home > .a-match .mcar { flex: 1; }
   .coach-home > .a-match .score { flex: 1; align-items: center; align-content: center; }
   .coach-home > .a-match .match-btns { margin-top: 0; padding-top: 16px; }
   .coach-home > .a-attend .last { margin-top: auto; }
@@ -1002,3 +1003,22 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .fp-seg { width: 100%; max-width: 30rem; }
 .st-split > .stack { min-width: 0; }
 .lv-add { flex-wrap: nowrap; } .lv-add .btn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Foto del jugador en lugar del número (el dorsal va en una esquina) */
+.pimg { position: relative; padding: 0 !important; background: var(--shell) !important; overflow: visible; }
+.pimg img { width: 100%; height: 100%; object-fit: cover; border-radius: inherit; display: block; }
+.pimg i { position: absolute; right: -5px; bottom: -5px; min-width: 22px; height: 22px; padding: 0 5px; border-radius: 11px; display: grid; place-items: center; background: var(--club); color: #fff; font-style: normal; font-size: .72rem; font-weight: 800; border: 2px solid #fff; font-variant-numeric: tabular-nums; line-height: 1; }
+/* Titulares y suplentes antes del partido */
+.lv-tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 10px; }
+.lv-tile { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; padding: 12px 6px 10px; border: 0; border-radius: 18px; background: var(--shell); font: inherit; color: var(--ink); text-align: center; cursor: pointer; }
+.lv-tile .num { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--club-soft); color: var(--club); font-weight: 800; font-size: 1.15rem; font-variant-numeric: tabular-nums; flex: none; }
+.lv-tile b { max-width: 100%; font-size: .92rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-tile small { max-width: 100%; font-size: .74rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lv-tile:hover { background: var(--club-soft); }
+.lv-team.tit { background: var(--club); color: #fff; }
+.lv-team.tit h2 { color: #fff; }
+.lv-team.tit .lv-tile { background: #fff; }
+.lv-team.tit .lv-tile:hover { background: var(--club-soft); }
+.lv-team.tit .lv-tile .num { background: var(--club); color: #fff; }
+.lv-team.tit .lv-tile.hole { background: transparent; border: 2px dashed #fff; color: #fff; cursor: default; padding: 10px 4px 8px; }
+.lv-team.tit .lv-tile.hole .num { background: transparent; border: 2px dashed #fff; }
+.lv-team.tit .lv-tile.hole small { color: #fff; }

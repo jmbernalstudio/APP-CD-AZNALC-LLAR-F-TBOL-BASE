@@ -182,6 +182,9 @@ const myName = () => S.live ? S.me.nombre : S.role === 'coach' ? S.me.nombre : S
 const roleName = () => S.role === 'coach' ? 'Entrenador' : 'Junta directiva';
 const myPerson = () => S.live ? S.me : { nombre: myName(), foto: null };
 /* Foto de la persona, o sus iniciales si la junta aún no ha subido ninguna */
+/* Número del jugador; si tiene foto, la foto con el dorsal en una esquina */
+const pnum = (p, cls, alt) => p.foto ? `<span class="${cls} pimg" aria-hidden="true"><img src="${esc(p.foto)}" alt="" loading="lazy">${p.dorsal ? `<i>${p.dorsal}</i>` : ''}</span>`
+  : `<span class="${cls}" aria-hidden="true">${p.dorsal || alt}</span>`;
 const avatar = (p, cls) => p.foto ? `<span class="${cls} ph" aria-hidden="true"><img src="${esc(p.foto)}" alt=""></span>` : `<span class="${cls}" aria-hidden="true">${esc(initials(p.nombre))}</span>`;
 function bindMe() {
   const b = $('#me'), m = $('#me-menu');
@@ -896,7 +899,7 @@ function bindTrain(team) {
 function rosterCard(team) {
   const t = S.teams[team];
   const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n));
-  return card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? `<div class="roster">${list.map(p => `<button type="button" class="tm tm-btn pcard" data-edit="${p.id}" aria-label="Editar a ${esc(p.n)}"><span class="k">${p.dorsal || '–'}</span>
+  return card('h-pl', `Plantilla · ${t.players.length} jugador${t.players.length === 1 ? '' : 'es'}`, list.length ? `<div class="roster">${list.map(p => `<button type="button" class="tm tm-btn pcard" data-edit="${p.id}" aria-label="Editar a ${esc(p.n)}">${pnum(p, 'k', '–')}
       <span class="grow"><b title="${esc(p.n)}">${esc(p.n)}</b><small>${p.dorsal ? 'Dorsal ' + p.dorsal : 'Sin dorsal'}</small></span>
       ${attPill(team, p.id, true)}<span class="go" aria-hidden="true">${ic('chev')}</span></button>`).join('')}</div>` : '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>');
 }
@@ -922,23 +925,34 @@ function bindRoster(team) {
 /* Ventana para cambiar nombre y dorsal, o quitar al jugador (con confirmación) */
 function editPlayer(team, p) {
   const t = S.teams[team];
+  const ph = { foto: p.foto || null };
   const m = modal(`<h2 id="mdl-t">${esc(p.n)}</h2>
     ${playerAttHTML(team, p)}
     ${statsOn() && playerStats(p.id).pj ? `<div class="patt"><b>Liga</b>${statKpis(team, p)}</div>` : ''}
     <form id="ef" class="stack" novalidate><b style="margin-top:4px">Editar jugador</b>
+      ${photoField(ph.foto, p.n)}
+      ${p.foto ? '<button type="button" class="linkbtn" id="efq" style="align-self:flex-start">Quitar la foto</button>' : ''}
       <label class="f" for="en">Nombre y apellidos<input type="text" id="en" autocomplete="off" value="${esc(p.n)}"></label>
       <label class="f" for="ed">Dorsal (opcional)<input type="number" id="ed" inputmode="numeric" min="1" max="99" value="${p.dorsal || ''}"></label>
       <p id="eerr" class="err" role="alert" hidden>Escribe el nombre del jugador.</p>
       <div class="btn-row"><button type="button" class="btn ghost" data-v="0">Cancelar</button><button type="submit" class="btn blue">${ic('check')} Guardar</button></div>
     </form>
     <button type="button" class="linkbtn" id="edel">Quitar de la plantilla</button>`, 'dialog', () => {});
+  bindPhoto(ph);
+  if ($('#efq')) $('#efq').onclick = () => { ph.foto = null; const l = $('label[for=fo]'); l.querySelector('.av').outerHTML = avatar({ nombre: p.n }, 'av'); $('#fo-t').textContent = 'Añadir foto (opcional)'; $('#efq').remove(); };
   $('#en').focus();
   $('#ef').onsubmit = async e => {
     e.preventDefault();
     const n = $('#en').value.trim(), dorsal = +$('#ed').value || null;
     if (!n) { $('#eerr').hidden = false; $('#en').focus(); return; }
     try { API() && await API().editarJugador(p.id, n, dorsal); } catch (_) { $('#eerr').textContent = 'No se ha podido guardar. Revisa la conexión.'; $('#eerr').hidden = false; return; }
-    p.n = n; p.dorsal = dorsal; m.close(); render(); say(`${n} guardado`);
+    p.n = n; p.dorsal = dorsal;
+    /* La foto va aparte: si falta el paso de Supabase, el resto se guarda igual */
+    let fotoMal = false;
+    if ((ph.foto || null) !== (p.foto || null)) {
+      try { API() && await API().fotoJugador(p.id, ph.foto); p.foto = ph.foto || undefined; } catch (_) { fotoMal = true; }
+    }
+    m.close(); render(); say(fotoMal ? `${n} guardado, pero sin la foto: falta un paso en Supabase.` : `${n} guardado`);
   };
   $('#edel').onclick = async () => {
     m.close();
@@ -972,7 +986,7 @@ function statsView(team) {
     <div class="seg g-scope st-sort" role="group" aria-label="Ordenar por">${SORTS.map(([k, l]) => `<button type="button" data-sts="${k}" aria-pressed="${sort === k}">${l}</button>`).join('')}</div>
     <div class="st-head" aria-hidden="true"><span>Jugador</span><span>PJ</span><span>Min.</span><span>Goles</span></div>
     <div class="st-list">${rows.map(r => `<button type="button" class="st-row" data-stp="${r.p.id}" aria-label="${esc(r.p.n)}${r.p.dorsal ? ', dorsal ' + r.p.dorsal : ''}: ${r.pj} partidos, ${r.m} minutos, ${r.g} goles">
-      <span class="k">${r.p.dorsal || '–'}</span><b class="st-n" title="${esc(r.p.n)}">${esc(r.p.n)}</b><span>${r.pj}</span><span class="${sort === 'min' ? 'on' : ''}">${r.m}'</span><span class="${sort === 'goles' ? 'on' : ''}">${r.g}</span></button>`).join('')}</div>
+      ${pnum(r.p, 'k', '–')}<b class="st-n" title="${esc(r.p.n)}">${esc(r.p.n)}</b><span>${r.pj}</span><span class="${sort === 'min' ? 'on' : ''}">${r.m}'</span><span class="${sort === 'goles' ? 'on' : ''}">${r.g}</span></button>`).join('')}</div>
     <p class="muted st-foot">PJ: partidos jugados. Partidos apuntados: ${pl.length - pend.length} de ${pl.length}.</p>`, 'st-card');
   const matches = card('h-stm', 'Partidos de liga', pl.length ? `<p class="muted" style="margin:0 0 4px">Toca un partido para ver su ficha o apuntar los minutos y los goles.</p>${pl.map(p => {
     const res = outcome(p), done = stFilled(team, p.fecha);
@@ -1007,7 +1021,7 @@ function statKpis(team, p) {
 }
 function statPlayer(team, p) {
   const e = EQ[team], pl = e ? played(e).slice().reverse().filter(x => stFilled(team, x.fecha)) : [];
-  const m = modal(`<div class="rqd-h"><span class="st-dor" aria-hidden="true">${p.dorsal || '–'}</span><div class="grow"><h2 id="mdl-t" class="st-h2" title="${esc(p.n)}">${esc(p.n)}</h2><small>${esc(team)}${p.dorsal ? ' · Dorsal ' + p.dorsal : ''}</small></div>
+  const m = modal(`<div class="rqd-h">${pnum(p, 'st-dor', '–')}<div class="grow"><h2 id="mdl-t" class="st-h2" title="${esc(p.n)}">${esc(p.n)}</h2><small>${esc(team)}${p.dorsal ? ' · Dorsal ' + p.dorsal : ''}</small></div>
       <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
     ${statKpis(team, p)}
     <b>Partido a partido</b>
@@ -1032,7 +1046,7 @@ function stScreen(team, back) {
   const list = [...t.players].sort((a, b) => (a.dorsal || 99) - (b.dorsal || 99) || a.n.localeCompare(b.n, 'es'));
   const ours = goalsUs(p), res = outcome(p);
   const row = x => { const r = d.rows[x.id], on = !!r;
-    return `<li class="st-e ${on ? 'on' : ''}" data-ste="${x.id}"><button type="button" class="st-tg" aria-pressed="${on}"><span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${x.dorsal || '–'}</span>
+    return `<li class="st-e ${on ? 'on' : ''}" data-ste="${x.id}"><button type="button" class="st-tg" aria-pressed="${on}"><span class="tick" aria-hidden="true">${ic('check')}</span>${pnum(x, 'num', '–')}
       <span class="grow"><b title="${esc(x.n)}">${esc(x.n)}</b><small class="pstate">${on ? 'Ha jugado' : 'No ha jugado'}</small></span></button>
       <div class="st-c" ${on ? '' : 'hidden'}><label class="st-m" for="stm-${x.id}">Minutos<input type="number" id="stm-${x.id}" inputmode="numeric" min="1" max="${max}" value="${on ? r.m : full}"></label>
       <div class="st-g" role="group" aria-label="Goles de ${esc(x.n)}"><span>Goles</span><span class="st-gc"><button type="button" class="iconbtn" data-gd="-1" aria-label="Un gol menos">${ic('minus')}</button><output>${on ? r.g : 0}</output><button type="button" class="iconbtn" data-gd="1" aria-label="Un gol más">${ic('plus')}</button></span></div></div></li>`; };
@@ -1136,7 +1150,7 @@ function pickPlayer(title, sub, ids, players) {
     const pl = id => players.find(x => x.id === id) || { n: 'Jugador', dorsal: null };
     const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${esc(title)}</h2>${sub ? `<small>${esc(sub)}</small>` : ''}</div>
         <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
-      ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}"><span class="num" aria-hidden="true">${pl(id).dorsal || '–'}</span><b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b></button>`).join('')}</div>`
+      ${ids.length ? `<div class="lv-pick">${ids.map(id => `<button type="button" class="lv-pk" data-pk="${id}">${pnum(pl(id), 'num', '–')}<b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b></button>`).join('')}</div>`
         : '<p class="muted" style="margin:0">No hay ningún jugador para elegir.</p>'}`, 'dialog', () => done(pick));
     m.el.classList.add('rqd');
     m.el.querySelectorAll('[data-pk]').forEach(b => b.onclick = () => { pick = +b.dataset.pk; m.close(false); });
@@ -1345,36 +1359,41 @@ function lvScreen(team, back) {
   if (L.fase === 'previa') {
     /* Si la convocatoria ha cambiado, solo cuentan los convocados */
     L.tit = L.tit.filter(id => cv.ids.includes(id)); L.sup = [...new Set([...L.sup.filter(id => cv.ids.includes(id)), ...cv.ids.filter(id => !L.tit.includes(id) && !L.sup.includes(id))])];
-    const st = id => L.tit.includes(id) ? 'tit' : 'sup';
-    const list = t.players.filter(x => cv.ids.includes(x.id)).sort((a, b) => byDor(a.id, b.id));
     const tmax = modOf(team);
-    const counts = () => `<b>${L.tit.length}</b> de ${tmax} titulares · <b>${L.sup.length}</b> suplentes`;
+    /* Dos grupos: se toca a un jugador para pasarlo de uno a otro */
+    const tile = (id, tit) => `<button type="button" class="lv-tile" data-lvp="${id}" aria-label="${esc(nm(id))}: ${tit ? 'titular. Toca para pasarlo a suplente' : 'suplente. Toca para sacarlo de titular'}">
+      ${pnum(pl(id), 'num', '–')}<b title="${esc(nm(id))}">${esc(nm(id))}</b><small>${tit ? 'Pasar a suplente' : 'Sacar de titular'}</small></button>`;
+    const holes = n => Array.from({ length: n }, () => `<span class="lv-tile hole" aria-hidden="true"><span class="num"></span><b>Libre</b><small>Toca un suplente</small></span>`).join('');
+    const grids = () => {
+      const tt = L.tit.slice().sort(byDor), ss = L.sup.slice().sort(byDor);
+      $('#lvT').innerHTML = tt.map(id => tile(id, true)).join('') + holes(Math.max(0, tmax - tt.length));
+      $('#lvS').innerHTML = ss.length ? ss.map(id => tile(id, false)).join('') : '<p class="muted" style="margin:0">No queda nadie en el banquillo.</p>';
+      $('#lvTn').textContent = `${L.tit.length} de ${tmax}`; $('#lvSn').textContent = L.sup.length;
+      $('#lvTn').className = L.tit.length === tmax ? 'pill' : 'pill gold';
+      document.querySelectorAll('[data-lvp]').forEach(b => b.onclick = () => {
+        const id = +b.dataset.lvp, tit = L.tit.includes(id);
+        if (!tit && L.tit.length >= tmax) return say(`Ya tienes los ${tmax} titulares. Toca antes a un titular para pasarlo a suplente.`);
+        if (tit) { L.tit = L.tit.filter(x => x !== id); L.sup.push(id); } else { L.sup = L.sup.filter(x => x !== id); L.tit.push(id); }
+        save(); grids();
+        const again = document.querySelector(`[data-lvp="${id}"]`); if (again) again.focus({ preventScroll: true });
+      });
+    };
     return { kicker, title, back,
       body: `<div class="split"><div class="stack">
         <section class="card match" aria-label="Partido"><span class="tag">${tag}</span>${score}
-          <small class="cv-place">${ic('clock')} ${L.partes} partes de ${L.min} minutos</small></section>
-        <p class="muted" style="margin:0">Estos son los ${list.length} convocados. Elige quién sale de titular y quién empieza en el banquillo.</p>
-        <ul class="st-es">${list.map(x => `<li class="st-e lv-pre" data-lvp="${x.id}"><div class="lv-who"><span class="num" aria-hidden="true">${x.dorsal || '–'}</span><b title="${esc(x.n)}">${esc(x.n)}</b></div>
-          <div class="seg lv-3" role="group" aria-label="${esc(x.n)}">${[['tit', 'Titular'], ['sup', 'Suplente']].map(([v, l]) => `<button type="button" data-st="${v}" aria-pressed="${st(x.id) === v}">${l}</button>`).join('')}</div></li>`).join('')}</ul></div>
+          <small class="cv-place">${ic('clock')} ${L.partes} partes de ${L.min} minutos · ${cv.ids.length} convocados</small></section>
+        <p class="muted" style="margin:0">Toca a un jugador para cambiarlo de grupo. Se guarda solo.</p>
+        <section class="card lv-team tit" aria-labelledby="h-lvT"><div class="card-h"><h2 id="h-lvT">Titulares</h2><span class="pill" id="lvTn"></span></div><div class="lv-tiles" id="lvT"></div></section>
+        <section class="card lv-team" aria-labelledby="h-lvS"><div class="card-h"><h2 id="h-lvS">Suplentes</h2><span class="pill blue" id="lvSn"></span></div><div class="lv-tiles" id="lvS"></div></section></div>
         <form id="lvf" class="card stack st-save" novalidate aria-labelledby="h-lvs"><h2 id="h-lvs" style="margin:0;font-size:1.1rem">Partido en directo</h2>
-          <p class="muted" style="margin:0" id="lvcnt" aria-live="polite">${counts()}</p>
-          <p class="muted" style="margin:0">Los titulares se guardan solos. Cuando el árbitro pite el comienzo, pulsa “Iniciar el directo” y el cronómetro empezará a contar.</p>
+          <p class="muted" style="margin:0">Cuando el árbitro pite el comienzo, pulsa “Iniciar el directo” y el cronómetro empezará a contar.</p>
           <p id="lverr" class="err" role="alert" hidden></p>
           <button type="submit" class="btn blue block">${ic('play')} Iniciar el directo</button></form></div>`,
       bind() {
-        document.querySelectorAll('[data-lvp]').forEach(li => {
-          const id = +li.dataset.lvp;
-          li.querySelectorAll('[data-st]').forEach(b => b.onclick = () => {
-            if (b.dataset.st === 'tit' && !L.tit.includes(id) && L.tit.length >= tmax) return say(`En fútbol ${tmax} salen ${tmax} titulares. Pasa antes a alguno a suplente.`);
-            L.tit = L.tit.filter(x => x !== id); L.sup = L.sup.filter(x => x !== id);
-            (b.dataset.st === 'tit' ? L.tit : L.sup).push(id);
-            li.querySelectorAll('[data-st]').forEach(x => x.setAttribute('aria-pressed', x === b));
-            $('#lvcnt').innerHTML = counts(); save();
-          });
-        });
+        grids();
         $('#lvf').onsubmit = ev => {
           ev.preventDefault();
-          if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular.'; $('#lverr').hidden = false; return; }
+          if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular: toca a un jugador de los suplentes.'; $('#lverr').hidden = false; return; }
           lvSnap(L); L.parte = 1; L.fase = 'juego'; L.ini = Date.now(); L.campo = [...L.tit].sort(byDor); L.campo.forEach(id => { L.desde[id] = 0; });
           L.ev.push({ t: 'ini', parte: 1, min: '0', s: 0, p: 1 }); save(); render(); say('¡Empieza el partido!');
         };
@@ -1387,7 +1406,7 @@ function lvScreen(team, back) {
     return { kicker: `Acta · ${esc(team)}`, title, back,
       body: `<div class="split"><div class="stack">
         <section class="card match" aria-label="Resultado"><span class="tag">${tag} · Final</span>${score}</section>
-        ${card('h-lvm', 'Minutos y goles', rows.length ? `<div class="st-head lv-h" aria-hidden="true"><span>Jugador</span><span></span><span>Min.</span><span>Goles</span></div><div class="st-list">${rows.map(r => `<div class="st-row lv-row"><span class="k">${pl(r.id).dorsal || '–'}</span>
+        ${card('h-lvm', 'Minutos y goles', rows.length ? `<div class="st-head lv-h" aria-hidden="true"><span>Jugador</span><span></span><span>Min.</span><span>Goles</span></div><div class="st-list">${rows.map(r => `<div class="st-row lv-row">${pnum(pl(r.id), 'k', '–')}
           <span class="st-n"><b title="${esc(pl(r.id).n)}">${esc(pl(r.id).n)}</b><small>${L.tit.includes(r.id) ? 'Titular' : 'Suplente'}</small></span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>
           <p class="muted st-foot">Ya están sumados a las estadísticas de cada jugador.</p>` : '<p class="muted" style="margin:0">No jugó nadie.</p>')}
         <div class="btn-row lv-add"><button type="button" class="btn blue" data-lvadd="gol">${ic('plus')} Gol nuestro</button><button type="button" class="btn outline" data-lvadd="golr">${ic('plus')} Gol del rival</button></div>
@@ -1412,7 +1431,7 @@ function lvScreen(team, back) {
   const playing = L.fase === 'juego', last = L.parte >= L.partes;
   const ctl = playing ? `<button type="button" class="btn gold block" id="lvend">${ic('stop')} ${last ? 'Finalizar partido' : `Finalizar ${parteLbl(L.parte)}`}</button>`
     : `<button type="button" class="btn gold block" id="lvgo">${ic('play')} Iniciar ${parteLbl(L.parte + 1)}</button>`;
-  const prow = (id, field) => `<div class="lv-p"><span class="k">${pl(id).dorsal || '–'}</span><b class="st-n" title="${esc(pl(id).n)}">${esc(pl(id).n)}</b>
+  const prow = (id, field) => `<div class="lv-p">${pnum(pl(id), 'k', '–')}<b class="st-n" title="${esc(pl(id).n)}">${esc(pl(id).n)}</b>
     <span class="lv-tags">${'<i class="lv-c ama" title="Tarjeta amarilla"></i>'.repeat(Math.min(lvYellow(L, id), 1))}${L.rojas.includes(id) ? '<i class="lv-c roja" title="Tarjeta roja"></i>' : ''}${lvGoals(L, id) ? `<span class="lv-gl">${ic('ball')}${lvGoals(L, id) > 1 ? lvGoals(L, id) : ''}</span>` : ''}</span>
     <span class="lv-m" data-lvm="${id}">${lvMins(L, id)}'</span></div>`;
   const actions = [['gol', 'ball', 'Gol nuestro'], ['golr', 'ball', 'Gol del rival'], ['cambio', 'swap', 'Cambio'], ['ama', 'card', 'Amarilla'], ['roja', 'card', 'Roja']];
@@ -1510,7 +1529,7 @@ function fpScreen(team, back) {
   const head = `<section class="card match" aria-label="Resultado"><span class="tag">${dateLbl(f)} · ${p.casa ? 'Local' : 'Visitante'}${res ? ' · ' + (res === 'G' ? 'Ganado' : res === 'P' ? 'Perdido' : 'Empatado') : ''}</span>${sc}</section>`;
   const view = S.fpView || 'res';
   const seg = `<div class="seg g-scope gm-seg fp-seg" role="group" aria-label="Qué ver del partido">${[['res', 'Convocatoria'], ['gol', 'Goles'], ['jug', 'Jugadores']].map(([k, l]) => `<button type="button" data-fpv="${k}" aria-pressed="${view === k}">${l}</button>`).join('')}</div>`;
-  const prow = (id, right, sub) => `<div class="lv-p"><span class="k">${pl(id).dorsal || '–'}</span><span class="st-n fp-n"><b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b>${sub ? `<small>${sub}</small>` : ''}</span><span></span><span class="lv-m">${right}</span></div>`;
+  const prow = (id, right, sub) => `<div class="lv-p">${pnum(pl(id), 'k', '–')}<span class="st-n fp-n"><b title="${esc(pl(id).n)}">${esc(pl(id).n)}</b>${sub ? `<small>${sub}</small>` : ''}</span><span></span><span class="lv-m">${right}</span></div>`;
   let body = '';
   if (view === 'res') {
     const ids = cv ? cv.ids.filter(id => t.players.some(x => x.id === id)) : A ? [...A.tit, ...A.sup] : [];
@@ -1534,7 +1553,7 @@ function fpScreen(team, back) {
   }
   if (view === 'jug') {
     const rows = t.players.filter(x => statOf(x.id, f)).map(x => ({ x, ...statOf(x.id, f) })).sort((u, v) => v.m - u.m || byDor(u.x.id, v.x.id));
-    body = card('h-fpj', `Han jugado · ${rows.length}`, rows.length ? `<div class="st-head lv-h" aria-hidden="true"><span>Jugador</span><span></span><span>Min.</span><span>Goles</span></div><div class="st-list">${rows.map(r => `<div class="st-row lv-row"><span class="k">${r.x.dorsal || '–'}</span>
+    body = card('h-fpj', `Han jugado · ${rows.length}`, rows.length ? `<div class="st-head lv-h" aria-hidden="true"><span>Jugador</span><span></span><span>Min.</span><span>Goles</span></div><div class="st-list">${rows.map(r => `<div class="st-row lv-row">${pnum(r.x, 'k', '–')}
         <span class="st-n"><b title="${esc(r.x.n)}">${esc(r.x.n)}</b>${A ? `<small>${A.tit.includes(r.x.id) ? 'Titular' : 'Suplente'}</small>` : ''}</span><span></span><span>${r.m}'</span><span>${r.g}</span></div>`).join('')}</div>`
       : '<p class="muted" style="margin:0">Todavía no se han apuntado los minutos de este partido.</p>');
   }
@@ -1628,7 +1647,7 @@ function convScreen() {
   const allBtn = on => on || many ? `${ic('x')} Quitar a todos` : `${ic('check')} Convocar a todos`;
   const cnt = () => `${c.ids.length}<small style="font-size:1.2rem;opacity:.7"> / ${Math.min(max, t.players.length)}</small>`;
   const row = (x, i) => `<li><button type="button" class="player" data-cv="${x.id}" aria-pressed="${c.ids.includes(x.id)}">
-    <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${x.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(x.n)}">${esc(x.n)}</span>
+    <span class="tick" aria-hidden="true">${ic('check')}</span>${pnum(x, 'num', i + 1)}<span class="pinfo"><span class="pname" title="${esc(x.n)}">${esc(x.n)}</span>
     <span class="pstate">${c.ids.includes(x.id) ? 'Convocado' : 'No va'}</span>${attPill(team, x.id)}</span></button></li>`;
   return {
     kicker: `Convocatoria · ${esc(team)}`, title: `vs ${esc(nice(p.rival))}`, back,
@@ -1691,31 +1710,34 @@ function matchSlide(team) {
 }
 function matchTag(team) { const nm = EQ[team] && nextMatch(EQ[team]); return nm ? dateLbl(nm.fecha) : ''; }
 function matchCarousel() {
-  const teams = Object.keys(S.teams), many = teams.length > 1, at = Math.max(0, teams.indexOf(S.team)), tag = matchTag(teams[at] || S.team);
-  const head = `<div class="card-h"><h2 id="h-m">Próximo partido</h2><span class="tag gold" id="mtag"${tag ? '' : ' hidden'}>${tag}</span></div>`;
-  if (!many) return `<div class="a-match mwrap"><section class="card match" aria-labelledby="h-m">${head}<div class="mslide">${matchSlide(S.team)}</div></section></div>`;
-  return `<div class="a-match mwrap"><section class="card match" aria-labelledby="h-m" aria-roledescription="carrusel">${head}
-    <div class="mcar" id="mcar" data-at="${at}">${teams.map((t, i) => `<div class="mslide" role="group" aria-roledescription="partido" aria-label="${esc(t)}, ${i + 1} de ${teams.length}"${i === at ? '' : ' inert'}>${matchSlide(t)}</div>`).join('')}</div></section>
+  const teams = Object.keys(S.teams), many = teams.length > 1, at = Math.max(0, teams.indexOf(S.team));
+  /* Cada equipo tiene su tarjeta entera; con varios equipos se desliza la tarjeta completa */
+  const one = (t, i) => { const tag = matchTag(t);
+    return `<section class="card match mslide" aria-labelledby="h-m${i}"${many ? ` role="group" aria-roledescription="partido" aria-label="${esc(t)}, ${i + 1} de ${teams.length}"${i === at ? '' : ' inert'}` : ''}>
+      <div class="card-h"><h2 id="h-m${i}">Próximo partido</h2>${tag ? `<span class="tag gold">${tag}</span>` : ''}</div>${matchSlide(t)}</section>`; };
+  if (!many) return `<div class="a-match mwrap">${one(S.team, 0)}</div>`;
+  return `<div class="a-match mwrap"><div class="mcar" id="mcar" data-at="${at}" aria-roledescription="carrusel" aria-label="Próximos partidos">${teams.map(one).join('')}</div>
     <div class="mdots" role="group" aria-label="Elegir equipo">${teams.map((t, i) => `<button type="button" data-dot="${i}" aria-label="Próximo partido del ${esc(t)}"${i === at ? ' aria-current="true"' : ''}></button>`).join('')}</div></div>`;
 }
 function bindCarousel() {
   document.querySelectorAll('[data-conv-team]').forEach(b => b.onclick = () => { S.team = b.dataset.convTeam; go('team', 'conv'); });
   document.querySelectorAll('[data-lv-team]').forEach(b => b.onclick = () => openLv(b.dataset.lvTeam, nextMatch(EQ[b.dataset.lvTeam]).fecha));
   const car = $('#mcar'); if (!car) return;
-  const teams = Object.keys(S.teams), slides = [...car.children], dots = [...document.querySelectorAll('[data-dot]')];
+  const slides = [...car.children], dots = [...document.querySelectorAll('[data-dot]')];
   let cur = +car.dataset.at;
-  const show = i => { cur = i; slides.forEach((s, k) => s.inert = k !== i); dots.forEach((d, k) => d.toggleAttribute('aria-current', k === i));
-    const tg = matchTag(teams[i]); $('#mtag').textContent = tg; $('#mtag').hidden = !tg; };
-  const to = (i, smooth = true) => car.scrollTo({ left: i * car.clientWidth, behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
+  const show = i => { cur = i; slides.forEach((s, k) => s.inert = k !== i); dots.forEach((d, k) => d.toggleAttribute('aria-current', k === i)); };
+  /* Paso entre tarjetas: su ancho más el hueco que las separa */
+  const step = () => slides[1].offsetLeft - slides[0].offsetLeft || car.clientWidth;
+  const to = (i, smooth = true) => car.scrollTo({ left: i * step(), behavior: smooth && !matchMedia('(prefers-reduced-motion: reduce)').matches ? 'smooth' : 'auto' });
   requestAnimationFrame(() => to(cur, false));
-  car.addEventListener('scroll', () => { const i = Math.round(car.scrollLeft / car.clientWidth); if (i !== cur && slides[i]) show(i); }, { passive: true });
+  car.addEventListener('scroll', () => { const i = Math.round(car.scrollLeft / step()); if (i !== cur && slides[i]) show(i); }, { passive: true });
   dots.forEach(d => d.onclick = () => { show(+d.dataset.dot); to(+d.dataset.dot); });
   // Arrastrar con el ratón (en pantallas táctiles ya se desliza con el dedo)
   let x0 = null, l0 = 0, moved = false;
   car.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' || e.button) return; x0 = e.clientX; l0 = car.scrollLeft; moved = false; });
   addEventListener('pointermove', e => { if (x0 === null) return; const dx = e.clientX - x0; if (Math.abs(dx) > 5 && !moved) { moved = true; car.classList.add('drag'); } if (moved) car.scrollLeft = l0 - dx; });
   addEventListener('pointerup', e => { if (x0 === null) return; const dx = e.clientX - x0; x0 = null; if (!moved) return;
-    car.classList.remove('drag'); const i = Math.min(slides.length - 1, Math.max(0, Math.abs(dx) > car.clientWidth / 5 ? cur + (dx < 0 ? 1 : -1) : cur)); show(i); to(i); });
+    car.classList.remove('drag'); const i = Math.min(slides.length - 1, Math.max(0, Math.abs(dx) > step() / 5 ? cur + (dx < 0 ? 1 : -1) : cur)); show(i); to(i); });
   car.addEventListener('click', e => { if (moved) { e.preventDefault(); e.stopPropagation(); moved = false; } }, true);
   car.addEventListener('dragstart', e => e.preventDefault());
 }
@@ -1802,7 +1824,7 @@ const COACH = {
       <p class="muted" style="margin:0">Toca a cada jugador que ha venido. Se guarda solo.</p>
       ${t.players.length ? '' : `<p class="card muted" style="margin:0">Todavía no hay jugadores en este equipo. Añádelos en “Plantilla”.</p>`}
       <ul class="players">${t.players.map((p, i) => `<li><button type="button" class="player" data-p="${p.id}" aria-pressed="${a.has(p.id)}">
-        <span class="tick" aria-hidden="true">${ic('check')}</span><span class="num" aria-hidden="true">${p.dorsal || i + 1}</span><span class="pinfo"><span class="pname" title="${esc(p.n)}">${esc(p.n)}</span>
+        <span class="tick" aria-hidden="true">${ic('check')}</span>${pnum(p, 'num', i + 1)}<span class="pinfo"><span class="pname" title="${esc(p.n)}">${esc(p.n)}</span>
         <span class="pstate">${a.has(p.id) ? 'Ha venido' : 'Sin marcar'}</span></span></button></li>`).join('')}</ul></div>
       ${attendanceCard(S.team, 'h-at2')}</div>`;
     const plv = S.plView === 'stats' ? 'stats' : 'roster';

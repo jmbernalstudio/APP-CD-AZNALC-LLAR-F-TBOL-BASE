@@ -325,3 +325,7 @@ create policy directo_mis_equipos on public.partidos_directo for all to authenti
 -- Fútbol 7 o fútbol 11 de cada equipo (la cambia la junta en Equipos > el equipo).
 -- Solo añade una columna vacía: no toca nada de lo que ya hay.
 alter table public.equipos add column if not exists modalidad int;
+
+-- Foto de cada jugador (opcional). Solo añade una columna: no toca nada de lo que ya hay.
+-- La ven únicamente su entrenador y la junta, con la sesión iniciada (la misma regla que la plantilla).
+alter table public.jugadores add column if not exists foto text;
