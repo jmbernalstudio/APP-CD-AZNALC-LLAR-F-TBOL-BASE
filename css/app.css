@@ -1060,7 +1060,7 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .cal-tip { margin: -6px 0 0; font-size: .86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* Partidos con borde azul del club; la columna de las horas con fondo */
 .tt-c.pa { border: 2px solid var(--club); }
-.tt-week .tt-wr .tt-h, .tt .tt-row .tt-h, .tt-week .tt-wr.th > span { background: #E9ECF3; }
+.tt-week .tt-wr .tt-h, .tt .tt-row .tt-h, .tt-week .tt-wr.th > span { background: #F3F5F9; }
 /* Calendario: horas centradas en vertical y separaciones más marcadas */
 .tt-week .tt-wr .tt-h, .tt .tt-row .tt-h { display: flex; align-items: center; justify-content: center; padding-top: 6px; padding-bottom: 6px; }
 .tt-week, .tt { border-color: #BFC6D4; }

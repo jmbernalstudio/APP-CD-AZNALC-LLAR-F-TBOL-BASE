@@ -2217,7 +2217,7 @@ async function calPoster(wk) {
   rr(PAD, HEAD, W - PAD * 2, H - HEAD - PAD, 24, '#FFFFFF');
   const colX = i => PAD + GUT + i * COLW;
   /* Columna de las horas con fondo */
-  x.save(); x.beginPath(); x.rect(PAD, HEAD, GUT, H - HEAD - PAD); x.clip(); rr(PAD, HEAD, GUT + 24, H - HEAD - PAD, 24, '#E9ECF3'); x.restore();
+  x.save(); x.beginPath(); x.rect(PAD, HEAD, GUT, H - HEAD - PAD); x.clip(); rr(PAD, HEAD, GUT + 24, H - HEAD - PAD, 24, '#F3F5F9'); x.restore();
   DIAS_D.forEach((dn, i) => { const f = addDays(wk, i), today = f === TODAY;
     text(dn.toUpperCase(), colX(i) + COLW / 2, HEAD + 30, 700, 18, today ? BLUE : MUTED, COLW - 16, 'center');
     if (today) { x.beginPath(); x.arc(colX(i) + COLW / 2, HEAD + 64, 22, 0, Math.PI * 2); x.fillStyle = BLUE; x.fill(); }
