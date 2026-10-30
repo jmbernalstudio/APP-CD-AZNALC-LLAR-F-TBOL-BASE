@@ -1270,6 +1270,8 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .dd-l button:hover, .dd-l button:focus-visible { background: var(--shell); }
 .dd-l button[aria-selected="true"] { background: var(--ink); color: #fff; font-weight: 700; }
 .dd-l button .i { width: 18px; height: 18px; }
+.pz-live { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.pz-live small { color: var(--club); font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .pz-gm .gm-h { justify-content: flex-start; min-width: 0; } .pz-gm .gm-h .pill { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .pz-gm .gm-h small { margin-left: auto; flex: none; } .pz-gm .gm-h .iconbtn { flex: none; background: var(--shell); box-shadow: none; }   /* la misma X que las ventanas */
 /* Todas las ventanas a pantalla completa (Jose): sin fondo oscuro, el contenido ocupa todo y en ordenador va centrado hasta 1100px */

@@ -1267,7 +1267,9 @@ function pizarra(team, L, players, save, e, p, onSub) {
   const d = document.createElement('div');
   d.className = 'pz'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', `Alineación contra ${nice(p.rival)}`);
   const back = document.activeElement;
-  const close = () => { d.remove(); lockScroll(); document.removeEventListener('keydown', key);
+  const pzClock = () => L.fase === 'juego' ? lvClock(L) : L.fase === 'pausa' ? `${lvClock(L)} · Descanso` : 'Final';
+  const tick = setInterval(() => { const c = d.querySelector('#pz-clock'); if (c && L.fase === 'juego') c.textContent = lvClock(L); }, 1000);
+  const close = () => { clearInterval(tick); d.remove(); lockScroll(); document.removeEventListener('keydown', key);
     if (L.form !== form0 || dirty) render();   /* la tarjeta Formación de debajo enseña la nueva */
     else if (back && back.focus) back.focus({ preventScroll: true }); };
   const key = ev => { if (ev.key === 'Escape' && !document.querySelector('.modal')) close(); };
@@ -1298,6 +1300,10 @@ function pizarra(team, L, players, save, e, p, onSub) {
         <div class="pz-btns"><button type="button" class="btn blue block" id="pz-wa"${ids.some(x => x != null) ? '' : ' disabled'}>${ic('send')} Enviar por WhatsApp</button>
         ${ids.some(x => x != null) ? `<button type="button" class="btn ghost block" id="pz-clr">${ic('undo')} Vaciar la pizarra</button>` : ''}</div></div></div></div>`;
     d.querySelector('#pz-x').onclick = close;
+    /* Con el partido empezado, en la tarjeta va el resultado y el cronómetro en vez de la hora */
+    const mid = d.querySelector('.pz-gm .gm-s > :nth-child(2)');
+    if (mid && L.fase !== 'previa') { const [a, b] = L.casa ? [L.nos, L.ellos] : [L.ellos, L.nos];
+      mid.outerHTML = `<span class="pz-live"><span class="gtime" aria-label="Resultado ${a} a ${b}">${a}–${b}</span><small id="pz-clock" role="timer">${pzClock()}</small></span>`; }
     /* Cambiar la formación: los jugadores siguen en el mismo orden y pasan a las posiciones nuevas */
     /* Desplegable de formación: se abre al tocarlo y se cierra al elegir, al tocar fuera o con Escape */
     const fb = d.querySelector('#pz-fmb'), fl = d.querySelector('#pz-fml');
