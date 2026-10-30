@@ -85,7 +85,7 @@
     if (!box) { box = document.createElement('div'); box.id = 'login'; box.className = 'login'; document.body.prepend(box); }
     box.hidden = false;
     box.innerHTML = `<main class="card stack" aria-labelledby="lg-t">
-      <img class="cr crest" src="${CREST}" alt="">
+      <img class="cr crest" src="${crestSm()}" alt="">
       <div><h1 id="lg-t">C.D. Aznalcóllar Fútbol Base</h1><p class="sub">Entrenadores y junta directiva</p></div>
       <form id="lg" class="stack" method="post" action="#" novalidate>
         <label class="f" for="lu">Usuario o correo<input type="text" id="lu" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required></label>

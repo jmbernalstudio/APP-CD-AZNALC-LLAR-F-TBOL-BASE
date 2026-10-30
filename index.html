@@ -34,6 +34,7 @@
 /* Pantalla de carga: el escudo gira en cuanto su imagen está lista y la pantalla dura al menos 3 s desde ese momento */
 (function () {
   var s = document.getElementById('splash'), img = s.querySelector('img'), t0 = 0, ready = false, done = false;
+  try { if (localStorage.getItem('escudo75') === '0') img.src = 'icons/escudo-clasico-160.png'; } catch (e) {}   /* escudo de siempre si el usuario lo eligió */
   function out() { if (done) return; done = true; s.classList.add('out'); setTimeout(function () { s.remove(); }, 400); }
   function finish() { setTimeout(out, Math.max(0, 3000 - (Date.now() - t0))); }
   function go() { if (t0) return; t0 = Date.now(); s.classList.add('go'); if (ready) finish(); }
