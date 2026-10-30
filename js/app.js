@@ -1319,7 +1319,7 @@ function pizarra(team, L, players, save, e, p, onSub) {
         const again = d.querySelector('#pz-fmb'); if (again) again.focus({ preventScroll: true }); });
     }
     if (d.querySelector('#pz-clr')) d.querySelector('#pz-clr').onclick = () => { L.pz.ids = []; sel = null; save(); draw(); };
-    d.querySelector('#pz-wa').onclick = () => shareImage({ title: 'Alineación', wait: 'Preparando la imagen…', build: () => pzPoster(team, L, players, e, p),
+    d.querySelector('#pz-wa').onclick = () => shareImage({ title: 'Alineación', wait: 'Preparando la imagen…', build: () => pzPoster(team, L, players, e, p, plans()),
       name: fileName('alineacion', team, p.fecha), alt: `Alineación del ${team} contra ${them}`, msg: '', what: 'la imagen' });
     d.querySelectorAll('[data-pzp]').forEach(b => b.onclick = () => { const id = +b.dataset.pzp; sel = sel === id ? null : id; draw();
       const again = d.querySelector(`[data-pzp="${id}"]`); if (again) again.focus({ preventScroll: true }); });
@@ -1356,7 +1356,7 @@ function pizarra(team, L, players, save, e, p, onSub) {
   document.body.append(d); lockScroll(); draw(); d.querySelector('#pz-x').focus({ preventScroll: true });
 }
 /* Imagen de la alineación para mandar por WhatsApp: escudos y partido arriba, el campo con cada jugador y el banquillo abajo */
-async function pzPoster(team, L, players, e, p) {
+async function pzPoster(team, L, players, e, p, plan = {}) {
   await Promise.all(['800 60px Outfit', '700 40px Outfit', '500 30px Outfit'].map(f => document.fonts.load(f).catch(() => {})));
   const form = L.form || formsOf(team)[0] || '', spots = pzSpots(form);
   const pl = id => players.find(x => x.id === id) || { id, n: 'Jugador', dorsal: null };
@@ -1367,7 +1367,7 @@ async function pzPoster(team, L, players, e, p) {
   const W = 1080, PAD = 48, HEAD = 380, FMH = form ? 84 + 24 : 0, FW = W - PAD * 2, FH = Math.round(FW * 90 / 68), BENCH = bench.length ? 70 + Math.ceil(bench.length / 3) * 100 : 0;
   const H = PAD + HEAD + 24 + FMH + FH + (BENCH ? 24 + BENCH : 0) + PAD;
   const cv = document.createElement('canvas'), x = cv.getContext('2d'); cv.width = W; cv.height = H;
-  const BLUE = '#0034DF', GRASS = '#E9F6EE', INK = '#0B0B0B', MUTED = '#5B6582', SOFT = '#E6EBFD';   /* campo claro como el dibujo de la formación */
+  const BLUE = '#0034DF', GOLD = '#FDCB2B', GRASS = '#E9F6EE', INK = '#0B0B0B', MUTED = '#5B6582', SOFT = '#E6EBFD';   /* campo claro como el dibujo de la formación */
   const font = (w, px) => `${w} ${px}px Outfit, system-ui, sans-serif`;
   const text = (t, tx, y, w, px, color, maxW, align = 'left', fit) => { x.font = font(w, px);
     if (fit) while (px > fit && x.measureText(t).width > maxW) x.font = font(w, --px);
@@ -1376,17 +1376,17 @@ async function pzPoster(team, L, players, e, p) {
   const path = (rx, ry, rw, rh, rad) => { rad = Math.min(rad, rh / 2, rw / 2); x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad); x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); };
   const rr = (rx, ry, rw, rh, rad, c) => { path(rx, ry, rw, rh, rad); x.fillStyle = c; x.fill(); };
   const crest = await loadImg(crestBig()), rival = crestOf(e, p.rival) ? await loadImg(crestOf(e, p.rival)) : null;
-  const photos = {}; await Promise.all([...ids, ...bench].filter(id => id != null && pl(id).foto).map(async id => { photos[id] = await loadImg(pl(id).foto); }));
+  const photos = {}; await Promise.all([...ids, ...bench, ...Object.values(plan)].filter(id => id != null && pl(id).foto).map(async id => { photos[id] = await loadImg(pl(id).foto); }));
   const logo = (img, cx, cy, sz, name) => { if (img) { const k = Math.min(sz / img.width, sz / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); }
     else { x.beginPath(); x.arc(cx, cy, sz / 2, 0, Math.PI * 2); x.fillStyle = INK; x.fill(); text(initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, '')), cx, cy + 2, 800, 36, '#FFFFFF', sz, 'center'); } };
   /* Cara del jugador: foto, si no dorsal, si no el icono de persona */
-  const face = (id, cx, cy, r, bg = BLUE) => { const q = pl(id);
+  const face = (id, cx, cy, r, bg = BLUE, fg = '#FFFFFF') => { const q = pl(id);
     x.beginPath(); x.arc(cx, cy, r + 4, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
     if (photos[id]) { x.save(); x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.clip(); const im = photos[id], k = Math.max(2 * r / im.width, 2 * r / im.height);
       x.drawImage(im, cx - im.width * k / 2, cy - im.height * k / 2, im.width * k, im.height * k); x.restore(); return; }
     x.beginPath(); x.arc(cx, cy, r, 0, Math.PI * 2); x.fillStyle = bg; x.fill();
-    if (q.dorsal) text(String(q.dorsal), cx, cy + 2, 800, r * 0.95, '#FFFFFF', 2 * r, 'center');
-    else { x.strokeStyle = '#FFFFFF'; x.lineWidth = r * 0.14; x.beginPath(); x.arc(cx, cy - r * 0.22, r * 0.3, 0, Math.PI * 2); x.stroke();
+    if (q.dorsal) text(String(q.dorsal), cx, cy + 2, 800, r * 0.95, fg, 2 * r, 'center');
+    else { x.strokeStyle = fg; x.lineWidth = r * 0.14; x.beginPath(); x.arc(cx, cy - r * 0.22, r * 0.3, 0, Math.PI * 2); x.stroke();
       x.beginPath(); x.arc(cx, cy + r * 0.72, r * 0.58, Math.PI * 1.15, Math.PI * 1.85); x.stroke(); } };
   x.fillStyle = '#F3F5F9'; x.fillRect(0, 0, W, H);
   /* Cabecera: la misma tarjeta del partido que se ve en la pantalla */
@@ -1399,7 +1399,11 @@ async function pzPoster(team, L, players, e, p) {
   const lx = PAD + FW * 0.2, rx2 = PAD + FW * 0.8, cy0 = PAD + 178;
   logo(lImg, lx, cy0, 120, lName); logo(rImg, rx2, cy0, 120, rName);
   text(lName, lx, cy0 + 96, 700, 32, INK, 330, 'center'); text(rName, rx2, cy0 + 96, 700, 32, INK, 330, 'center');
-  if (res) { const sc = scoreTxt(p); x.font = font(800, 46); const sw = x.measureText(sc).width + 52;
+  if (L.fase && L.fase !== 'previa') {   /* en directo: el resultado de ahora y el cronómetro, como en la pantalla */
+    const [a, b] = L.casa ? [L.nos, L.ellos] : [L.ellos, L.nos];
+    text(`${a}–${b}`, W / 2, cy0 - 10, 800, 76, INK, 260, 'center');
+    text(L.fase === 'juego' ? lvClock(L) : L.fase === 'pausa' ? `${lvClock(L)} · Descanso` : 'Final', W / 2, cy0 + 50, 800, 30, BLUE, 260, 'center'); }
+  else if (res) { const sc = scoreTxt(p); x.font = font(800, 46); const sw = x.measureText(sc).width + 52;
     rr(W / 2 - sw / 2, cy0 - 38, sw, 76, 20, res === 'G' ? '#12A15A' : res === 'P' ? '#E23B4E' : '#8A93A8'); text(sc, W / 2, cy0 + 2, 800, 46, '#FFFFFF', sw, 'center'); }
   else if (p.hora) text(p.hora, W / 2, cy0 + 4, 800, 76, INK, 260, 'center');
   else text('Hora por confirmar', W / 2, cy0 + 4, 700, 28, MUTED, 220, 'center');
@@ -1416,10 +1420,12 @@ async function pzPoster(team, L, players, e, p) {
   const R = spots.length > 8 ? 54 : 70, PW = spots.length > 8 ? 150 : 220;   /* bolas grandes; en fútbol 11 algo menos para que quepan */
   spots.forEach((sp, i) => { const cx = fx + FW * sp.x / 100, cy = fy + FH * sp.y / 100, id = ids[i];
     if (id == null) { x.setLineDash([10, 8]); x.beginPath(); x.arc(cx, cy, R, 0, Math.PI * 2); x.strokeStyle = '#8E97A8'; x.lineWidth = 4; x.stroke(); x.setLineDash([]); return; }
-    const col = i ? BLUE : INK;   /* el portero, en negro */
-    face(id, cx, cy, R, col);
-    x.font = font(700, 28); let nm = pl(id).n; if (x.measureText(nm).width > PW) nm = shortName(nm); const tw = Math.min(x.measureText(nm).width, PW) + 28;
-    rr(cx - tw / 2, cy + R + 12, tw, 42, 21, col); text(nm, cx, cy + R + 34, 700, 28, '#FFFFFF', PW, 'center'); });
+    /* Un cambio previsto (solo probado en la pizarra) sale en dorado con el que entraría */
+    const pin = plan[i], who = pin != null ? pin : id, col = pin != null ? GOLD : i ? BLUE : INK, ink = pin != null ? INK : '#FFFFFF';
+    if (pin != null) { x.setLineDash([12, 8]); x.beginPath(); x.arc(cx, cy, R + 12, 0, Math.PI * 2); x.strokeStyle = GOLD; x.lineWidth = 5; x.stroke(); x.setLineDash([]); }
+    face(who, cx, cy, R, col, ink);
+    x.font = font(700, 28); let nm = pl(who).n; if (x.measureText(nm).width > PW) nm = shortName(nm); const tw = Math.min(x.measureText(nm).width, PW) + 28;
+    rr(cx - tw / 2, cy + R + 12, tw, 42, 21, col); text(nm, cx, cy + R + 34, 700, 28, ink, PW, 'center'); });
   /* Banquillo */
   if (BENCH) { const by = fy + FH + 24; text(`Banquillo · ${bench.length}`, PAD, by + 26, 800, 32, INK, FW);
     /* fichas tan altas como la barra de la formación */
