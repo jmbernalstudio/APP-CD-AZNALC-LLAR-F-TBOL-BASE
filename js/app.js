@@ -585,7 +585,7 @@ function openMatch(e, p) {
       <div class="wide"><dt>Campo</dt><dd>${placeOf(p) ? esc(placeOf(p)) : 'Por confirmar'}</dd></div>
       <div class="wide"><dt>Competición</dt><dd>${esc(e.cat)}</dd></div></dl>
     ${p.casa ? '' : `<section class="mx-k" aria-labelledby="mx-kt"><h3 id="mx-kt">Equipación del rival</h3>${kit}</section>`}
-    ${p.campo && !p.casa ? `<a class="btn blue block" target="_blank" rel="noopener" href="${esc(mapsUrl(p))}">${ic('pin')} Cómo llegar</a>` : ''}
+    ${needMaps(p) ? `<a class="btn blue block" target="_blank" rel="noopener" href="${esc(mapsUrl(p))}">${ic('pin')} Cómo llegar</a>` : ''}
     ${lvAvail(e, p) ? `<button type="button" class="btn blue block" id="mx-lv">${ic(actaOf(e.nombre, p.fecha) && actaOf(e.nombre, p.fecha).fase === 'fin' ? 'list' : (actaOf(e.nombre, p.fecha) || {}).fase && actaOf(e.nombre, p.fecha).fase !== 'previa' ? 'play' : 'pen')} ${(() => { const a = actaOf(e.nombre, p.fecha); return !a || a.fase === 'previa' ? 'Rellenar datos' : a.fase === 'fin' ? 'Ver acta del partido' : 'Seguir el directo'; })()}</button>` : ''}
     ${fichaAvail(e, p) ? `<button type="button" class="btn outline block" id="mx-fp">${ic('list')} Ficha del partido</button>` : ''}
     ${p.goles && S.teams[e.nombre] && statsOn() && !stFilled(e.nombre, p.fecha) ? `<button type="button" class="btn outline block" id="mx-st">${ic('clock')} Apuntar minutos y goles</button>` : ''}
@@ -670,7 +670,9 @@ async function matchPoster(e, p) {
 /* Texto con la ubicación del campo (solo de visitante: de local jugamos en casa) */
 /* En la Liga Educa, el enlace de Google Maps que trae el PDF de la liga; si no, se busca el campo por su nombre */
 const mapsUrl = p => /^https:\/\//.test(p.maps || '') ? p.maps : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(placeOf(p))}`;
-const mapsMsg = p => p.campo && !p.casa ? `*Cómo llegar y ubicación del partido:*\n\n📍 ${mapsUrl(p)}` : '';
+/* Cómo llegar sólo hace falta de visitante y si el partido no se ha jugado todavía */
+const needMaps = p => !!p.campo && !p.casa && !p.goles && !(p.fecha < TODAY);
+const mapsMsg = p => needMaps(p) ? `*Cómo llegar y ubicación del partido:*\n\n📍 ${mapsUrl(p)}` : '';
 /* Ventana para mandar una imagen por WhatsApp. Muchos móviles (iPhone y algunos Android) quitan el texto
    cuando se comparte una imagen, así que la ubicación va en un segundo paso con un enlace de WhatsApp,
    que abre el chat con el texto ya escrito en los dos sistemas. Al compartir la imagen, el texto también queda copiado */
