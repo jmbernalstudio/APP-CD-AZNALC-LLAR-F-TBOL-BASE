@@ -1213,7 +1213,8 @@ const actaOf = (team, f) => (S.actas || {})[`${team} ${f}`] || null;
 /* Dorsal de cada jugador en este partido (se elige al poner titulares y suplentes); si no, el de la plantilla */
 const lvDor = (L, x) => (L.dor && L.dor[x.id] != null ? L.dor[x.id] : x.dorsal) || null;
 const lvPlayers = (L, players) => players.map(x => ({ ...x, dorsal: lvDor(L, x) }));
-const dorTxt = q => q && q.dorsal ? `${q.dorsal} · ` : '';
+/* Junto al nombre solo si tiene foto: sin foto el dorsal ya va dentro de la bola */
+const dorTxt = q => q && q.foto && q.dorsal ? `${q.dorsal} · ` : '';
 function lvLoad(team, p) {
   let L = null; try { L = JSON.parse(localStorage.getItem(lvKey(team, p.fecha)) || 'null'); } catch (_) {}
   const srv = actaOf(team, p.fecha);
