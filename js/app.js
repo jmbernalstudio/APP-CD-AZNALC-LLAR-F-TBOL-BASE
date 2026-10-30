@@ -72,7 +72,7 @@ const ourRow = e => e.tabla.find(r => US.test(r.equipo));
 const placeOf = p => (p.campo || '').replace(/\s*\((F11|F7)[^)]*\)/gi, '').trim().split(' - ').map(x => nice(x.trim())).join(' · ');
 const updated = () => { const d = new Date(D.actualizado); return isNaN(d) ? '' : `${d.getDate()} ${MES[d.getMonth()]}`; };
 function crestBadge(e, name, cls = 'mini') {
-  const src = US.test(name) ? CREST_SRC : crestOf(e, name);
+  const src = US.test(name) ? crestSm() : crestOf(e, name);
   return src ? `<span class="${cls} img" aria-hidden="true"><img src="${src}" alt="" loading="lazy"></span>`
     : `<span class="${cls}" style="background:var(--navy)" aria-hidden="true">${initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, ''))}</span>`;
 }
@@ -202,8 +202,17 @@ function say(msg, undo) {
 }
 
 
-const CREST = 'icons/escudo-160.png';
-const CREST_SRC = CREST;
+/* Escudo del club: el del 75º aniversario (por defecto) o el de siempre, según elija cada usuario en Opciones.
+   Se guarda en el propio móvil; si no se puede leer, sale el del aniversario */
+const ESC75 = () => { try { return localStorage.getItem('escudo75') !== '0'; } catch (_) { return true; } };
+const crestSm = () => ESC75() ? 'icons/escudo-160.png' : 'icons/escudo-clasico-160.png';
+const crestBig = () => ESC75() ? 'icons/escudo.png' : 'icons/escudo-clasico.png';
+/* Lo que no pinta la app (menú lateral e icono de la pestaña) se cambia aquí */
+function applyCrest() {
+  document.querySelectorAll('.rail .logo').forEach(i => { i.src = crestSm(); });
+  const fav = document.querySelector('link[rel=icon]'); if (fav) fav.href = crestSm();
+}
+applyCrest();
 const CLUB = 'C.D. Aznalcóllar';
 const greet = () => { const h = new Date().getHours(); return h < 14 ? 'Buenos días' : h < 21 ? 'Buenas tardes' : 'Buenas noches'; };
 const myName = () => S.live ? S.me.nombre : S.role === 'coach' ? S.me.nombre : S.board;
@@ -214,17 +223,37 @@ const myPerson = () => S.live ? S.me : { nombre: myName(), foto: null };
 const pnum = (p, cls, alt) => p.foto ? `<span class="${cls} pimg" aria-hidden="true"><img src="${esc(p.foto)}" alt="" loading="lazy">${p.dorsal ? `<i>${p.dorsal}</i>` : ''}</span>`
   : `<span class="${cls}" aria-hidden="true">${p.dorsal || alt}</span>`;
 const avatar = (p, cls) => p.foto ? `<span class="${cls} ph" aria-hidden="true"><img src="${esc(p.foto)}" alt=""></span>` : `<span class="${cls}" aria-hidden="true">${esc(initials(p.nombre))}</span>`;
+/* La foto de arriba abre la pantalla de Opciones (antes era un menú desplegable) */
 function bindMe() {
-  const b = $('#me'), m = $('#me-menu');
-  const close = () => { m.hidden = true; b.setAttribute('aria-expanded', 'false'); };
-  b.onclick = e => { e.stopPropagation(); m.hidden = !m.hidden; b.setAttribute('aria-expanded', String(!m.hidden)); if (!m.hidden) m.querySelector('button').focus(); };
-  m.onclick = e => e.stopPropagation();
-  m.onkeydown = e => { if (e.key === 'Escape') { close(); b.focus(); } };
-  document.onclick = close;
-  if ($('#logout')) $('#logout').onclick = () => window.logout && window.logout();
-  $('#rename').onclick = () => { close(); renameMe(); };
-  if ($('#push-menu')) $('#push-menu').onclick = () => { close(); activarPush(); };
-  m.querySelectorAll('[data-role]').forEach(x => x.onclick = () => { S.role = x.dataset.role; go('home'); });
+  $('#me').onclick = () => { if (S.tab === 'opts') return; S.optsFrom = [S.tab, S.sub]; go('opts'); };
+}
+function optsScreen() {
+  const back = () => { const [t, sub] = S.optsFrom || ['home', null]; go(t, sub); };
+  const on = ESC75();
+  return { kicker: 'Tu cuenta', title: 'Opciones', back,
+    body: `<div class="opts">
+      <section class="card opts-me" aria-label="Tu perfil">${avatar(myPerson(), 'av big')}<div class="grow"><b>${esc(myName())}</b><small>${roleName()}</small></div>
+        <button type="button" class="btn ghost" id="rename">${ic('pen')} Cambiar mi nombre</button></section>
+      <section class="card stack" aria-labelledby="h-op-esc"><h2 id="h-op-esc" class="opts-h">Escudo del club</h2>
+        <div class="opts-row"><div class="grow"><b id="op-esc-l">Usar escudo del 75º aniversario</b><small>Si lo quitas, en toda la app sale el escudo de siempre.</small></div>
+          <button type="button" class="tgl" role="switch" id="op-esc" aria-checked="${on}" aria-labelledby="op-esc-l"><span></span></button></div>
+        <div class="opts-cr" aria-hidden="true"><img src="${crestSm()}" alt=""></div></section>
+      ${S.live && ['off', 'on', 'denied'].includes(S.push) ? `<section class="card stack" aria-labelledby="h-op-push"><h2 id="h-op-push" class="opts-h">Notificaciones</h2>
+        ${S.push === 'on' ? `<p class="push-st">${ic('check')} Notificaciones activadas</p>`
+          : S.push === 'denied' ? '<p class="muted" style="margin:0">Notificaciones bloqueadas. Actívalas en los ajustes del móvil.</p>'
+          : `<button type="button" class="btn blue block" id="push-menu">${ic('bell')} Activar notificaciones</button>`}</section>` : ''}
+      <section class="card stack opts-end">${S.live ? `<button type="button" class="btn red block" id="logout">${ic('out')} Cerrar sesión</button>`
+        : `<small>Demostración · ver como</small>
+          <button type="button" class="btn ${S.role === 'coach' ? 'blue' : 'out'} block" data-role="coach">Entrenador</button>
+          <button type="button" class="btn ${S.role === 'board' ? 'blue' : 'out'} block" data-role="board">Junta</button>`}</section></div>`,
+    bind() {
+      $('#rename').onclick = renameMe;
+      if ($('#push-menu')) $('#push-menu').onclick = activarPush;
+      if ($('#logout')) $('#logout').onclick = () => window.logout && window.logout();
+      document.querySelectorAll('.opts [data-role]').forEach(x => x.onclick = () => { S.role = x.dataset.role; go('home'); });
+      $('#op-esc').onclick = () => { const v = !ESC75(); try { localStorage.setItem('escudo75', v ? '1' : '0'); } catch (_) {}
+        applyCrest(); render(); say(v ? 'Ahora sale el escudo del 75º aniversario' : 'Ahora sale el escudo de siempre'); $('#op-esc').focus(); };
+    } };
 }
 /* ---------- Notificaciones al móvil ---------- */
 const pushNo = () => { try { return localStorage.getItem('push-no') === '1'; } catch (_) { return false; } };
@@ -306,7 +335,7 @@ function bindPhoto(state) {
   };
 }
 const firstName = () => myName().split(' ')[0];
-const crestImg = (cls = '') => `<img class="cr ${cls}" src="${CREST}" alt="">`;
+const crestImg = (cls = '') => `<img class="cr ${cls}" src="${crestSm()}" alt="">`;
 
 
 /* Días de entrenamiento: 1 = lunes … 7 = domingo (los elige la junta en cada equipo) */
@@ -392,17 +421,8 @@ function render(focus) {
   $('#top').innerHTML = `
     ${v.back ? `<button type="button" class="back" data-back aria-label="Volver">${ic('back')}</button>` : crestImg('logo')}
     <div class="title"><small>${v.kicker}</small><h1 id="title">${v.title}</h1></div>
-    <div class="me-wrap"><button type="button" class="me" id="me" aria-haspopup="true" aria-expanded="false" aria-controls="me-menu" aria-label="Tu cuenta: ${esc(myName())}">
-      ${S.tab === 'home' ? `<span class="me-t"><small>${roleName()}</small></span>` : `<span class="me-t"><small>${roleName()}</small><b>${esc(myName())}</b></span>`}${avatar(myPerson(), 'av')}</button>
-      <div class="me-menu card" id="me-menu" hidden>${avatar(myPerson(), 'av big')}<b>${esc(myName())}</b><small>${roleName()}</small>
-        <button type="button" class="btn ghost block" id="rename">${ic('pen')} Cambiar mi nombre</button>
-        ${!S.live ? '' : S.push === 'off' ? `<button type="button" class="btn ghost block" id="push-menu">${ic('bell')} Activar notificaciones</button>`
-          : S.push === 'on' ? `<small class="push-st">${ic('check')} Notificaciones activadas</small>`
-          : S.push === 'denied' ? '<small class="push-st">Notificaciones bloqueadas. Actívalas en los ajustes del móvil.</small>' : ''}
-        ${S.live ? `<button type="button" class="btn red block" id="logout">${ic('out')} Cerrar sesión</button>`
-          : `<div class="stack" style="width:100%;gap:8px"><small>Demostración · ver como</small>
-            <button type="button" class="btn ${S.role === 'coach' ? 'blue' : 'out'} block" data-role="coach">Entrenador</button>
-            <button type="button" class="btn ${S.role === 'board' ? 'blue' : 'out'} block" data-role="board">Junta</button></div>`}</div></div>
+    <div class="me-wrap"><button type="button" class="me" id="me" aria-label="Opciones de tu cuenta: ${esc(myName())}">
+      ${S.tab === 'home' ? `<span class="me-t"><small>${roleName()}</small></span>` : `<span class="me-t"><small>${roleName()}</small><b>${esc(myName())}</b></span>`}${avatar(myPerson(), 'av')}</button></div>
     ${S.role === 'coach' ? `<button type="button" class="iconbtn" data-go="msg" aria-label="Mensajes${unread ? `, ${unread} sin leer` : ''}">${ic('bell')}${unread ? '<span class="dot"></span>' : ''}</button>`
       : `<button type="button" class="iconbtn" data-go="home" aria-label="Peticiones${unseen ? `, ${unseen} sin ver` : ''}">${ic('bell')}${unseen ? '<span class="dot"></span>' : ''}</button>`}`;
   bindMe();
@@ -608,7 +628,7 @@ async function matchPoster(e, p) {
   x.font = font(700, 30); const pw = Math.min(x.measureText(e.nombre).width + 44, 560);
   rr(96, 92, pw, 56, 28, GOLD); text(e.nombre, 96 + pw / 2, 121, 700, 30, INK, pw - 44);
   text(`Jornada ${p.j}`, W - 96, 121, 500, 30, MUTED, 380, 'right');
-  const src = crestOf(e, p.rival), [ours, theirs] = await Promise.all([loadImg('icons/escudo.png'), src ? loadImg(src) : null]);
+  const src = crestOf(e, p.rival), [ours, theirs] = await Promise.all([loadImg(crestBig()), src ? loadImg(src) : null]);
   const side = (img, name, mine, cx) => {
     if (img) fitImg(img, cx, 260, 150);
     else { x.beginPath(); x.arc(cx, 260, 70, 0, Math.PI * 2); x.fillStyle = BLUE; x.fill(); text(initials(name.replace(/^[A-Z.]+\s/, '').replace(/"/g, '')), cx, 262, 800, 48, '#FFFFFF'); }
@@ -1323,7 +1343,7 @@ async function pzPoster(team, L, players, e, p) {
     x.fillStyle = color; x.textAlign = align; x.textBaseline = 'middle'; x.fillText(t, tx, y); return x.measureText(t).width; };
   const path = (rx, ry, rw, rh, rad) => { rad = Math.min(rad, rh / 2, rw / 2); x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad); x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); };
   const rr = (rx, ry, rw, rh, rad, c) => { path(rx, ry, rw, rh, rad); x.fillStyle = c; x.fill(); };
-  const crest = await loadImg('icons/escudo.png'), rival = crestOf(e, p.rival) ? await loadImg(crestOf(e, p.rival)) : null;
+  const crest = await loadImg(crestBig()), rival = crestOf(e, p.rival) ? await loadImg(crestOf(e, p.rival)) : null;
   const photos = {}; await Promise.all([...ids, ...bench].filter(id => id != null && pl(id).foto).map(async id => { photos[id] = await loadImg(pl(id).foto); }));
   const logo = (img, cx, cy, sz, name) => { if (img) { const k = Math.min(sz / img.width, sz / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); }
     else { x.beginPath(); x.arc(cx, cy, sz / 2, 0, Math.PI * 2); x.fillStyle = INK; x.fill(); text(initials(nice(name).replace(/^[A-Z.]+\s/, '').replace(/"/g, '')), cx, cy + 2, 800, 36, '#FFFFFF', sz, 'center'); } };
@@ -1890,7 +1910,7 @@ async function convPoster(team, p, c, players) {
   const rr = (rx, ry, rw, rh, rad, color) => { x.beginPath(); x.moveTo(rx + rad, ry); x.arcTo(rx + rw, ry, rx + rw, ry + rh, rad); x.arcTo(rx + rw, ry + rh, rx, ry + rh, rad);
     x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); x.fillStyle = color; x.fill(); };
   const fitImg = (img, cx, cy, box) => { const k = Math.min(box / img.width, box / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); };
-  const src = crestOf(e, p.rival), [ours, theirs] = await Promise.all([loadImg('icons/escudo.png'), src ? loadImg(src) : null]);
+  const src = crestOf(e, p.rival), [ours, theirs] = await Promise.all([loadImg(crestBig()), src ? loadImg(src) : null]);
   x.fillStyle = BG; x.fillRect(0, 0, W, H);
   x.translate(0, -TOP); // sin cabecera: la tarjeta del partido empieza arriba
   // Tarjeta del partido (como en "Partidos")
@@ -2038,6 +2058,7 @@ function bindCarousel() {
 
 /* ---------- ENTRENADOR ---------- */
 const COACH = {
+  opts: optsScreen,
   home() {
     const t = S.teams[S.team];
     const mine = S.requests.filter(r => r.by === S.coach && r.st < 3);
@@ -2462,7 +2483,7 @@ async function calPoster(wk, day) {
     x.arcTo(rx, ry + rh, rx, ry, rad); x.arcTo(rx, ry, rx + rw, ry, rad); x.closePath(); };
   const rr = (rx, ry, rw, rh, rad, color) => { path(rx, ry, rw, rh, rad); x.fillStyle = color; x.fill(); };
   const line = (x1, y1, x2, y2, c = LINE, lw = 2) => { x.beginPath(); x.moveTo(x1, y1); x.lineTo(x2, y2); x.strokeStyle = c; x.lineWidth = lw; x.stroke(); };
-  const crest = await loadImg('icons/escudo.png'), crests = {};
+  const crest = await loadImg(crestBig()), crests = {};
   await Promise.all([...new Set(all.filter(it => it.kind === 'pa').map(it => crestOf(it.e, it.p.rival)).filter(Boolean))].map(async src => { crests[src] = await loadImg(src); }));
   const badge = (img, cx, cy, sz) => { x.beginPath(); x.arc(cx, cy, sz / 2 + 4, 0, Math.PI * 2); x.fillStyle = '#FFFFFF'; x.fill();
     if (img) { const k = Math.min(sz / img.width, sz / img.height); x.drawImage(img, cx - img.width * k / 2, cy - img.height * k / 2, img.width * k, img.height * k); } };
@@ -2549,6 +2570,7 @@ function gamesScreen() {
     } };
 }
 const BOARD = {
+  opts: optsScreen,
   home() {
     const open = S.requests.filter(r => r.st < 3);
     const order = [...S.requests].sort((a, b) => (a.st === 3) - (b.st === 3) || b.urgent - a.urgent || a.st - b.st);

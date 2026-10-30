@@ -465,10 +465,24 @@ label.chip:has(input:checked) { background: var(--navy); color: #fff; }
 .av img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .av.big { width: 76px; height: 76px; font-size: 1.5rem; }
 .me[aria-expanded="true"] .av { box-shadow: 0 0 0 3px var(--club); }
-.me-menu { position: absolute; right: 0; top: calc(100% + 10px); z-index: 20; width: min(17rem, calc(100vw - 32px)); display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; box-shadow: 0 18px 50px -20px rgba(0, 0, 0, .45); }
-.me-menu > b { font-size: 1.1rem; margin-top: 8px; } .me-menu > small { color: var(--muted); margin-bottom: 12px; }
-.me-menu > b, .me-menu > small { max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.me-menu > .btn + .btn { margin-top: 6px; }
+/* Pantalla de Opciones (se abre al tocar la foto de arriba) */
+.opts { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+@media (min-width: 1024px) { .opts { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; } .opts > .opts-me, .opts > .opts-end { grid-column: 1 / -1; } }
+.opts-me { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.opts-me .grow, .opts-row .grow { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.opts-me b { font-size: 1.15rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .opts-me small, .opts-row small { color: var(--muted); }
+.opts-me .btn { flex: none; }
+@media (max-width: 560px) { .opts-me { flex-wrap: wrap; } .opts-me .btn { width: 100%; } }
+.opts-h { margin: 0; font-size: 1.1rem; }
+.opts-row { display: flex; align-items: center; gap: 14px; min-width: 0; }
+.opts-row b { font-weight: 700; }
+.opts-cr { display: grid; place-items: center; padding: 8px 0; } .opts-cr img { width: 96px; height: 96px; object-fit: contain; }
+/* Interruptor: azul del club cuando está activado */
+.tgl { flex: none; width: 60px; height: 34px; border-radius: 17px; border: 0; padding: 3px; background: #C9D1E0; cursor: pointer; display: flex; align-items: center; transition: background .2s; }
+.tgl span { width: 28px; height: 28px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .2s; }
+.tgl[aria-checked="true"] { background: var(--club); } .tgl[aria-checked="true"] span { transform: translateX(26px); }
+.tgl:focus-visible { outline: 3px solid var(--club); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .tgl, .tgl span { transition: none; } }
 .btn.out { background: var(--card); color: var(--bad-ink); border: 2px solid var(--bad-soft); }
 .photo .av { width: 50px; height: 50px; }
 .tm .av { border-radius: 50%; }
