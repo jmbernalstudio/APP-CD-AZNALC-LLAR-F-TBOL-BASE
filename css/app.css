@@ -1226,6 +1226,11 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
 .pz-s.hole b { background: #5B6475; }
 /* El portero, en negro como en el dibujo de la formación */
 .pz-s.gk .pz-f:not(.add):not(:has(img)) { background: var(--ink); } .pz-s.gk b { background: var(--ink); }
+/* Cambio previsto en el directo (solo en la pizarra, sin apuntar): en dorado */
+.pz-s.plan .pz-f:not(:has(img)) { background: var(--gold); color: var(--gold-ink); }
+.pz-s.plan .pz-f { outline: 3px dashed var(--gold); outline-offset: 3px; }
+.pz-s.plan b { background: var(--gold); color: var(--gold-ink); display: inline-flex; align-items: center; gap: 4px; }
+.pz-s.plan b .i { width: 14px; height: 14px; flex: none; }
 .pz-s.wait .pz-f { outline: 3px solid var(--club); outline-offset: 3px; }
 .pz-f { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; background: var(--club); color: #fff; font-weight: 800; font-size: 1.25rem; overflow: hidden; border: 3px solid #fff; flex: none; }
 /* Bolas del campo grandes y con sombra para que se vean bien; en fútbol 11 algo menores para que quepan */
