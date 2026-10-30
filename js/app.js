@@ -1056,9 +1056,12 @@ function editPlayer(team, p) {
 /* Minutos y goles de cada jugador en liga. La federación no los publica: el entrenador los apunta tras cada partido */
 const statOf = (id, f) => (S.stats[id] || {})[f];
 const stFilled = (team, f) => S.teams[team].players.some(p => statOf(p.id, f));
-function playerStats(id) {
+/* Partidos convocados: convocatorias del equipo hechas en la app para partidos de liga ya jugados (o de hoy) */
+const convCount = (team, id) => { const e = EQ[team]; if (!e) return 0;
+  return e.partidos.filter(p => !p.descansa && p.fecha <= TODAY && ((S.conv[convKey(team, p)] || {}).ids || []).includes(id)).length; };
+function playerStats(id, team) {
   const r = Object.values(S.stats[id] || {});
-  return { pj: r.length, m: r.reduce((a, x) => a + x.m, 0), g: r.reduce((a, x) => a + x.g, 0) };
+  return { pc: team ? convCount(team, id) : 0, pj: r.length, m: r.reduce((a, x) => a + x.m, 0), g: r.reduce((a, x) => a + x.g, 0) };
 }
 const statsOn = () => !(S.live && S.statsOff);
 const goalsUs = p => p.goles[p.casa ? 0 : 1];
@@ -1068,15 +1071,15 @@ function statsView(team) {
   if (!statsOn()) return `<section class="card stack notrain"><span class="ic">${ic('clock')}</span><p style="margin:0">Las estadísticas estarán listas en cuanto la junta termine un paso. Vuelve a mirar en un rato.</p></section>`;
   const pl = e ? played(e).slice().reverse() : [], pend = pl.filter(p => !stFilled(team, p.fecha));
   const sort = S.stSort || 'dorsal';
-  const rows = t.players.map(p => ({ p, ...playerStats(p.id) })).sort((a, b) => (sort === 'min' ? b.m - a.m || b.pj - a.pj : sort === 'goles' ? b.g - a.g || b.m - a.m : 0)
+  const rows = t.players.map(p => ({ p, ...playerStats(p.id, team) })).sort((a, b) => (sort === 'min' ? b.m - a.m || b.pj - a.pj : sort === 'goles' ? b.g - a.g || b.m - a.m : 0)
     || (a.p.dorsal || 99) - (b.p.dorsal || 99) || a.p.n.localeCompare(b.p.n, 'es'));
   const SORTS = [['dorsal', 'Dorsal'], ['min', 'Minutos'], ['goles', 'Goles']];
   const players = card('h-st', 'Estadísticas de liga', !t.players.length ? '<p class="muted" style="margin:0">Todavía no hay jugadores.</p>' : `
     <div class="seg g-scope st-sort" role="group" aria-label="Ordenar por">${SORTS.map(([k, l]) => `<button type="button" data-sts="${k}" aria-pressed="${sort === k}">${l}</button>`).join('')}</div>
-    <div class="st-head" aria-hidden="true"><span>Jugador</span><span>PJ</span><span>Min.</span><span>Goles</span></div>
-    <div class="st-list">${rows.map(r => `<button type="button" class="st-row" data-stp="${r.p.id}" aria-label="${esc(r.p.n)}${r.p.dorsal ? ', dorsal ' + r.p.dorsal : ''}: ${r.pj} partidos, ${r.m} minutos, ${r.g} goles">
-      ${pnum(r.p, 'k', '–')}<b class="st-n" title="${esc(r.p.n)}">${pn(r.p.n)}</b><span>${r.pj}</span><span class="${sort === 'min' ? 'on' : ''}">${r.m}'</span><span class="${sort === 'goles' ? 'on' : ''}">${r.g}</span></button>`).join('')}</div>
-    <p class="muted st-foot">PJ: partidos jugados. Partidos apuntados: ${pl.length - pend.length} de ${pl.length}.</p>`, 'st-card');
+    <div class="st-head st5" aria-hidden="true"><span>Jugador</span><span>PC</span><span>PJ</span><span>Min.</span><span>Goles</span></div>
+    <div class="st-list">${rows.map(r => `<button type="button" class="st-row st5" data-stp="${r.p.id}" aria-label="${esc(r.p.n)}${r.p.dorsal ? ', dorsal ' + r.p.dorsal : ''}: ${r.pc} convocado, ${r.pj} jugados, ${r.m} minutos, ${r.g} goles">
+      ${pnum(r.p, 'k', '–')}<b class="st-n" title="${esc(r.p.n)}">${pn(r.p.n)}</b><span>${r.pc}</span><span>${r.pj}</span><span class="${sort === 'min' ? 'on' : ''}">${r.m}'</span><span class="${sort === 'goles' ? 'on' : ''}">${r.g}</span></button>`).join('')}</div>
+    <p class="muted st-foot">PC: partidos convocado. PJ: partidos jugados. Partidos apuntados: ${pl.length - pend.length} de ${pl.length}.</p>`, 'st-card');
   const matches = card('h-stm', 'Partidos de liga', pl.length ? `<p class="muted" style="margin:0 0 4px">Toca un partido para ver su ficha o apuntar los minutos y los goles.</p>${pl.map(p => {
     const res = outcome(p), done = stFilled(team, p.fecha);
     return `<button type="button" class="mt st-mt" data-stm="${p.fecha}"><span class="cal-d"><span>J${p.j}</span><b>${toDate(p.fecha).getDate()}</b></span>${crestBadge(e, p.rival)}
@@ -1113,9 +1116,9 @@ function bindStats(team) {
 }
 /* Cifras de liga de un jugador (en su ficha y en la ventana de estadísticas) */
 function statKpis(team, p) {
-  const s = playerStats(p.id), e = EQ[team], du = durOf(team), full = du.partes * du.min;
+  const s = playerStats(p.id, team), e = EQ[team], du = durOf(team), full = du.partes * du.min;
   const filled = e ? played(e).filter(x => stFilled(team, x.fecha)).length : 0, pct = filled && full ? Math.round(s.m / (filled * full) * 100) : null;
-  return `<div class="st-kpis"><div><b>${s.pj}</b><small>Partidos</small></div><div><b>${s.m}'</b><small>Minutos</small></div><div><b>${s.g}</b><small>Goles</small></div><div><b>${s.pj ? Math.round(s.m / s.pj) + "'" : '–'}</b><small>Media</small></div></div>
+  return `<div class="st-kpis"><div><b>${s.pc}</b><small>Convocado</small></div><div><b>${s.pj}</b><small>Jugados</small></div><div><b>${s.m}'</b><small>Minutos</small></div><div><b>${s.g}</b><small>Goles</small></div><div><b>${s.pj ? Math.round(s.m / s.pj) + "'" : '–'}</b><small>Media</small></div></div>
     ${pct != null ? `<small class="muted">Ha jugado el ${pct}% de los minutos posibles (${filled} partido${filled === 1 ? '' : 's'} apuntado${filled === 1 ? '' : 's'}).</small>` : ''}`;
 }
 function statPlayer(team, p) {
