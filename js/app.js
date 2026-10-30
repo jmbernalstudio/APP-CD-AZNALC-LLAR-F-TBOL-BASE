@@ -1503,15 +1503,38 @@ function askComo(title, sub, prev) {
 }
 /* Lo que ha pasado, del último al primero */
 const LV_EDIT = ['gol', 'golr', 'ama', 'roja', 'cambio'];
+const lvTxt = (L, nm, x) => x.t === 'ini' ? `Empieza la ${parteLbl(x.parte)}` : x.t === 'fin' ? (x.parte < L.partes ? `Final de la ${parteLbl(x.parte)}` : 'Final del partido')
+  : x.t === 'gol' ? `Gol de ${nm(x.id)}` : x.t === 'golr' ? `Gol del ${L.rival}` : x.t === 'ama' ? `Tarjeta amarilla a ${nm(x.id)}`
+  : x.t === 'roja' ? `Tarjeta roja a ${nm(x.id)}${x.doble ? ' (segunda amarilla)' : ''}` : `Entra ${nm(x.in)} y sale ${nm(x.out)}`;
+const lvIcon = x => x.t === 'gol' || x.t === 'golr' ? 'ball' : x.t === 'ama' || x.t === 'roja' ? 'card' : x.t === 'cambio' ? 'swap' : 'whistle';
 function lvTimeline(L, nm, edit) {
-  const txt = x => x.t === 'ini' ? `Empieza la ${parteLbl(x.parte)}` : x.t === 'fin' ? (x.parte < L.partes ? `Final de la ${parteLbl(x.parte)}` : 'Final del partido')
-    : x.t === 'gol' ? `Gol de ${nm(x.id)}` : x.t === 'golr' ? `Gol del ${L.rival}` : x.t === 'ama' ? `Tarjeta amarilla a ${nm(x.id)}`
-    : x.t === 'roja' ? `Tarjeta roja a ${nm(x.id)}${x.doble ? ' (segunda amarilla)' : ''}` : `Entra ${nm(x.in)} y sale ${nm(x.out)}`;
-  const icon = x => x.t === 'gol' || x.t === 'golr' ? 'ball' : x.t === 'ama' || x.t === 'roja' ? 'card' : x.t === 'cambio' ? 'swap' : 'whistle';
+  const txt = x => lvTxt(L, nm, x), icon = lvIcon;
   if (!L.ev.length) return '<p class="muted" style="margin:0">Todavía no ha pasado nada.</p>';
   const row = x => `<span class="lv-mn">${x.min}'</span><span class="lv-ic" aria-hidden="true">${ic(icon(x))}</span><span class="grow">${esc(txt(x))}${comoTxt(x.como) ? `<small class="lv-como">${esc(comoTxt(x.como))}</small>` : ''}</span>`;
   return `${edit ? '<p class="muted lv-hint">Toca un apunte para corregirlo o borrarlo.</p>' : ''}<ol class="lv-tl">${L.ev.map((x, i) => [x, i]).reverse().map(([x, i]) => `<li class="lv-x ${x.t}">${edit && LV_EDIT.includes(x.t)
     ? `<button type="button" class="lv-xb" data-evi="${i}" aria-label="Corregir: ${esc(txt(x))}, minuto ${x.min}">${row(x)}<span class="lv-pen" aria-hidden="true">${ic('pen')}</span></button>` : row(x)}</li>`).join('')}</ol>`;
+}
+/* Deshacer del directo: elegir qué apunte borrar. Devuelve el índice en L.ev, o undefined si se cierra.
+   El último pitido (empezar o terminar una parte) sólo se puede quitar si es lo último que se hizo */
+function lvUndoOpts(L) {
+  const o = L.ev.map((x, i) => [x, i]).filter(([x]) => LV_EDIT.includes(x.t)).map(([, i]) => i);
+  const k = L.ev.length - 1, last = L.ev[k], top = L.hist && L.hist[L.hist.length - 1];
+  if (last && !LV_EDIT.includes(last.t) && top) {
+    try { if (JSON.stringify(JSON.parse(top).ev) === JSON.stringify(L.ev.slice(0, k))) o.push(k); } catch (_) {}
+  }
+  return o.sort((a, b) => b - a);
+}
+function lvUndoPick(L, nm) {
+  return new Promise(done => {
+    let pick;
+    const row = i => { const x = L.ev[i]; return `<li class="lv-x ${x.t}"><button type="button" class="lv-xb" data-ui="${i}" aria-label="Borrar: ${esc(lvTxt(L, nm, x))}, minuto ${x.min}"><span class="lv-mn">${x.min}'</span><span class="lv-ic" aria-hidden="true">${ic(lvIcon(x))}</span><span class="grow">${esc(lvTxt(L, nm, x))}</span><span class="lv-pen" aria-hidden="true">${ic('trash')}</span></button></li>`; };
+    const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">Deshacer</h2><small>¿Qué quieres borrar?</small></div>
+        <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+      <ol class="lv-tl">${lvUndoOpts(L).map(row).join('')}</ol>`, 'dialog', () => done(pick));
+    m.el.classList.add('rqd');
+    m.el.querySelectorAll('[data-ui]').forEach(b => b.onclick = () => { pick = +b.dataset.ui; m.close(false); });
+    m.el.querySelector('[data-ui]').focus();
+  });
 }
 /* Rehace el estado (campo, minutos, marcador, expulsados) a partir de los apuntes, después de corregir alguno.
    Cada apunte guarda su segundo de partido (s) y su parte (p); los del descanso llevan b. Devuelve false si algo no cuadra */
@@ -1800,7 +1823,7 @@ function lvScreen(team, back) {
       <section class="card match lv-top" aria-label="Marcador"><div class="lv-ph"><span class="tag">${playing ? parteLbl(L.parte) : last ? 'Final' : 'Descanso'}</span><span class="lv-clock" id="lv-clock" role="timer" aria-label="Tiempo de partido">${lvClock(L)}</span></div>
         ${score}${ctl}</section>
       <div class="lv-acts">${actions.map(([a, i, l]) => `<button type="button" class="lv-a ${a}" data-lva="${a}"><span class="lv-ai" aria-hidden="true">${ic(i)}</span><span>${l}</span></button>`).join('')}
-        <button type="button" class="lv-a undo" id="lvundo"${L.hist && L.hist.length ? '' : ' disabled'}><span class="lv-ai" aria-hidden="true">${ic('undo')}</span><span>Deshacer</span></button></div>
+        <button type="button" class="lv-a undo" id="lvundo"${lvUndoOpts(L).length ? '' : ' disabled'}><span class="lv-ai" aria-hidden="true">${ic('undo')}</span><span>Deshacer</span></button></div>
       ${card('h-lvc', `En el campo · ${L.campo.length}`, L.campo.length ? L.campo.slice().sort(byDor).map(id => prow(id, true)).join('') : '<p class="muted" style="margin:0">No hay nadie en el campo.</p>', '',
         formsOf(team).length && L.campo.length ? `<button type="button" class="more" id="lvpz2">${ic('team')} Pizarra</button>` : '')}
       ${card('h-lvb', `Banquillo · ${banca().length}`, banca().length ? banca().map(id => prow(id, false)).join('') : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>')}
@@ -1845,9 +1868,20 @@ function lvScreen(team, back) {
         try { await lvToStats(team, f, L); L.hist = []; done('Partido finalizado. Minutos y goles guardados en las estadísticas.'); }
         catch (_) { done('Partido finalizado. Las estadísticas no se han podido guardar: usa “Corregir minutos y goles”.'); }
       };
-      $('#lvundo').onclick = () => {
-        const prev = L.hist.pop(); if (!prev) return;
-        const h = L.hist; Object.keys(L).forEach(x => delete L[x]); Object.assign(L, JSON.parse(prev), { hist: h }); done('Deshecho');
+      $('#lvundo').onclick = async () => {
+        if (!lvUndoOpts(L).length) return;
+        const i = await lvUndoPick(L, nm); if (i == null) return;
+        const x = L.ev[i], what = `${x.min}' · ${lvTxt(L, nm, x)}`;
+        if (!await ask('¿Borrar esta acción?', what, 'Sí, borrar')) return;
+        if (L.ev[i] !== x) return;
+        /* Un pitido se quita volviendo a como estaba justo antes; lo demás se borra y se rehace el partido */
+        if (!LV_EDIT.includes(x.t)) {
+          const prev = L.hist.pop(), h = L.hist; Object.keys(L).forEach(k => delete L[k]); Object.assign(L, JSON.parse(prev), { hist: h });
+          return done('Acción borrada');
+        }
+        const prev = JSON.stringify(lvStrip(L)); lvSnap(L); L.ev.splice(i, 1);
+        if (!lvRebuild(L)) { const h = L.hist; h.pop(); Object.keys(L).forEach(k => delete L[k]); Object.assign(L, JSON.parse(prev), { hist: h }); return say('No se puede borrar: los cambios de después dependen de él. Borra antes esos cambios.'); }
+        done('Acción borrada');
       };
       document.querySelectorAll('[data-lva]').forEach(b => b.onclick = async () => {
         const a = b.dataset.lva, mn = lvMin(L), at = playing ? { s: lvCap(L), p: L.parte } : { s: L.acc, p: L.parte, b: true };
