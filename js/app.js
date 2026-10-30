@@ -1247,30 +1247,35 @@ const lvAvail = (e, p) => !!S.teams[e.nombre] && !p.descansa && (!!actaOf(e.nomb
 const pzSpots = form => { const lines = form ? form.split('-').map(Number) : [], spots = [{ x: 50, y: 88 }];
   lines.forEach((k, r) => { for (let i = 0; i < k; i++) spots.push({ x: 100 * (i + 1) / (k + 1), y: 88 - (r + 1) * (74 / lines.length) }); });
   return spots; };
-function pizarra(team, L, players, save, e, p) {
-  let form = L.form || formsOf(team)[0] || '', spots = pzSpots(form), n = spots.length;
+function pizarra(team, L, players, save, e, p, onSub) {
+  let form = L.form || formsOf(team)[0] || '', spots = pzSpots(form), n = spots.length, dirty = false;
   const form0 = L.form;
   L.pz = L.pz || { ids: [] };
+  /* En el directo se pueden probar cambios en la pizarra sin apuntarlos: L.pz.plan = { hueco: el que entraría } */
+  const live = typeof onSub === 'function' && ['juego', 'pausa'].includes(L.fase);
+  L.pz.plan = L.pz.plan || {};
   let sel = null;   /* jugador elegido abajo, a la espera de tocar su hueco */
   const pl = id => players.find(x => x.id === id) || { id, n: 'Jugador', dorsal: null };
   const byDor = (a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99) || pl(a).n.localeCompare(pl(b).n, 'es');
   const avail = () => (L.fase === 'previa' ? L.tit : L.campo).filter(id => !(L.rojas || []).includes(id));
   const bench = () => (L.fase === 'previa' ? L.sup : [...new Set([...L.tit, ...L.sup])].filter(id => !L.campo.includes(id) && !(L.rojas || []).includes(id))).slice().sort(byDor);
   const slots = () => { const ok = avail(); return Array.from({ length: n }, (_, i) => ok.includes(L.pz.ids[i]) ? L.pz.ids[i] : null); };
+  const plans = () => { const ids = slots(), bn = bench(), out = {}; if (!live) return out;
+    Object.entries(L.pz.plan).forEach(([i, id]) => { if (ids[+i] != null && bn.includes(id) && !Object.values(out).includes(id)) out[+i] = id; }); return out; };
   const face = q => q.foto ? `<span class="pz-f"><img src="${esc(q.foto)}" alt=""></span>` : q.dorsal ? `<span class="pz-f num">${q.dorsal}</span>` : `<span class="pz-f none">${ic('user')}</span>`;
   const them = L.rival;
   const d = document.createElement('div');
   d.className = 'pz'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true'); d.setAttribute('aria-label', `Alineación contra ${nice(p.rival)}`);
   const back = document.activeElement;
   const close = () => { d.remove(); lockScroll(); document.removeEventListener('keydown', key);
-    if (L.form !== form0) render();   /* la tarjeta Formación de debajo enseña la nueva */
+    if (L.form !== form0 || dirty) render();   /* la tarjeta Formación de debajo enseña la nueva */
     else if (back && back.focus) back.focus({ preventScroll: true }); };
   const key = ev => { if (ev.key === 'Escape' && !document.querySelector('.modal')) close(); };
-  const place = (i, id) => { const arr = slots(), cur = arr[i];
-    if (id === null) arr[i] = null; else { const was = arr.indexOf(id); if (was >= 0) arr[was] = cur; arr[i] = id; }   /* si ya estaba en otro hueco, se cambian */
+  const place = (i, id) => { const arr = slots(), cur = arr[i]; delete L.pz.plan[i];
+    if (id === null) arr[i] = null; else { const was = arr.indexOf(id); if (was >= 0) { arr[was] = cur; delete L.pz.plan[was]; } arr[i] = id; }   /* si ya estaba en otro hueco, se cambian */
     L.pz.ids = arr; save(); };
   const draw = () => {
-    const ids = slots(), free = avail().filter(id => !ids.includes(id)).sort(byDor), bn = bench();
+    const ids = slots(), free = avail().filter(id => !ids.includes(id)).sort(byDor), bn = bench(), pp = plans();
     if (sel != null && !free.includes(sel) && !ids.includes(sel)) sel = null;
     d.innerHTML = `<div class="pz-in">
       ${gameCard(e, p, false).replace(/ data-match="[^"]*" role="button" tabindex="0" aria-label="[^"]*"/, '').replace('class="gm"', 'class="gm pz-gm"')
@@ -1280,9 +1285,9 @@ function pizarra(team, L, players, save, e, p) {
             `<li><button type="button" role="option" data-fm="${x}" aria-selected="${x === form}">${x}${x === form ? ic('check') : ''}</button></li>`).join('')}</ul></div>` : ''}
       <div class="pz-field${n > 8 ? ' f11' : ''}" role="group" aria-label="Campo">
         <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
-        ${spots.map((sp, i) => { const id = ids[i], q = id != null ? pl(id) : null;
-          return `<button type="button" class="pz-s${i ? '' : ' gk'}${q ? '' : ' hole'}${sel != null ? ' wait' : ''}" data-pz="${i}" style="left:${sp.x}%;top:${sp.y}%" aria-label="${i ? 'Hueco ' + i : 'Portero'}: ${q ? esc(q.n) : 'vacío'}">
-            ${q ? face(q) : `<span class="pz-f add">${ic('plus')}</span>`}<b>${q ? pn(q.n) : i ? 'Libre' : 'Portero'}</b></button>`; }).join('')}
+        ${spots.map((sp, i) => { const id = ids[i], pin = pp[i], q = pin != null ? pl(pin) : id != null ? pl(id) : null;
+          return `<button type="button" class="pz-s${i ? '' : ' gk'}${q ? '' : ' hole'}${pin != null ? ' plan' : ''}${sel != null ? ' wait' : ''}" data-pz="${i}" style="left:${sp.x}%;top:${sp.y}%" aria-label="${i ? 'Hueco ' + i : 'Portero'}: ${pin != null ? `cambio previsto, entraría ${esc(q.n)} por ${esc(pl(id).n)}` : q ? esc(q.n) : 'vacío'}">
+            ${q ? face(q) : `<span class="pz-f add">${ic('plus')}</span>`}<b>${pin != null ? ic('swap') : ''}${q ? pn(q.n) : i ? 'Libre' : 'Portero'}</b></button>`; }).join('')}
       </div>
       <div class="pz-side">
         <h3>${L.fase === 'previa' ? 'Titulares por colocar' : 'En el campo, por colocar'} · ${free.length}</h3>
@@ -1315,6 +1320,27 @@ function pizarra(team, L, players, save, e, p) {
     d.querySelectorAll('[data-pz]').forEach(b => b.onclick = async () => {
       const i = +b.dataset.pz, cur = ids[i];
       if (sel != null) { place(i, sel); sel = null; }
+      else if (live && cur != null) {
+        /* Directo: probar un cambio sin apuntarlo, o apuntarlo ya como sustitución */
+        const pin = pp[i];
+        if (pin != null) {
+          const c = await choose(`Cambio previsto: entra ${pl(pin).n}`, `Sale ${pl(cur).n}`, [['now', 'Hacer el cambio ahora', 'check', 'blue'], ['drop', 'Quitar el cambio previsto', 'x', 'ghost']]);
+          if (!c) return;
+          if (c === 'now') { onSub(cur, pin); dirty = true; } delete L.pz.plan[i]; save();
+        } else {
+          const c = await choose(pl(cur).n, i ? 'En el campo' : 'Portero', [['try', 'Probar un cambio', 'swap', 'blue'], ['move', 'Cambiar de sitio o quitar de la pizarra', 'pen', 'ghost']]);
+          if (!c) return;
+          if (c === 'move') { const id = await pickSlot(i ? 'Elige al jugador de este hueco' : 'Elige al portero', true, free, players); if (id === undefined) return; place(i, id); }
+          else {
+            const taken = Object.values(pp), inn = await pickPlayer('¿Quién entraría?', `Sale ${pl(cur).n}`, bn.filter(x => !taken.includes(x)), players);
+            if (inn == null) return;
+            const c2 = await choose('¿Lo guardas como sustitución?', `Entra ${pl(inn).n} y sale ${pl(cur).n}`, [['save', 'Sí, hacer el cambio ahora', 'check', 'blue'], ['plan', 'No, solo probarlo en la pizarra', 'pen', 'ghost']]);
+            if (!c2) return;
+            if (c2 === 'save') { onSub(cur, inn); dirty = true; delete L.pz.plan[i]; } else L.pz.plan[i] = inn;
+            save();
+          }
+        }
+      }
       else { const id = await pickSlot(i ? 'Elige al jugador de este hueco' : 'Elige al portero', cur != null, free, players);   /* solo los que aún no están en el campo */
         if (id === undefined) return; place(i, id); }
       draw(); const again = d.querySelector(`[data-pz="${i}"]`); if (again) again.focus({ preventScroll: true });
@@ -1395,6 +1421,17 @@ async function pzPoster(team, L, players, e, p) {
       rr(cx, cy - 42, cw - 12, 84, 42, '#FFFFFF'); face(id, cx + 44, cy, 30); x.font = font(700, 28);
       text(x.measureText(pl(id).n).width > cw - 110 ? shortName(pl(id).n) : pl(id).n, cx + 86, cy + 1, 700, 28, INK, cw - 110); }); }
   return new Promise(ok2 => cv.toBlob(b => ok2(b), 'image/png'));
+}
+/* Ventana con varias opciones en botones: devuelve el valor elegido, o undefined si se cierra */
+function choose(title, sub, opts) {
+  return new Promise(done => {
+    let pick;
+    const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2">${esc(title)}</h2>${sub ? `<small>${esc(sub)}</small>` : ''}</div>
+        <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+      <div class="stack">${opts.map(([v, label, icon, cls]) => `<button type="button" class="btn ${cls || 'ghost'} block" data-ch="${v}">${ic(icon)} ${esc(label)}</button>`).join('')}</div>`, 'dialog', () => done(pick));
+    m.el.querySelectorAll('[data-ch]').forEach(b => b.onclick = () => { pick = b.dataset.ch; m.close(false); });
+    m.el.querySelector('[data-ch]').focus();
+  });
 }
 /* Elegir jugador para un hueco de la pizarra: devuelve su id, null para dejar el hueco vacío, o undefined si se cierra */
 function pickSlot(title, filled, ids, players) {
@@ -1760,7 +1797,16 @@ function lvScreen(team, back) {
       ${card('h-lvt', 'Lo que ha pasado', lvTimeline(L, nm, true))}</div>`,
     bind() {
       clearInterval(S.lvTick);
-      if ($('#lvpz2')) $('#lvpz2').onclick = () => pizarra(team, L, t.players, save, e, p);
+      /* Una sustitución: sale uno del campo y entra uno del banquillo (desde el botón Cambio o desde la pizarra) */
+      const subNow = (out, inn) => {
+        const mn = lvMin(L), at = playing ? { s: lvCap(L), p: L.parte } : { s: L.acc, p: L.parte, b: true };
+        lvSnap(L);
+        if (playing) { const c = lvCap(L); L.seg[out] = (L.seg[out] || 0) + c - (L.desde[out] || 0); L.desde[inn] = c; } else L.desde[inn] = L.acc;
+        L.campo = L.campo.map(x => x === out ? inn : x);
+        if (L.pz) L.pz.ids = L.pz.ids.map(x => x === out ? inn : x);   /* en la pizarra, el que entra ocupa el sitio del que sale */
+        L.ev.push({ t: 'cambio', out, in: inn, min: mn, ...at }); save();
+      };
+      if ($('#lvpz2')) $('#lvpz2').onclick = () => pizarra(team, L, t.players, save, e, p, subNow);
       if (playing) {
         S.lvTick = setInterval(() => {
           if (!$('#lv-clock')) return clearInterval(S.lvTick);
@@ -1815,11 +1861,7 @@ function lvScreen(team, back) {
         if (a === 'cambio') {
           const out = await pickPlayer('¿Quién sale?', `Cambio · minuto ${mn}`, L.campo.slice().sort(byDor), t.players); if (out == null) return;
           const inn = await pickPlayer('¿Quién entra?', `Sale ${pl(out).n}`, banca(), t.players); if (inn == null) return;
-          lvSnap(L);
-          if (playing) { const c = lvCap(L); L.seg[out] = (L.seg[out] || 0) + c - (L.desde[out] || 0); L.desde[inn] = c; } else L.desde[inn] = L.acc;
-          L.campo = L.campo.map(x => x === out ? inn : x);
-          if (L.pz) L.pz.ids = L.pz.ids.map(x => x === out ? inn : x);   /* en la pizarra, el que entra ocupa el sitio del que sale */
-          L.ev.push({ t: 'cambio', out, in: inn, min: mn, ...at }); return done(`Entra ${pl(inn).n} y sale ${pl(out).n}`);
+          subNow(out, inn); return done(`Entra ${pl(inn).n} y sale ${pl(out).n}`);
         }
       });
     } };
