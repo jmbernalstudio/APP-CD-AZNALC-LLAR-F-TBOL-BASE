@@ -1280,3 +1280,12 @@ select, .rq .ctl select { -webkit-appearance: none; appearance: none; padding-ri
   padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, calc((100% - 1100px) / 2), env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(16px, calc((100% - 1100px) / 2), env(safe-area-inset-left, 0px)); }
 .modal .card > * { flex-shrink: 0; }
 .modal .facts.mx-f { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+/* Dorsal del partido: se elige tocando al jugador en titulares y suplentes */
+.lv-tile.nod small { background: var(--gold); color: var(--gold-ink); font-weight: 700; padding: 1px 8px; border-radius: 99px; }
+.lv-dh { margin: 0; font-size: 1rem; }
+.lv-dors { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 8px; }
+.lv-dn { min-height: 52px; border: 0; border-radius: 16px; background: var(--shell); font: inherit; font-weight: 800; font-size: 1.1rem; color: var(--ink); cursor: pointer; font-variant-numeric: tabular-nums; }
+.lv-dn:hover:not(:disabled) { background: var(--club-soft); }
+.lv-dn.on { background: var(--club); color: #fff; }
+.lv-dn:disabled { opacity: .35; cursor: default; }
+.lv-dother { display: flex; gap: 10px; align-items: flex-end; } .lv-dother .f { flex: 1; min-width: 0; } .lv-dother .btn { flex: none; }

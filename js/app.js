@@ -1210,6 +1210,10 @@ function stScreen(team, back) {
 const lvKey = (team, f) => `directo ${team} ${f}`;
 const lvStrip = L => { const { hist, ...r } = L; return r; };
 const actaOf = (team, f) => (S.actas || {})[`${team} ${f}`] || null;
+/* Dorsal de cada jugador en este partido (se elige al poner titulares y suplentes); si no, el de la plantilla */
+const lvDor = (L, x) => (L.dor && L.dor[x.id] != null ? L.dor[x.id] : x.dorsal) || null;
+const lvPlayers = (L, players) => players.map(x => ({ ...x, dorsal: lvDor(L, x) }));
+const dorTxt = q => q && q.dorsal ? `${q.dorsal} · ` : '';
 function lvLoad(team, p) {
   let L = null; try { L = JSON.parse(localStorage.getItem(lvKey(team, p.fecha)) || 'null'); } catch (_) {}
   const srv = actaOf(team, p.fecha);
@@ -1250,6 +1254,7 @@ const pzSpots = form => { const lines = form ? form.split('-').map(Number) : [],
   lines.forEach((k, r) => { for (let i = 0; i < k; i++) spots.push({ x: 100 * (i + 1) / (k + 1), y: 88 - (r + 1) * (74 / lines.length) }); });
   return spots; };
 function pizarra(team, L, players, save, e, p, onSub) {
+  players = lvPlayers(L, players);
   let form = L.form || formsOf(team)[0] || '', spots = pzSpots(form), n = spots.length, dirty = false;
   const form0 = L.form;
   L.pz = L.pz || { ids: [] };
@@ -1291,14 +1296,14 @@ function pizarra(team, L, players, save, e, p, onSub) {
         <i class="pz-mid"></i><i class="pz-circle"></i><i class="pz-area top"></i><i class="pz-area bot"></i>
         ${spots.map((sp, i) => { const id = ids[i], pin = pp[i], q = pin != null ? pl(pin) : id != null ? pl(id) : null;
           return `<button type="button" class="pz-s${i ? '' : ' gk'}${q ? '' : ' hole'}${pin != null ? ' plan' : ''}${sel != null ? ' wait' : ''}" data-pz="${i}" style="left:${sp.x}%;top:${sp.y}%" aria-label="${i ? 'Hueco ' + i : 'Portero'}: ${pin != null ? `cambio previsto, entraría ${esc(q.n)} por ${esc(pl(id).n)}` : q ? esc(q.n) : 'vacío'}">
-            ${q ? face(q) : `<span class="pz-f add">${ic('plus')}</span>`}<b>${pin != null ? ic('swap') : ''}${q ? pn(q.n) : i ? 'Libre' : 'Portero'}</b></button>`; }).join('')}
+            ${q ? face(q) : `<span class="pz-f add">${ic('plus')}</span>`}<b>${pin != null ? ic('swap') : ''}${q ? dorTxt(q) + pn(q.n) : i ? 'Libre' : 'Portero'}</b></button>`; }).join('')}
       </div>
       <div class="pz-side">
         <h3>${L.fase === 'previa' ? 'Titulares por colocar' : 'En el campo, por colocar'} · ${free.length}</h3>
-        ${free.length ? `<div class="pz-free">${free.map(id => `<button type="button" class="pz-chip${sel === id ? ' on' : ''}" data-pzp="${id}" aria-pressed="${sel === id}">${face(pl(id))}<b>${pn(pl(id).n)}</b></button>`).join('')}</div>`
+        ${free.length ? `<div class="pz-free">${free.map(id => `<button type="button" class="pz-chip${sel === id ? ' on' : ''}" data-pzp="${id}" aria-pressed="${sel === id}">${face(pl(id))}<b>${dorTxt(pl(id))}${pn(pl(id).n)}</b></button>`).join('')}</div>`
           : `<p class="muted" style="margin:0">${avail().length ? 'Todos colocados. Toca a uno del campo para cambiarlo o quitarlo.' : L.fase === 'previa' ? 'Primero elige a los titulares.' : 'No hay nadie en el campo.'}</p>`}
         <h3>Banquillo · ${bn.length}</h3>
-        ${bn.length ? `<div class="pz-free">${bn.map(id => `<span class="pz-chip off">${face(pl(id))}<b>${pn(pl(id).n)}</b></span>`).join('')}</div>` : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>'}
+        ${bn.length ? `<div class="pz-free">${bn.map(id => `<span class="pz-chip off">${face(pl(id))}<b>${dorTxt(pl(id))}${pn(pl(id).n)}</b></span>`).join('')}</div>` : '<p class="muted" style="margin:0">No hay nadie en el banquillo.</p>'}
         <div class="pz-btns"><button type="button" class="btn blue block" id="pz-wa"${ids.some(x => x != null) ? '' : ' disabled'}>${ic('send')} Enviar por WhatsApp</button>
         ${ids.some(x => x != null) ? `<button type="button" class="btn ghost block" id="pz-clr">${ic('undo')} Vaciar la pizarra</button>` : ''}</div></div></div></div>`;
     d.querySelector('#pz-x').onclick = close;
@@ -1426,14 +1431,14 @@ async function pzPoster(team, L, players, e, p, plan = {}) {
     const pin = plan[i], who = pin != null ? pin : id, col = pin != null ? GOLD : i ? BLUE : INK, ink = pin != null ? INK : '#FFFFFF';
     if (pin != null) { x.setLineDash([12, 8]); x.beginPath(); x.arc(cx, cy, R + 12, 0, Math.PI * 2); x.strokeStyle = GOLD; x.lineWidth = 5; x.stroke(); x.setLineDash([]); }
     face(who, cx, cy, R, col, ink);
-    x.font = font(700, 28); let nm = pl(who).n; if (x.measureText(nm).width > PW) nm = shortName(nm); const tw = Math.min(x.measureText(nm).width, PW) + 28;
+    x.font = font(700, 28); let nm = dorTxt(pl(who)) + pl(who).n; if (x.measureText(nm).width > PW) nm = dorTxt(pl(who)) + shortName(pl(who).n); const tw = Math.min(x.measureText(nm).width, PW) + 28;
     rr(cx - tw / 2, cy + R + 12, tw, 42, 21, col); text(nm, cx, cy + R + 34, 700, 28, ink, PW, 'center'); });
   /* Banquillo */
   if (BENCH) { const by = fy + FH + 24; text(`Banquillo · ${bench.length}`, PAD, by + 26, 800, 32, INK, FW);
     /* fichas tan altas como la barra de la formación */
     const cw = FW / 3; bench.forEach((id, k) => { const cx = PAD + (k % 3) * cw, cy = by + 70 + Math.floor(k / 3) * 100 + 42;
       rr(cx, cy - 42, cw - 12, 84, 42, '#FFFFFF'); face(id, cx + 44, cy, 30); x.font = font(700, 28);
-      text(x.measureText(pl(id).n).width > cw - 110 ? shortName(pl(id).n) : pl(id).n, cx + 86, cy + 1, 700, 28, INK, cw - 110); }); }
+      text(dorTxt(pl(id)) + (x.measureText(dorTxt(pl(id)) + pl(id).n).width > cw - 110 ? shortName(pl(id).n) : pl(id).n), cx + 86, cy + 1, 700, 28, INK, cw - 110); }); }
   return new Promise(ok2 => cv.toBlob(b => ok2(b), 'image/png'));
 }
 /* Ventana con varias opciones en botones: devuelve el valor elegido, o undefined si se cierra */
@@ -1699,7 +1704,7 @@ function lvScreen(team, back) {
   const k = `${team} ${p.fecha}`;
   if (!S.lv || S.lv.k !== k) S.lv = { k, L: lvLoad(team, p) };
   const L = S.lv.L, f = p.fecha;
-  const pl = id => t.players.find(x => x.id === id) || { id, n: 'Jugador', dorsal: null };
+  const pl = id => { const x = t.players.find(y => y.id === id); return x ? { ...x, dorsal: lvDor(L, x) } : { id, n: 'Jugador', dorsal: null }; };
   const nm = id => pl(id).n;
   const byDor = (a, b) => (pl(a).dorsal || 99) - (pl(b).dorsal || 99) || pl(a).n.localeCompare(pl(b).n, 'es');
   const save = () => lvSave(team, f, L);
@@ -1723,9 +1728,39 @@ function lvScreen(team, back) {
     /* Si la convocatoria ha cambiado, solo cuentan los convocados */
     L.tit = L.tit.filter(id => cv.ids.includes(id)); L.sup = [...new Set([...L.sup.filter(id => cv.ids.includes(id)), ...cv.ids.filter(id => !L.tit.includes(id) && !L.sup.includes(id))])];
     const tmax = modOf(team);
-    /* Dos grupos: se toca a un jugador para pasarlo de uno a otro */
-    const tile = (id, tit) => `<button type="button" class="lv-tile" data-lvp="${id}" aria-label="${esc(nm(id))}: ${tit ? 'titular. Toca para pasarlo a suplente' : 'suplente. Toca para sacarlo de titular'}">
-      ${pnum(pl(id), 'num', '–')}<b title="${esc(nm(id))}">${pn(nm(id))}</b><small>${tit ? 'A suplente' : 'A titular'}</small></button>`;
+    /* Dos grupos: se toca a un jugador para ponerle el dorsal o pasarlo de uno a otro. El dorsal es obligatorio para seguir */
+    const tile = (id, tit) => { const q = pl(id); return `<button type="button" class="lv-tile${q.dorsal ? '' : ' nod'}" data-lvp="${id}" aria-label="${esc(q.n)}, ${tit ? 'titular' : 'suplente'}, ${q.dorsal ? 'dorsal ' + q.dorsal : 'sin dorsal'}. Toca para poner el dorsal o pasarlo a ${tit ? 'suplente' : 'titular'}">
+      ${pnum(q, 'num', '?')}<b title="${esc(q.n)}">${pn(q.n)}</b><small>${q.dorsal ? 'Dorsal ' + q.dorsal : 'Falta el dorsal'}</small></button>`; };
+    const sinDor = () => [...L.tit, ...L.sup].filter(id => !pl(id).dorsal);
+    const faltaDor = () => { const k = sinDor().length; return k ? `Falta el dorsal de ${k === 1 ? '1 jugador' : k + ' jugadores'}: tócalos para ponerlo.` : ''; };
+    const dorsal = id => {
+      const tit = L.tit.includes(id), q = pl(id);
+      const taken = new Map([...L.tit, ...L.sup].filter(x => x !== id && pl(x).dorsal).map(x => [+pl(x).dorsal, x]));
+      const m = modal(`<div class="rqd-h"><div class="grow"><h2 id="mdl-t" class="st-h2" title="${esc(q.n)}">${pn(q.n)}</h2><small>${tit ? 'Titular' : 'Suplente'}</small></div>
+          <button type="button" class="iconbtn" data-v="0" aria-label="Cerrar">${ic('x')}</button></div>
+        <h3 class="lv-dh">Dorsal en este partido</h3>
+        <div class="lv-dors" role="group" aria-label="Dorsal">${Array.from({ length: 30 }, (_, i) => i + 1).map(n => `<button type="button" class="lv-dn${+q.dorsal === n ? ' on' : ''}" data-dn="${n}" aria-pressed="${+q.dorsal === n}"${taken.has(n) ? ` disabled aria-label="${n}: lo lleva ${esc(nm(taken.get(n)))}"` : ''}>${n}</button>`).join('')}</div>
+        <form class="lv-dother" novalidate><label class="f" for="lv-dno">Otro número<input type="number" id="lv-dno" inputmode="numeric" min="1" max="99" value="${q.dorsal > 30 ? q.dorsal : ''}"></label>
+          <button type="submit" class="btn outline">${ic('check')} Poner</button></form>
+        <p class="err" id="lv-dne" role="alert" hidden></p>
+        <button type="button" class="btn blue block" id="lv-mv">${ic('swap')} ${tit ? 'Pasar a suplentes' : 'Pasar a titulares'}</button>`, 'dialog', () => {});
+      m.el.classList.add('rqd');
+      const err = t => { const x = m.el.querySelector('#lv-dne'); x.textContent = t; x.hidden = false; };
+      const after = () => { save(); m.close(false); grids(); const again = document.querySelector(`[data-lvp="${id}"]`); if (again) again.focus({ preventScroll: true }); };
+      const put = n => {
+        if (!(n >= 1 && n <= 99)) return err('Pon un número del 1 al 99.');
+        if (taken.has(n)) return err(`El ${n} ya lo lleva ${nm(taken.get(n))}.`);
+        L.dor = { ...(L.dor || {}), [id]: n }; after();
+      };
+      m.el.querySelectorAll('[data-dn]').forEach(b => b.onclick = () => put(+b.dataset.dn));
+      m.el.querySelector('.lv-dother').onsubmit = ev => { ev.preventDefault(); put(+m.el.querySelector('#lv-dno').value); };
+      m.el.querySelector('#lv-mv').onclick = () => {
+        if (!tit && L.tit.length >= tmax) return err(`Ya tienes los ${tmax} titulares. Pasa antes a un titular a suplente.`);
+        if (tit) { L.tit = L.tit.filter(x => x !== id); L.sup.push(id); } else { L.sup = L.sup.filter(x => x !== id); L.tit.push(id); }
+        after();
+      };
+      (m.el.querySelector('.lv-dn.on') || m.el.querySelector('.lv-dn:not(:disabled)') || m.el.querySelector('[data-v]')).focus();
+    };
     const holes = n => Array.from({ length: n }, () => `<span class="lv-tile hole" aria-hidden="true"><span class="num"></span><b>Libre</b><small>Hueco</small></span>`).join('');
     const grids = () => {
       const tt = L.tit.slice().sort(byDor), ss = L.sup.slice().sort(byDor);
@@ -1733,16 +1768,11 @@ function lvScreen(team, back) {
       $('#lvS').innerHTML = ss.length ? ss.map(id => tile(id, false)).join('') : '<p class="muted" style="margin:0">No queda nadie en el banquillo.</p>';
       $('#lvTn').textContent = `${L.tit.length} de ${tmax}`; $('#lvSn').textContent = L.sup.length;
       $('#lvTn').className = L.tit.length === tmax ? 'pill' : 'pill gold';
-      /* La pizarra solo se abre con los titulares ya elegidos */
-      if ($('#lvpz')) { const falta = tmax - L.tit.length; $('#lvpz').disabled = falta > 0; $('#lvpzn').hidden = falta <= 0;
-        $('#lvpzn').textContent = `Primero elige a los ${tmax} titulares abajo (${falta === 1 ? 'falta 1' : 'faltan ' + falta}).`; }
-      document.querySelectorAll('[data-lvp]').forEach(b => b.onclick = () => {
-        const id = +b.dataset.lvp, tit = L.tit.includes(id);
-        if (!tit && L.tit.length >= tmax) return say(`Ya tienes los ${tmax} titulares. Toca antes a un titular para pasarlo a suplente.`);
-        if (tit) { L.tit = L.tit.filter(x => x !== id); L.sup.push(id); } else { L.sup = L.sup.filter(x => x !== id); L.tit.push(id); }
-        save(); grids();
-        const again = document.querySelector(`[data-lvp="${id}"]`); if (again) again.focus({ preventScroll: true });
-      });
+      /* La pizarra solo se abre con los titulares ya elegidos y todos los dorsales puestos */
+      if ($('#lvpz')) { const falta = tmax - L.tit.length, msg = falta > 0 ? `Primero elige a los ${tmax} titulares abajo (${falta === 1 ? 'falta 1' : 'faltan ' + falta}).` : faltaDor();
+        $('#lvpz').disabled = !!msg; $('#lvpzn').hidden = !msg; $('#lvpzn').textContent = msg; }
+      if ($('#lverr') && !$('#lverr').hidden && !faltaDor() && L.tit.length) $('#lverr').hidden = true;
+      document.querySelectorAll('[data-lvp]').forEach(b => b.onclick = () => dorsal(+b.dataset.lvp));
     };
     return { kicker, title, back,
       body: `<div class="split"><div class="stack">
@@ -1754,7 +1784,7 @@ function lvScreen(team, back) {
           <p class="muted" style="margin:0">Fútbol ${modOf(team)}: sin contar al portero. Sale luego en las estadísticas.</p>
           <button type="button" class="btn outline block" id="lvpz">${ic('team')} Colocar a los titulares en el campo</button>
           <p class="muted" id="lvpzn" style="margin:0" hidden></p></section>` : ''}
-        <p class="muted" style="margin:0">Toca a un jugador para cambiarlo de grupo. Se guarda solo.</p>
+        <p class="muted" style="margin:0">Toca a un jugador para ponerle el dorsal o cambiarlo de grupo. Se guarda solo.</p>
         <section class="card lv-team tit" aria-labelledby="h-lvT"><div class="card-h"><h2 id="h-lvT">Titulares</h2><span class="pill" id="lvTn"></span></div><div class="lv-tiles" id="lvT"></div></section>
         <section class="card lv-team" aria-labelledby="h-lvS"><div class="card-h"><h2 id="h-lvS">Suplentes</h2><span class="pill blue" id="lvSn"></span></div><div class="lv-tiles" id="lvS"></div></section></div>
         <form id="lvf" class="card stack st-save" novalidate aria-labelledby="h-lvs"><h2 id="h-lvs" style="margin:0;font-size:1.1rem">¿Cómo lo quieres rellenar?</h2>
@@ -1765,11 +1795,12 @@ function lvScreen(team, back) {
           <p id="lverr" class="err" role="alert" hidden></p></form></div>`,
       bind() {
         grids();
-        if ($('#lvpz')) $('#lvpz').onclick = () => L.tit.length === tmax && pizarra(team, L, t.players, save, e, p);
+        if ($('#lvpz')) $('#lvpz').onclick = () => L.tit.length === tmax && !sinDor().length && pizarra(team, L, lvPlayers(L, t.players), save, e, p);
         document.querySelectorAll('[name=lvfm]').forEach(r => r.onchange = () => { L.form = r.value; save();
           $('#lvfmp').innerHTML = formPitch(L.form); $('#lvfmn').textContent = L.form; $('#lvfmn').className = 'pill'; });
         $('#lvdif').onclick = async () => {
           if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular: toca a un jugador de los suplentes.'; $('#lverr').hidden = false; return; }
+          if (faltaDor()) { $('#lverr').textContent = faltaDor(); $('#lverr').hidden = false; return; }
           lvSnap(L); lvDiferido(L); L.hist = []; save();
           try { await lvToStats(team, f, L); } catch (_) {}
           render(); say('Listo. Ahora añade los goles, cambios y tarjetas con su minuto.');
@@ -1777,6 +1808,7 @@ function lvScreen(team, back) {
         $('#lvf').onsubmit = ev => {
           ev.preventDefault();
           if (!L.tit.length) { $('#lverr').textContent = 'Elige al menos a un titular: toca a un jugador de los suplentes.'; $('#lverr').hidden = false; return; }
+          if (faltaDor()) { $('#lverr').textContent = faltaDor(); $('#lverr').hidden = false; return; }
           if (f < TODAY) return;
           lvSnap(L); L.parte = 1; L.fase = 'juego'; L.ini = Date.now(); L.campo = [...L.tit].sort(byDor); L.campo.forEach(id => { L.desde[id] = 0; });
           L.ev.push({ t: 'ini', parte: 1, min: '0', s: 0, p: 1 }); save(); render(); say('¡Empieza el partido!');
@@ -1801,11 +1833,11 @@ function lvScreen(team, back) {
       bind() {
         $('#lvfix').onclick = () => { S.stDate = f; S.stDraft = null; go('team', S.role === 'coach' ? 'st' : 'st:' + team); };
         $('#lvdel').onclick = () => lvDelete(team, f);
-        document.querySelectorAll('[data-lvadd]').forEach(b => b.onclick = () => lvAddGoal(team, f, L, b.dataset.lvadd, t.players, async msg => {
+        document.querySelectorAll('[data-lvadd]').forEach(b => b.onclick = () => lvAddGoal(team, f, L, b.dataset.lvadd, lvPlayers(L, t.players), async msg => {
           save(); try { await lvToStats(team, f, L); } catch (_) {} render(); say(msg);
         }));
         /* Corregir un apunte del acta: se vuelven a calcular los minutos y goles de las estadísticas */
-        document.querySelectorAll('[data-evi]').forEach(b => b.onclick = () => lvEdit(team, f, L, +b.dataset.evi, t.players, async msg => {
+        document.querySelectorAll('[data-evi]').forEach(b => b.onclick = () => lvEdit(team, f, L, +b.dataset.evi, lvPlayers(L, t.players), async msg => {
           save(); try { await lvToStats(team, f, L); } catch (_) {} render(); say(msg);
         }));
       } };
@@ -1843,7 +1875,7 @@ function lvScreen(team, back) {
         if (L.pz) L.pz.ids = L.pz.ids.map(x => x === out ? inn : x);   /* en la pizarra, el que entra ocupa el sitio del que sale */
         L.ev.push({ t: 'cambio', out, in: inn, min: mn, ...at }); save();
       };
-      if ($('#lvpz2')) $('#lvpz2').onclick = () => pizarra(team, L, t.players, save, e, p, subNow);
+      if ($('#lvpz2')) $('#lvpz2').onclick = () => pizarra(team, L, lvPlayers(L, t.players), save, e, p, subNow);
       if (playing) {
         S.lvTick = setInterval(() => {
           if (!$('#lv-clock')) return clearInterval(S.lvTick);
@@ -1854,7 +1886,7 @@ function lvScreen(team, back) {
       }
       const done = msg => { save(); render(); if (msg) say(msg); };
       $('#lvdel').onclick = () => lvDelete(team, f);
-      document.querySelectorAll('[data-evi]').forEach(b => b.onclick = () => lvEdit(team, f, L, +b.dataset.evi, t.players, done));
+      document.querySelectorAll('[data-evi]').forEach(b => b.onclick = () => lvEdit(team, f, L, +b.dataset.evi, lvPlayers(L, t.players), done));
       if ($('#lvgo')) $('#lvgo').onclick = () => {
         lvSnap(L); L.parte++; L.fase = 'juego'; L.ini = Date.now(); L.campo.forEach(id => { L.desde[id] = L.acc; });
         L.ev.push({ t: 'ini', parte: L.parte, min: String((L.parte - 1) * L.min), s: L.acc, p: L.parte }); done(`Empieza la ${parteLbl(L.parte)}`);
@@ -1891,11 +1923,11 @@ function lvScreen(team, back) {
         const como = async (x, title) => { const c = await askComo(title, `Minuto ${mn}`); if (c) { x.como = c; save(); render(); } };
         if (a === 'golr') { lvSnap(L); L.ellos++; const x = { t: 'golr', min: mn, ...at }; L.ev.push(x); done(`Gol del ${them} en el minuto ${mn}`); return como(x, '¿Cómo nos han marcado?'); }
         if (a === 'gol') {
-          const id = await pickPlayer('¿Quién ha marcado?', `Minuto ${mn}`, L.campo.slice().sort(byDor), t.players); if (id == null) return;
+          const id = await pickPlayer('¿Quién ha marcado?', `Minuto ${mn}`, L.campo.slice().sort(byDor), lvPlayers(L, t.players)); if (id == null) return;
           lvSnap(L); L.nos++; const x = { t: 'gol', id, min: mn, ...at }; L.ev.push(x); done(`Gol de ${pl(id).n} en el minuto ${mn}`); return como(x, `¿Cómo ha sido el gol de ${pl(id).n}?`);
         }
         if (a === 'ama' || a === 'roja') {
-          const id = await pickPlayer(a === 'ama' ? '¿A quién le sacan amarilla?' : '¿A quién le sacan roja?', `Minuto ${mn}`, [...L.campo.slice().sort(byDor), ...banca()], t.players); if (id == null) return;
+          const id = await pickPlayer(a === 'ama' ? '¿A quién le sacan amarilla?' : '¿A quién le sacan roja?', `Minuto ${mn}`, [...L.campo.slice().sort(byDor), ...banca()], lvPlayers(L, t.players)); if (id == null) return;
           lvSnap(L);
           const doble = a === 'ama' && lvYellow(L, id) >= 1;
           L.ev.push({ t: 'ama' === a ? 'ama' : 'roja', id, min: mn, ...at });
@@ -1907,8 +1939,8 @@ function lvScreen(team, back) {
           return done(`${a === 'ama' && !doble ? 'Amarilla' : 'Roja'} a ${pl(id).n} en el minuto ${mn}`);
         }
         if (a === 'cambio') {
-          const out = await pickPlayer('¿Quién sale?', `Cambio · minuto ${mn}`, L.campo.slice().sort(byDor), t.players); if (out == null) return;
-          const inn = await pickPlayer('¿Quién entra?', `Sale ${pl(out).n}`, banca(), t.players); if (inn == null) return;
+          const out = await pickPlayer('¿Quién sale?', `Cambio · minuto ${mn}`, L.campo.slice().sort(byDor), lvPlayers(L, t.players)); if (out == null) return;
+          const inn = await pickPlayer('¿Quién entra?', `Sale ${pl(out).n}`, banca(), lvPlayers(L, t.players)); if (inn == null) return;
           subNow(out, inn); return done(`Entra ${pl(inn).n} y sale ${pl(out).n}`);
         }
       });
@@ -1925,7 +1957,7 @@ function fpScreen(team, back) {
   const e = EQ[team], t = S.teams[team], p = e && e.partidos.find(x => x.fecha === S.fpDate && !x.descansa);
   if (!p) return { kicker: 'Ficha del partido', title: esc(team), back, body: emptyPage('cal', 'No encontramos ese partido', 'Vuelve atrás y elige otro partido.') };
   const f = p.fecha, a = actaOf(team, f), A = a && a.fase === 'fin' ? a : null, cv = S.conv[convKey(team, p)];
-  const pl = id => t.players.find(x => x.id === id) || { id, n: 'Jugador', dorsal: null };
+  const pl = id => { const x = t.players.find(y => y.id === id); return x ? (A ? { ...x, dorsal: lvDor(A, x) } : x) : { id, n: 'Jugador', dorsal: null }; };
   const byDor = (x, y) => (pl(x).dorsal || 99) - (pl(y).dorsal || 99) || pl(x).n.localeCompare(pl(y).n, 'es');
   const goles = p.goles || (A ? (p.casa ? [A.nos, A.ellos] : [A.ellos, A.nos]) : null);
   const res = goles ? outcome({ ...p, goles }) : null, rv = nice(p.rival);
